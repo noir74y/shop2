@@ -20,5 +20,5 @@ public class OrdersItemsEntity {
 
     @Positive
     @Column(nullable = false)
-    private Integer counter;
+    private Integer quantity;
 }
