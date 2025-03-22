@@ -1,6 +1,9 @@
 package ru.noir74.shop.models.entity;
 
 import jakarta.persistence.*;
+import ru.noir74.shop.models.domain.Order;
+
+import java.util.Set;
 
 @Entity
 @Table(name = "items", schema = "store")
@@ -18,7 +21,10 @@ public class ItemEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Lob
-    @Column(columnDefinition = "BYTEA")
-    private byte[] image;
+    @OneToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @JoinColumn(name = "image_id", referencedColumnName = "id")
+    private ImageEntity imageEntity;
+
+    @OneToMany(mappedBy = "itemEntity", cascade = CascadeType.PERSIST)
+    private Set<OrdersItemsEntity> ordersItemsEntities;
 }

@@ -8,5 +8,5 @@ import java.util.List;
 public class OrderDto {
     private Long id;
     private List<ItemDtoResp> items;
-    private Integer totalPrice;
+    private Integer totalCost;
 }
