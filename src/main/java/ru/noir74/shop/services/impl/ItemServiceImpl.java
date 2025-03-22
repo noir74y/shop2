@@ -4,5 +4,5 @@ import org.springframework.stereotype.Service;
 import ru.noir74.shop.services.ItemService;
 
 @Service
-public class ItemImpl implements ItemService {
+public class ItemServiceImpl implements ItemService {
 }
