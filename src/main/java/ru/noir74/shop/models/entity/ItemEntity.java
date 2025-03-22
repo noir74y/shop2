@@ -1,7 +1,6 @@
 package ru.noir74.shop.models.entity;
 
 import jakarta.persistence.*;
-import ru.noir74.shop.models.domain.Order;
 
 import java.util.Set;
 

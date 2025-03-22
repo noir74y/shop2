@@ -1,12 +1,21 @@
 package ru.noir74.shop.models.dto;
 
-import org.springframework.core.SpringVersion;
-import ru.noir74.shop.models.domain.Item;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrderDto {
     private Long id;
-    private List<ItemDtoResp> items;
+    private List<OrderItem> items;
     private Integer totalCost;
+}
+
+record OrderItem(ItemDtoResp itemDtoResp, Integer quantity) {
 }

@@ -39,8 +39,8 @@ public class OrderMapper {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    public List<OrderDto> bulkModel2DtoResp(List<Order> models) {
-        return models.stream()
+    public List<OrderDto> bulkDomain2Dto(List<Order> domains) {
+        return domains.stream()
                 .map(this::domain2dto)
                 .collect(Collectors.toCollection(ArrayList::new));
     }

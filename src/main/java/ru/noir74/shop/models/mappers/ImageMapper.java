@@ -13,13 +13,13 @@ import java.util.Optional;
 public class ImageMapper {
     private final ModelMapper modelMapper;
 
-    public ImageEntity model2entity(ItemImage model) {
-        return Optional.ofNullable(model)
+    public ImageEntity domain2entity(ItemImage domain) {
+        return Optional.ofNullable(domain)
                 .map(obj -> modelMapper.map(obj, ImageEntity.class))
                 .orElse(null);
     }
 
-    public ItemImage entity2model(ImageEntity entity) {
+    public ItemImage entity2domain(ImageEntity entity) {
         return Optional.ofNullable(entity)
                 .map(obj -> modelMapper.map(obj, ItemImage.class))
                 .orElse(null);

@@ -13,6 +13,9 @@ public class ImageEntity {
     @Column(columnDefinition = "BYTEA")
     private byte[] image;
 
+    @Column(nullable = false)
+    private String imageName;
+
     @OneToOne(mappedBy = "imageEntity")
     private ItemEntity itemEntity;
 }

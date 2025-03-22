@@ -3,7 +3,10 @@ package ru.noir74.shop.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import ru.noir74.shop.services.CartService;
 
 @Controller
@@ -14,13 +17,14 @@ public class CartController {
 
     @GetMapping
     public String get(Model model) {
+        var cart = cartService.get();
         return "cart";
     }
 
     @PostMapping(value = "item/{itemId}/quantity/{quantity}")
     public String setQuantity(Model model,
-                                 @PathVariable("itemId") Long itemId,
-                                 @PathVariable("quantity") Integer quantity) {
+                              @PathVariable("itemId") Long itemId,
+                              @PathVariable("quantity") Integer quantity) {
         return "cart";
     }
 

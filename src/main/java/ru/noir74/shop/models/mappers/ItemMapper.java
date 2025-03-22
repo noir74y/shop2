@@ -40,8 +40,8 @@ public class ItemMapper {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    public List<ItemDtoResp> bulkModel2DtoResp(List<Item> models) {
-        return models.stream()
+    public List<ItemDtoResp> bulkDomain2DtoResp(List<Item> domains) {
+        return domains.stream()
                 .map(this::domain2dtoResp)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
