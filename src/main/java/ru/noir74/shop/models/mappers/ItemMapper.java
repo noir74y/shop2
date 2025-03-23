@@ -9,6 +9,7 @@ import ru.noir74.shop.models.dto.ItemDtoResp;
 import ru.noir74.shop.models.entity.ItemEntity;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,13 +38,13 @@ public class ItemMapper {
     public List<Item> bulkEntity2domain(List<ItemEntity> entities) {
         return entities.stream()
                 .map(this::entity2domain)
-                .collect(Collectors.toCollection(ArrayList::new));
+                .collect(Collectors.toCollection(LinkedList::new));
     }
 
     public List<ItemDtoResp> bulkDomain2DtoResp(List<Item> domains) {
         return domains.stream()
                 .map(this::domain2dtoResp)
-                .collect(Collectors.toCollection(ArrayList::new));
+                .collect(Collectors.toCollection(LinkedList::new));
     }
 
 }
