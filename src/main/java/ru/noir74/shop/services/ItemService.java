@@ -1,12 +1,12 @@
 package ru.noir74.shop.services;
 
-import org.springframework.stereotype.Service;
+import ru.noir74.shop.misc.ItemSorting;
 import ru.noir74.shop.models.domain.Item;
 
 import java.util.List;
 
 public interface ItemService {
-    List<Item> getPage(String page, String size, String sort);
+    List<Item> getPage(Integer page, Integer size, ItemSorting sort);
 
     Item get(Long id);
 

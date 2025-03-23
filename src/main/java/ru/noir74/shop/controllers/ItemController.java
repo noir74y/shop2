@@ -4,25 +4,33 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ru.noir74.shop.configurations.AppConfiguration;
+import ru.noir74.shop.misc.ItemSorting;
 import ru.noir74.shop.models.dto.ItemDtoReq;
 import ru.noir74.shop.models.mappers.ItemMapper;
 import ru.noir74.shop.services.CartService;
 import ru.noir74.shop.services.ItemService;
 
+import java.util.Objects;
+
 @Controller
 @RequestMapping("/item")
 @RequiredArgsConstructor
 public class ItemController {
+    private final AppConfiguration appConfiguration;
     private final ItemService itemService;
     private final CartService cartService;
     private final ItemMapper itemMapper;
 
     @GetMapping
     public String getPage(Model model,
-                          @RequestParam(defaultValue = "1", required = false, name = "page") String page,
-                          @RequestParam(defaultValue = "10", required = false, name = "size") String size,
-                          @RequestParam(defaultValue = "TITLE", required = false, name = "sort") String sort) {
-        var items = itemMapper.bulkDomain2DtoResp(itemService.getPage(page, size, sort));
+                          @RequestParam(required = false, name = "page") String page,
+                          @RequestParam(required = false, name = "size") String size,
+                          @RequestParam(required = false, name = "sort") String sort) {
+        var items = itemMapper.bulkDomain2DtoResp(itemService.getPage(
+                Objects.nonNull(page) ? Integer.parseInt(page) : appConfiguration.getDefaultPageNumber(),
+                Objects.nonNull(size) ? Integer.parseInt(size) : appConfiguration.getDefaultPageSize(),
+                Objects.nonNull(sort) ? ItemSorting.valueOf(sort) : appConfiguration.getDefaultPageSorting()));
         return "items";
     }
 

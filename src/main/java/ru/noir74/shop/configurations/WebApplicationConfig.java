@@ -7,7 +7,7 @@ import org.springframework.web.multipart.support.StandardServletMultipartResolve
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import ru.noir74.shop.controllers.LoggingInterceptor;
+import ru.noir74.shop.misc.LoggingInterceptor;
 
 @Configuration
 @EnableWebMvc

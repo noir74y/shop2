@@ -1,4 +1,4 @@
-package ru.noir74.shop.repositories;
+package ru.noir74.shop.misc;
 
 public enum ItemSorting {
     TITLE,

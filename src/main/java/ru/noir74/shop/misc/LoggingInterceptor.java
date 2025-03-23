@@ -1,4 +1,4 @@
-package ru.noir74.shop.controllers;
+package ru.noir74.shop.misc;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,12 +14,12 @@ public class LoggingInterceptor implements HandlerInterceptor {
     public boolean preHandle(@NonNull HttpServletRequest request,
                              @Nullable HttpServletResponse response,
                              @Nullable Object handler) throws Exception {
-        log.info("{} {}", request.getMethod(),request.getServletPath());
+        log.info("{} {}", request.getMethod(), request.getServletPath());
 
         if (handler instanceof HandlerMethod handlerMethod) {
             String controllerName = handlerMethod.getBean().getClass().getSimpleName();
             String methodName = handlerMethod.getMethod().getName();
-            log.info("{}.{}()", controllerName,methodName);
+            log.info("{}.{}()", controllerName, methodName);
         }
         return true;
     }

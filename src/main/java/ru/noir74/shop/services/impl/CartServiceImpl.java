@@ -1,7 +1,6 @@
 package ru.noir74.shop.services.impl;
 
 import org.springframework.stereotype.Service;
-import ru.noir74.shop.models.domain.Item;
 import ru.noir74.shop.models.dto.OrderDto;
 import ru.noir74.shop.services.CartService;
 

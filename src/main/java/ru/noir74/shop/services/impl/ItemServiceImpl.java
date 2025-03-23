@@ -1,6 +1,7 @@
 package ru.noir74.shop.services.impl;
 
 import org.springframework.stereotype.Service;
+import ru.noir74.shop.misc.ItemSorting;
 import ru.noir74.shop.models.domain.Item;
 import ru.noir74.shop.services.ItemService;
 
@@ -9,7 +10,7 @@ import java.util.List;
 @Service
 public class ItemServiceImpl implements ItemService {
     @Override
-    public List<Item> getPage(String page, String size, String sort) {
+    public List<Item> getPage(Integer page, Integer size, ItemSorting sort) {
         return null;
     }
 
