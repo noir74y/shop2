@@ -5,7 +5,6 @@ import ru.noir74.shop.models.dto.OrderDto;
 
 import java.util.List;
 
-@Service
 public interface CartService {
     List<OrderDto> get();
 

@@ -5,7 +5,6 @@ import ru.noir74.shop.models.domain.Order;
 
 import java.util.List;
 
-@Service
 public interface OrderService {
     List<Order> getALl();
 
