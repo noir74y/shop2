@@ -7,7 +7,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ComponentScan("ru.noir74.blog.mappers")
 public class ModelMapperConfig {
     @Bean
     public ModelMapper modelMapper() {

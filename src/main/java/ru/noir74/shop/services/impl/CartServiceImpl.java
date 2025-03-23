@@ -15,7 +15,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void addItem(Long itemId) {
+    public void addToCart(Long itemId) {
     }
 
     @Override

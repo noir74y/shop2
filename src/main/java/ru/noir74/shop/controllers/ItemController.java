@@ -52,7 +52,7 @@ public class ItemController {
 
     @PostMapping(value = "{id}/addToCart")
     public String addToCart(@PathVariable("id") Long id) {
-        cartService.addItem(id);
+        cartService.addToCart(id);
         return "redirect:/cart";
     }
 
