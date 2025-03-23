@@ -25,7 +25,4 @@ public class ItemEntity {
 
     @Column(columnDefinition = "TEXT")
     private String description;
-
-    @OneToMany(mappedBy = "itemEntity", cascade = CascadeType.PERSIST)
-    private Set<OrdersItemsEntity> ordersItemsEntities;
 }
