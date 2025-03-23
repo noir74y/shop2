@@ -16,6 +16,7 @@ public class ItemImage {
     private Long id;
     private byte[] image;
     private String imageName;
+    private Long itemId;
 
     public boolean isImageReadyToBeSaved() {
         return Objects.nonNull(image) &&

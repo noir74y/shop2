@@ -1,9 +1,15 @@
 package ru.noir74.shop.models.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.Set;
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
 @Entity
 @Table(name = "items", schema = "store")
 public class ItemEntity {
@@ -19,10 +25,6 @@ public class ItemEntity {
 
     @Column(columnDefinition = "TEXT")
     private String description;
-
-    @OneToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-    @JoinColumn(name = "image_id", referencedColumnName = "id")
-    private ImageEntity imageEntity;
 
     @OneToMany(mappedBy = "itemEntity", cascade = CascadeType.PERSIST)
     private Set<OrdersItemsEntity> ordersItemsEntities;

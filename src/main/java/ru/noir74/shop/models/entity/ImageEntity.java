@@ -1,7 +1,13 @@
 package ru.noir74.shop.models.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
 @Entity
 @Table(name = "images", schema = "store")
 public class ImageEntity {
@@ -16,6 +22,8 @@ public class ImageEntity {
     @Column(nullable = false)
     private String imageName;
 
-    @OneToOne(mappedBy = "imageEntity")
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "item_id")
     private ItemEntity itemEntity;
 }
