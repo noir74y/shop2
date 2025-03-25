@@ -1,11 +1,11 @@
 package ru.noir74.shop.services;
 
-import ru.noir74.shop.models.dto.OrderDto;
+import ru.noir74.shop.models.domain.OrderItem;
 
 import java.util.List;
 
 public interface CartService {
-    List<OrderDto> get();
+    List<OrderItem> get();
 
     void addToCart(Long itemId);
 

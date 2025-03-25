@@ -13,7 +13,6 @@ import ru.noir74.shop.repositories.OrderRepository;
 import ru.noir74.shop.services.OrderService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

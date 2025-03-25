@@ -8,7 +8,6 @@ import ru.noir74.shop.models.dto.ItemDtoReq;
 import ru.noir74.shop.models.dto.ItemDtoResp;
 import ru.noir74.shop.models.entity.ItemEntity;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;

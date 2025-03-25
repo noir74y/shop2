@@ -12,7 +12,7 @@ import lombok.*;
 @Table(name = "images", schema = "store")
 public class ImageEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Lob

@@ -1,14 +1,12 @@
 package ru.noir74.shop.services.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.hibernate.query.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.noir74.shop.misc.ItemSorting;
 import ru.noir74.shop.models.domain.Item;
-import ru.noir74.shop.models.entity.ItemEntity;
 import ru.noir74.shop.models.mappers.ItemMapper;
 import ru.noir74.shop.repositories.ItemRepository;
 import ru.noir74.shop.services.ItemService;

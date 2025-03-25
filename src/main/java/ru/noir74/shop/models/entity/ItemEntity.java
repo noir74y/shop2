@@ -3,8 +3,6 @@ package ru.noir74.shop.models.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Set;
-
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,7 +12,7 @@ import java.util.Set;
 @Table(name = "items", schema = "store")
 public class ItemEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(length = 255, nullable = false)
