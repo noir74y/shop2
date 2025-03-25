@@ -2,16 +2,16 @@ package ru.noir74.shop.models.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Setter
+@Getter
 @Entity
 @Table(name = "orders_items", schema = "store")
-public class OrdersItemsEntity {
+public class OrderItemEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

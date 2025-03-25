@@ -11,7 +11,8 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Order {
-    private Long id;
-    private List<OrderItem> orderItems;
+public class OrderItem {
+    private Long orderId;
+    private Long itemId;
+    private Integer quantity;
 }

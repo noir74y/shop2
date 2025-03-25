@@ -2,6 +2,7 @@ package ru.noir74.shop.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.noir74.shop.models.domain.OrderItem;
 import ru.noir74.shop.models.dto.OrderDto;
 import ru.noir74.shop.services.CartService;
 import ru.noir74.shop.services.OrderService;
@@ -12,6 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
     private final OrderService orderService;
+    private final List<OrderItem> orderItemList;
 
     @Override
     public List<OrderDto> get() {
@@ -32,5 +34,6 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public void makeOrder() {
+        orderService.create(orderItemList);
     }
 }

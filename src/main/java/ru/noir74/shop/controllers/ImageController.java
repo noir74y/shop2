@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.noir74.shop.models.domain.ItemImage;
+import ru.noir74.shop.models.domain.Image;
 import ru.noir74.shop.services.ImageService;
 
 import java.io.IOException;
@@ -19,10 +19,10 @@ public class ImageController {
 
     @GetMapping("{id}")
     public void getImage(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-        Optional.ofNullable(imageService.findImageById(id)).ifPresent(itemImage -> {
-            response.setContentType("image/" + itemImage.getImageType());
+        Optional.ofNullable(imageService.findImageById(id)).ifPresent(image -> {
+            response.setContentType("image/" + image.getImageType());
             try {
-                response.getOutputStream().write(itemImage.getImage());
+                response.getOutputStream().write(image.getImage());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -31,7 +31,7 @@ public class ImageController {
 
     @PostMapping("{id}")
     public String setImage(@PathVariable("id") Long id, @RequestParam("file") MultipartFile file) throws IOException {
-        imageService.setImageById(ItemImage.builder().id(id).image(file.getBytes()).imageName(file.getOriginalFilename()).build());
+        imageService.setImageById(Image.builder().id(id).image(file.getBytes()).imageName(file.getOriginalFilename()).build());
         return "post";
     }
 }

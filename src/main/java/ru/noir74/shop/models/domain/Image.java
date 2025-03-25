@@ -12,7 +12,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemImage {
+public class Image {
     private Long id;
     private byte[] image;
     private String imageName;

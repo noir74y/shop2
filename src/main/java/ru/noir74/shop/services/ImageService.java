@@ -1,9 +1,9 @@
 package ru.noir74.shop.services;
 
-import ru.noir74.shop.models.domain.ItemImage;
+import ru.noir74.shop.models.domain.Image;
 
 public interface ImageService {
-    ItemImage findImageById(Long itemId);
+    Image findImageById(Long itemId);
 
-    void setImageById(ItemImage ItemImage);
+    void setImageById(Image Image);
 }

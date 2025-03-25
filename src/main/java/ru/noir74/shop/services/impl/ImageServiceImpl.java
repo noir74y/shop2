@@ -3,7 +3,7 @@ package ru.noir74.shop.services.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.noir74.shop.models.domain.ItemImage;
+import ru.noir74.shop.models.domain.Image;
 import ru.noir74.shop.models.mappers.ImageMapper;
 import ru.noir74.shop.repositories.ImageRepository;
 import ru.noir74.shop.services.ImageService;
@@ -16,13 +16,13 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     @Transactional(readOnly = true)
-    public ItemImage findImageById(Long itemId) {
+    public Image findImageById(Long itemId) {
         return imageMapper.entity2domain(imageRepository.findById(itemId).orElse(null));
     }
 
     @Override
     @Transactional
-    public void setImageById(ItemImage itemImage) {
-        imageRepository.save(imageMapper.domain2entity(itemImage));
+    public void setImageById(Image image) {
+        imageRepository.save(imageMapper.domain2entity(image));
     }
 }
