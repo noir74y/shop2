@@ -1,11 +1,16 @@
 package ru.noir74.shop.models.mappers;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeMap;
 import org.springframework.stereotype.Component;
 import ru.noir74.shop.models.domain.Order;
+import ru.noir74.shop.models.domain.OrderItem;
 import ru.noir74.shop.models.dto.OrderDto;
 import ru.noir74.shop.models.entity.OrderEntity;
+import ru.noir74.shop.models.entity.OrderItemEntity;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -16,6 +21,26 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OrderMapper {
     private final ModelMapper modelMapper;
+    private final OrderItemMapper orderItemMapper;
+
+    @PostConstruct
+    private void setup() {
+        Converter<List<OrderItem>, List<OrderItemEntity>> orderItemList2orderItemListEntityConverter =
+                list -> orderItemMapper.bulkDomain2entity(list.getSource());
+        Converter<List<OrderItemEntity>, List<OrderItem>> orderItemListEntity2orderItemListConverter =
+                list -> orderItemMapper.bulkEntity2domain(list.getSource());
+
+        TypeMap<Order, OrderEntity> order2orderEntityMapper = modelMapper.createTypeMap(Order.class, OrderEntity.class);
+        TypeMap<OrderEntity, Order> orderEntity2orderMapper = modelMapper.createTypeMap(OrderEntity.class, Order.class);
+
+        order2orderEntityMapper.addMappings(modelMapper ->
+                modelMapper.using(orderItemList2orderItemListEntityConverter)
+                        .map(Order::getOrderItems, OrderEntity::setOrderItemEntities));
+
+        orderEntity2orderMapper.addMappings(modelMapper ->
+                modelMapper.using(orderItemListEntity2orderItemListConverter)
+                        .map(OrderEntity::getOrderItemEntities, Order::setOrderItems));
+    }
 
     public Order dto2domain(OrderDto dto) {
         return Optional.ofNullable(dto).map(obj -> modelMapper.map(obj, Order.class)).orElse(null);
