@@ -1,36 +1,36 @@
 package ru.noir74.shop.repositories;
 
 import org.springframework.stereotype.Repository;
-import ru.noir74.shop.models.entity.OrderItemEntity;
+import ru.noir74.shop.models.entity.ItemEntity;
 
 import java.util.LinkedList;
 import java.util.List;
 
 @Repository
 public class CartRepository {
-    private final List<OrderItemEntity> cartStorage;
+    private final List<ItemEntity> cartStorage;
 
     public CartRepository() {
-        this.cartStorage = new LinkedList<OrderItemEntity>();
+        this.cartStorage = new LinkedList<ItemEntity>();
     }
 
-    public List<OrderItemEntity> findAll() {
+    public List<ItemEntity> findAll() {
         return cartStorage;
     }
 
-    public void insert(OrderItemEntity orderItemEntity) {
-        cartStorage.add(orderItemEntity);
+    public void insert(ItemEntity itemEntity) {
+        cartStorage.add(itemEntity);
     }
 
-    public void delete(OrderItemEntity orderItemEntity) {
-        cartStorage.remove(orderItemEntity);
+    public void delete(ItemEntity itemEntity) {
+        cartStorage.remove(itemEntity);
     }
 
-    public void replace(OrderItemEntity orderItemEntity) {
+    public void replace(ItemEntity itemEntity) {
         var toBeReplaced = cartStorage.stream()
-                .filter(obj -> obj.getItemEntity().getId().equals(orderItemEntity.getItemEntity().getId()))
+                .filter(obj -> obj.getProductEntity().getId().equals(itemEntity.getProductEntity().getId()))
                 .findFirst().orElse(null);
-        cartStorage.set(cartStorage.indexOf(toBeReplaced), orderItemEntity);
+        cartStorage.set(cartStorage.indexOf(toBeReplaced), itemEntity);
     }
 
 }

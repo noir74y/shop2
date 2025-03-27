@@ -9,21 +9,18 @@ import lombok.*;
 @Setter
 @Getter
 @Entity
-@Table(name = "images", schema = "store")
-public class ImageEntity {
+@Table(name = "products", schema = "store")
+public class ProductEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Lob
-    @Column(columnDefinition = "BYTEA")
-    private byte[] image;
+    @Column(length = 255, nullable = false)
+    private String title;
 
     @Column(nullable = false)
-    private String imageName;
+    private Integer price;
 
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "product_id")
-    private ProductEntity productEntity;
+    @Column(columnDefinition = "TEXT")
+    private String description;
 }

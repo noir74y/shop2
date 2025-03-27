@@ -5,7 +5,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import ru.noir74.shop.models.domain.Image;
 import ru.noir74.shop.models.entity.ImageEntity;
-import ru.noir74.shop.repositories.ItemRepository;
+import ru.noir74.shop.repositories.ProductRepository;
 
 import java.util.Optional;
 
@@ -13,14 +13,14 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ImageMapper {
     private final ModelMapper modelMapper;
-    private final ItemRepository itemRepository;
+    private final ProductRepository productRepository;
 
     public ImageEntity domain2entity(Image domain) {
         var entity = Optional.ofNullable(domain)
                 .map(obj -> modelMapper.map(obj, ImageEntity.class))
                 .orElse(null);
         Optional.ofNullable(entity).ifPresent(obj ->
-                obj.setItemEntity(itemRepository.findById(domain.getItemId()).orElse(null))
+                obj.setProductEntity(productRepository.findById(domain.getItemId()).orElse(null))
         );
         return entity;
     }
@@ -29,7 +29,7 @@ public class ImageMapper {
         var domain = Optional.ofNullable(entity)
                 .map(obj -> modelMapper.map(obj, Image.class))
                 .orElse(null);
-        Optional.ofNullable(domain).ifPresent(obj -> obj.setItemId(entity.getItemEntity().getId()));
+        Optional.ofNullable(domain).ifPresent(obj -> obj.setItemId(entity.getProductEntity().getId()));
         return domain;
     }
 

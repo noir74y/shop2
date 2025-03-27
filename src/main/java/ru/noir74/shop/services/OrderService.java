@@ -1,7 +1,7 @@
 package ru.noir74.shop.services;
 
+import ru.noir74.shop.models.domain.Item;
 import ru.noir74.shop.models.domain.Order;
-import ru.noir74.shop.models.domain.OrderItem;
 
 import java.util.List;
 
@@ -10,5 +10,5 @@ public interface OrderService {
 
     Order get(Long id);
 
-    Long create(List<OrderItem> orderItemList);
+    Long create(List<Item> itemList);
 }

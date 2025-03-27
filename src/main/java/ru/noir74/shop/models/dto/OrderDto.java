@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.noir74.shop.models.domain.OrderItem;
+import ru.noir74.shop.models.domain.Item;
 
 import java.util.List;
 
@@ -14,9 +14,9 @@ import java.util.List;
 @AllArgsConstructor
 public class OrderDto {
     private Long id;
-    private List<OrderItem> orderItems;
+    private List<Item> items;
 
     public Integer getOrderCost() {
-        return orderItems.stream().mapToInt(obj -> obj.getItem().getPrice() * obj.getQuantity()).sum();
+        return items.stream().mapToInt(obj -> obj.getProduct().getPrice() * obj.getQuantity()).sum();
     }
 }

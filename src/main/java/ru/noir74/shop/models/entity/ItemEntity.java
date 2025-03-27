@@ -1,6 +1,7 @@
 package ru.noir74.shop.models.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 @Builder
@@ -12,15 +13,18 @@ import lombok.*;
 @Table(name = "items", schema = "store")
 public class ItemEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(length = 255, nullable = false)
-    private String title;
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    private OrderEntity orderEntity;
 
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private ProductEntity productEntity;
+
+    @Positive
     @Column(nullable = false)
-    private Integer price;
-
-    @Column(columnDefinition = "TEXT")
-    private String description;
+    private Integer quantity;
 }

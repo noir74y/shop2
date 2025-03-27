@@ -18,5 +18,5 @@ public class OrderEntity {
     private Long id;
 
     @OneToMany(mappedBy = "orderEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<OrderItemEntity> orderItemEntities;
+    private List<ItemEntity> itemEntities;
 }

@@ -2,11 +2,11 @@ package ru.noir74.shop.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.noir74.shop.models.domain.OrderItem;
-import ru.noir74.shop.models.entity.OrderItemEntity;
-import ru.noir74.shop.models.mappers.OrderItemMapper;
+import ru.noir74.shop.models.domain.Item;
+import ru.noir74.shop.models.entity.ItemEntity;
+import ru.noir74.shop.models.mappers.ItemMapper;
 import ru.noir74.shop.repositories.CartRepository;
-import ru.noir74.shop.repositories.ItemRepository;
+import ru.noir74.shop.repositories.ProductRepository;
 import ru.noir74.shop.services.CartService;
 import ru.noir74.shop.services.OrderService;
 
@@ -17,19 +17,19 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
-    public final ItemRepository itemRepository;
+    public final ProductRepository productRepository;
     private final OrderService orderService;
-    private final OrderItemMapper orderItemMapper;
+    private final ItemMapper itemMapper;
 
     @Override
-    public List<OrderItem> get() {
-        return orderItemMapper.bulkEntity2domain(cartRepository.findAll());
+    public List<Item> get() {
+        return itemMapper.bulkEntity2domain(cartRepository.findAll());
     }
 
     @Override
     public void addToCart(Long itemId) {
-        cartRepository.insert(OrderItemEntity.builder()
-                .itemEntity(itemRepository.findById(itemId).orElse(null))
+        cartRepository.insert(ItemEntity.builder()
+                .productEntity(productRepository.findById(itemId).orElse(null))
                 .quantity(1)
                 .build());
     }
@@ -39,7 +39,7 @@ public class CartServiceImpl implements CartService {
         cartRepository.delete(cartRepository
                 .findAll()
                 .stream()
-                .filter(obj -> obj.getItemEntity().getId().equals(itemId))
+                .filter(obj -> obj.getProductEntity().getId().equals(itemId))
                 .findFirst().orElse(null));
     }
 
@@ -48,7 +48,7 @@ public class CartServiceImpl implements CartService {
         var orderItemEntity = cartRepository
                 .findAll()
                 .stream()
-                .filter(obj -> obj.getItemEntity().getId().equals(itemId))
+                .filter(obj -> obj.getProductEntity().getId().equals(itemId))
                 .findFirst().orElse(null);
         Optional.ofNullable(orderItemEntity).ifPresent(obj -> {
             obj.setQuantity(quantity);
@@ -58,6 +58,6 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public void makeOrder() {
-        orderService.create(orderItemMapper.bulkEntity2domain(cartRepository.findAll()));
+        orderService.create(itemMapper.bulkEntity2domain(cartRepository.findAll()));
     }
 }
