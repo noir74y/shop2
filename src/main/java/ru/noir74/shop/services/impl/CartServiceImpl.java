@@ -11,7 +11,6 @@ import ru.noir74.shop.services.CartService;
 import ru.noir74.shop.services.OrderService;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,24 +35,24 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public void removeFromCart(Long itemId) {
-        cartRepository.delete(cartRepository
+        cartRepository
                 .findAll()
                 .stream()
                 .filter(obj -> obj.getProductEntity().getId().equals(itemId))
-                .findFirst().orElse(null));
+                .findFirst()
+                .ifPresent(cartRepository::delete);
     }
 
     @Override
     public void setQuantity(Long itemId, Integer quantity) {
-        var orderItemEntity = cartRepository
+        cartRepository
                 .findAll()
                 .stream()
                 .filter(obj -> obj.getProductEntity().getId().equals(itemId))
-                .findFirst().orElse(null);
-        Optional.ofNullable(orderItemEntity).ifPresent(obj -> {
-            obj.setQuantity(quantity);
-            cartRepository.replace(obj);
-        });
+                .findFirst().ifPresent(obj -> {
+                    obj.setQuantity(quantity);
+                    cartRepository.replace(obj);
+                });
     }
 
     @Override

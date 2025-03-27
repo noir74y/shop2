@@ -27,10 +27,8 @@ public class CartRepository {
     }
 
     public void replace(ItemEntity itemEntity) {
-        var toBeReplaced = cartStorage.stream()
+        cartStorage.stream()
                 .filter(obj -> obj.getProductEntity().getId().equals(itemEntity.getProductEntity().getId()))
-                .findFirst().orElse(null);
-        cartStorage.set(cartStorage.indexOf(toBeReplaced), itemEntity);
+                .findFirst().ifPresent(obj-> cartStorage.set(cartStorage.indexOf(obj), itemEntity));
     }
-
 }
