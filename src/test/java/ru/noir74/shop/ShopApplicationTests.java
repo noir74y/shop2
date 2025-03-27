@@ -183,14 +183,22 @@ class ShopApplicationTests {
         mockMvc.perform(MockMvcRequestBuilders.post("/cart/order"))
                 .andExpect(status().isOk());
 
+        mockMvc.perform(MockMvcRequestBuilders.get("/order"))
+                .andExpect(status().isOk());
+
         assertEquals(1, orderService.getAll().size());
     }
 
     @Test
     @DisplayName("14th step - list orders")
-    void listOrders() {
+    void listOrders() throws Exception {
         var orderId = orderService.getAll().getFirst().getId();
         var item = orderService.get(orderId).getItems().getFirst();
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/order/" + String.valueOf(orderId))
+                        .param("id", String.valueOf(orderId)))
+                .andExpect(status().isOk());
+
         assertEquals(product, item.getProduct());
         assertEquals(quantity, item.getQuantity());
     }
