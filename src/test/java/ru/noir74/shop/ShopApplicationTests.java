@@ -1,26 +1,26 @@
 package ru.noir74.shop;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.noir74.shop.models.domain.Item;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import ru.noir74.shop.misc.ProductSorting;
 import ru.noir74.shop.models.domain.Product;
-import ru.noir74.shop.models.entity.ItemEntity;
-import ru.noir74.shop.models.entity.OrderEntity;
-import ru.noir74.shop.models.mappers.ItemMapper;
-import ru.noir74.shop.repositories.ImageRepository;
-import ru.noir74.shop.repositories.ItemRepository;
-import ru.noir74.shop.repositories.OrderRepository;
-import ru.noir74.shop.repositories.ProductRepository;
+import ru.noir74.shop.repositories.*;
 import ru.noir74.shop.services.CartService;
 import ru.noir74.shop.services.ImageService;
 import ru.noir74.shop.services.OrderService;
 import ru.noir74.shop.services.ProductService;
 
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
+@AutoConfigureMockMvc
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.DisplayName.class)
 class ShopApplicationTests {
     @Autowired
     ProductRepository productRepository;
@@ -30,6 +30,8 @@ class ShopApplicationTests {
     ImageRepository imageRepository;
     @Autowired
     ItemRepository itemRepository;
+    @Autowired
+    CartRepository cartRepository;
 
     @Autowired
     ProductService productService;
@@ -41,10 +43,11 @@ class ShopApplicationTests {
     CartService cartService;
 
     @Autowired
-    ItemMapper itemMapper;
+    protected MockMvc mockMvc;
 
-    @BeforeEach
+    @BeforeAll
     void setUp() {
+        cartRepository.deleteAll();
         itemRepository.deleteAll();
         orderRepository.deleteAll();
         imageRepository.deleteAll();
@@ -52,11 +55,81 @@ class ShopApplicationTests {
     }
 
     @Test
-    void contextLoads() {
-        var product = productService.create(Product.builder().title("product1").price(1).description("desc").build());
-        var item1 = Item.builder().product(product).quantity(1).build();
-        var item2 = Item.builder().product(product).quantity(2).build();
-        orderService.create(List.of(item1,item2));
+    @DisplayName("01 - create product")
+    void createProduct() throws Exception {
+        var product = Product.builder().title("product").price(1).description("description").build();
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/product")
+                        .param("title", product.getTitle())
+                        .param("price", String.valueOf(product.getPrice()))
+                        .param("description",product.getDescription()))
+                .andExpect(status().is3xxRedirection());
+
+        var productId = productService.getPage(0,10, ProductSorting.TITLE).getFirst().getId();
+        product.setId(productId);
+        assertEquals(product, productService.get(productId));
     }
+
+    @Test
+    @DisplayName("02 - change product")
+    void changeProduct(){
+
+    }
+
+    @Test
+    @DisplayName("03 - set image for product")
+    void setImageForProduct(){
+
+    }
+
+    @Test
+    @DisplayName("04 - delete product")
+    void deleteProduct(){
+
+    }
+
+    @Test
+    @DisplayName("05 - add product again")
+    void addProductAgain(){
+
+    }
+
+    @Test
+    @DisplayName("06 - add product to cart")
+    void addProductToCart() {
+
+    }
+
+    @Test
+    @DisplayName("07 - remove product from cart")
+    void removeProductFromCart() {
+
+    }
+
+    @Test
+    @DisplayName("08 - add product to cart again")
+    void addProductToCartAgain() {
+
+    }
+
+    @Test
+    @DisplayName("09 - change quantity of product in cart")
+    void changeQuantityOfProductInCart() {
+
+    }
+
+    @Test
+    @DisplayName("10th - make order")
+    void makeOrder() {
+
+    }
+
+    @Test
+    @DisplayName("11th - list orders")
+    void listOrders() {
+
+    }
+
 }
+
 

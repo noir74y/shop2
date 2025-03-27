@@ -29,6 +29,10 @@ public class CartRepository {
     public void replace(ItemEntity itemEntity) {
         cartStorage.stream()
                 .filter(obj -> obj.getProductEntity().getId().equals(itemEntity.getProductEntity().getId()))
-                .findFirst().ifPresent(obj-> cartStorage.set(cartStorage.indexOf(obj), itemEntity));
+                .findFirst().ifPresent(obj -> cartStorage.set(cartStorage.indexOf(obj), itemEntity));
+    }
+
+    public void deleteAll() {
+        cartStorage.clear();
     }
 }

@@ -5,7 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.noir74.shop.misc.ItemSorting;
+import ru.noir74.shop.misc.ProductSorting;
 import ru.noir74.shop.models.domain.Product;
 import ru.noir74.shop.models.mappers.ProductMapper;
 import ru.noir74.shop.repositories.ProductRepository;
@@ -23,7 +23,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Product> getPage(Integer page, Integer size, ItemSorting sort) {
+    public List<Product> getPage(Integer page, Integer size, ProductSorting sort) {
         var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "title"));
         return productMapper.bulkEntity2domain(productRepository.findAll(pageable).stream().collect(Collectors.toCollection(LinkedList::new)));
     }

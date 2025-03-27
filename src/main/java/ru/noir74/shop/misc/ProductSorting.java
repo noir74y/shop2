@@ -1,6 +1,6 @@
 package ru.noir74.shop.misc;
 
-public enum ItemSorting {
+public enum ProductSorting {
     TITLE,
     PRICE;
 }

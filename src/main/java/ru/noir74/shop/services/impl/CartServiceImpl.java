@@ -58,5 +58,6 @@ public class CartServiceImpl implements CartService {
     @Override
     public void makeOrder() {
         orderService.create(itemMapper.bulkEntity2domain(cartRepository.findAll()));
+        cartRepository.deleteAll();
     }
 }

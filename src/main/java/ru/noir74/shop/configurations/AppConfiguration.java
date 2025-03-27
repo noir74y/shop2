@@ -3,7 +3,7 @@ package ru.noir74.shop.configurations;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import ru.noir74.shop.misc.ItemSorting;
+import ru.noir74.shop.misc.ProductSorting;
 
 @Configuration
 @Getter
@@ -16,5 +16,5 @@ public class AppConfiguration {
     private Integer DefaultPageSize;
 
     @Value("${product.default.page.sorting}")
-    private ItemSorting DefaultPageSorting;
+    private ProductSorting DefaultPageSorting;
 }
