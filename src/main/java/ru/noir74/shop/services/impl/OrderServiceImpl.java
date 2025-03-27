@@ -18,8 +18,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
-    private final ItemRepository itemRepository;
     private final OrderMapper orderMapper;
+    private final ItemRepository itemRepository;
     private final ItemMapper itemMapper;
 
     @Override
@@ -36,12 +36,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public Long create(List<Item> itemList) {
-        //var orderEntity = orderRepository.save(OrderEntity.builder().build());
-        //var orderItems = orderItemList.stream().map(obj -> obj.setOrderId(orderId)).collect(Collectors.toSet());
-        return orderRepository.save(
-                OrderEntity.builder()
-                        .itemEntities(itemMapper.bulkDomain2entity(itemList))
-                        .build()).getId();
+    public Order create(List<Item> items) {
+        return orderMapper.entity2domain(orderRepository.save(
+                OrderEntity
+                        .builder()
+                        .itemEntities(itemRepository.saveAll(itemMapper.bulkDomain2entity(items)))
+                        .build()));
     }
 }

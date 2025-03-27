@@ -10,7 +10,7 @@ public interface ProductService {
 
     Product get(Long id);
 
-    Long create(Product product);
+    Product create(Product product);
 
     void update(Product product);
 

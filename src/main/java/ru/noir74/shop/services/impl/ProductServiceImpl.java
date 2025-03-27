@@ -36,8 +36,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public Long create(Product product) {
-        return productMapper.entity2domain(productRepository.save(productMapper.domain2entity(product))).getId();
+    public Product create(Product product) {
+        return productMapper.entity2domain(productRepository.save(productMapper.domain2entity(product)));
     }
 
     @Override

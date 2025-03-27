@@ -16,9 +16,12 @@ public class ItemEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "order_id")
-    private OrderEntity orderEntity;
+//    @ManyToOne
+//    @JoinColumn(name = "order_id")
+//    private OrderEntity orderEntity;
+
+    @Column(name = "order_id")
+    private Long orderId;
 
     @ManyToOne
     @JoinColumn(name = "product_id")

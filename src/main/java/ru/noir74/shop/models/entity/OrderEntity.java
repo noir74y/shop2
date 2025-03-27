@@ -17,6 +17,7 @@ public class OrderEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = "orderEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JoinColumn(name = "order_id")
     private List<ItemEntity> itemEntities;
 }

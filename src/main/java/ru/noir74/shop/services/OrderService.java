@@ -10,5 +10,5 @@ public interface OrderService {
 
     Order get(Long id);
 
-    Long create(List<Item> itemList);
+    Order create(List<Item> itemList);
 }
