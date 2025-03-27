@@ -21,18 +21,24 @@ public class CartController {
         return "cart";
     }
 
-    @PostMapping(value = "item/{itemId}/quantity/{quantity}")
-    public String setQuantity(Model model,
-                              @PathVariable("itemId") Long itemId,
-                              @PathVariable("quantity") Integer quantity) {
-        cartService.setQuantity(itemId, quantity);
-        return "cart";
+    @PostMapping(value = "product/{id}/add")
+    public String addToCart(@PathVariable("id") Long productId) {
+        cartService.addToCart(productId);
+        return "redirect:/cart";
     }
 
-    @PostMapping(value = "item/{itemId}/remove")
-    public String removeItem(Model model, @PathVariable("itemId") Long itemId) {
+    @PostMapping(value = "item/{id}/remove")
+    public String removeFromCart(@PathVariable("id") Long itemId) {
         cartService.removeFromCart(itemId);
-        return "cart";
+        return "redirect:/cart";
+    }
+
+    @PostMapping(value = "item/{id}/quantity/{quantity}")
+    public String setQuantity(Model model,
+                              @PathVariable("id") Long itemId,
+                              @PathVariable("quantity") Integer quantity) {
+        cartService.setQuantity(itemId, quantity);
+        return "redirect:/cart";
     }
 
     @PostMapping(value = "order")

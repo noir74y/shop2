@@ -6,7 +6,7 @@ import ru.noir74.shop.models.domain.Order;
 import java.util.List;
 
 public interface OrderService {
-    List<Order> getALl();
+    List<Order> getAll();
 
     Order get(Long id);
 

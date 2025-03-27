@@ -24,7 +24,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Order> getALl() {
+    public List<Order> getAll() {
         return orderMapper.bulkEntity2domain(orderRepository.findAll());
     }
 

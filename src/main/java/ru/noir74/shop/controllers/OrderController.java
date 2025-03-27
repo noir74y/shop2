@@ -20,7 +20,8 @@ public class OrderController {
     @GetMapping
     @Transactional(readOnly = true)
     public String getALl(Model model) {
-        var orders = orderMapper.bulkDomain2Dto(orderService.getALl());
+
+        var orders = orderMapper.bulkDomain2Dto(orderService.getAll());
         return "orders";
     }
 

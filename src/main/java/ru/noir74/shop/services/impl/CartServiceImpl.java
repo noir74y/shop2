@@ -26,11 +26,12 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void addToCart(Long itemId) {
-        cartRepository.insert(ItemEntity.builder()
-                .productEntity(productRepository.findById(itemId).orElse(null))
-                .quantity(1)
-                .build());
+    public void addToCart(Long productId) {
+        productRepository.findById(productId)
+                .ifPresent(obj -> cartRepository.insert(ItemEntity.builder()
+                        .productEntity(obj)
+                        .quantity(1)
+                        .build()));
     }
 
     @Override
@@ -49,7 +50,8 @@ public class CartServiceImpl implements CartService {
                 .findAll()
                 .stream()
                 .filter(obj -> obj.getProductEntity().getId().equals(itemId))
-                .findFirst().ifPresent(obj -> {
+                .findFirst()
+                .ifPresent(obj -> {
                     obj.setQuantity(quantity);
                     cartRepository.replace(obj);
                 });

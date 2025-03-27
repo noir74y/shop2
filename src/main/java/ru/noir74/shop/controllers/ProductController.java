@@ -8,7 +8,6 @@ import ru.noir74.shop.configurations.AppConfiguration;
 import ru.noir74.shop.misc.ProductSorting;
 import ru.noir74.shop.models.dto.ProductDtoReq;
 import ru.noir74.shop.models.mappers.ProductMapper;
-import ru.noir74.shop.services.CartService;
 import ru.noir74.shop.services.ProductService;
 
 import java.util.Objects;
@@ -19,7 +18,6 @@ import java.util.Objects;
 public class ProductController {
     private final AppConfiguration appConfiguration;
     private final ProductService productService;
-    private final CartService cartService;
     private final ProductMapper productMapper;
 
     @GetMapping
@@ -57,17 +55,4 @@ public class ProductController {
         productService.delete(id);
         return "redirect:/product";
     }
-
-    @PostMapping(value = "{id}/addToCart")
-    public String addToCart(@PathVariable("id") Long id) {
-        cartService.addToCart(id);
-        return "redirect:/cart";
-    }
-
-    @PostMapping(value = "{id}/removeFromCart")
-    public String removeFromCart(@PathVariable("id") Long id) {
-        cartService.removeFromCart(id);
-        return "redirect:/cart";
-    }
-
 }

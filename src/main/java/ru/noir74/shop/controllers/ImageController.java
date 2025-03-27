@@ -32,6 +32,6 @@ public class ImageController {
     @PostMapping("{id}")
     public String setImage(@PathVariable("id") Long id, @RequestParam("file") MultipartFile file) throws IOException {
         imageService.setImageById(Image.builder().id(id).image(file.getBytes()).imageName(file.getOriginalFilename()).build());
-        return "post";
+        return "products";
     }
 }
