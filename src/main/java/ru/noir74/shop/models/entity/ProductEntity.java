@@ -23,4 +23,9 @@ public class ProductEntity {
 
     @Column(columnDefinition = "TEXT")
     private String description;
+
+    @OneToOne(cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JoinColumn(name = "id")
+    private ImageEntity imageEntity;
+
 }
