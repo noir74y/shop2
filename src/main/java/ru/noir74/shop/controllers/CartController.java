@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import ru.noir74.shop.services.CartService;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
 
 @Controller
 @RequestMapping("/cart")
@@ -27,21 +27,21 @@ public class CartController {
     }
 
     @PostMapping(value = "product/{id}/add")
-    public String addToCart(@PathVariable("id") @NotEmpty @Pattern(regexp = "^[1-9]+$") Long productId) {
+    public String addToCart(@PathVariable("id") @NotEmpty @Positive Long productId) {
         cartService.addToCart(productId);
         return "redirect:/cart";
     }
 
     @PostMapping(value = "item/{id}/remove")
-    public String removeFromCart(@PathVariable("id") @NotEmpty @Pattern(regexp = "^[1-9]+$") Long itemId) {
+    public String removeFromCart(@PathVariable("id") @NotEmpty @Positive Long itemId) {
         cartService.removeFromCart(itemId);
         return "redirect:/cart";
     }
 
     @PostMapping(value = "item/{id}/quantity/{quantity}")
     public String setQuantity(Model model,
-                              @PathVariable("id") @NotEmpty @Pattern(regexp = "^[1-9]+$") Long itemId,
-                              @PathVariable("quantity") @NotEmpty @Pattern(regexp = "^[1-9]+$") Integer quantity) {
+                              @PathVariable("id") @NotEmpty @Positive Long itemId,
+                              @PathVariable("quantity") @NotEmpty @Positive Integer quantity) {
         cartService.setQuantity(itemId, quantity);
         return "redirect:/cart";
     }

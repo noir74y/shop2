@@ -3,6 +3,7 @@ package ru.noir74.shop.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.noir74.shop.configurations.AppConfiguration;
 import ru.noir74.shop.misc.enums.ProductSorting;
@@ -11,13 +12,15 @@ import ru.noir74.shop.models.dto.ProductDtoReq;
 import ru.noir74.shop.models.mappers.ProductMapper;
 import ru.noir74.shop.services.ProductService;
 
+import jakarta.validation.constraints.Pattern;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
 import java.util.Objects;
 
 @Controller
 @RequestMapping("/product")
 @RequiredArgsConstructor
+@Validated
 public class ProductController {
     private final AppConfiguration appConfiguration;
     private final ProductService productService;
@@ -36,7 +39,7 @@ public class ProductController {
     }
 
     @GetMapping("{id}")
-    public String get(Model model, @PathVariable("id") @NotEmpty @Pattern(regexp = "^[1-9]+$") Long id) {
+    public String get(Model model, @PathVariable("id") @NotEmpty @Positive Long id) {
         var item = productMapper.domain2dtoResp(productService.get(id));
         return "product";
     }
@@ -48,13 +51,13 @@ public class ProductController {
     }
 
     @PostMapping(value = "{id}")
-    public String update(@ModelAttribute ProductDtoReq productDtoReq, @PathVariable("id") @NotEmpty @Pattern(regexp = "^[1-9]+$") Long id) {
+    public String update(@ModelAttribute ProductDtoReq productDtoReq, @PathVariable("id") @NotEmpty @Positive Long id) {
         productService.update(productMapper.dtoReq2domain(productDtoReq));
         return "redirect:/product";
     }
 
     @PostMapping(value = "{id}", params = "_method=delete")
-    public String delete(@PathVariable("id") @NotEmpty @Pattern(regexp = "^[1-9]+$") Long id) {
+    public String delete(@PathVariable("id") @NotEmpty @Positive Long id) {
         productService.delete(id);
         return "redirect:/product";
     }
