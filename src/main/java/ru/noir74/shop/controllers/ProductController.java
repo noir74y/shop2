@@ -1,5 +1,6 @@
 package ru.noir74.shop.controllers;
 
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,7 +13,6 @@ import ru.noir74.shop.models.dto.ProductDtoReq;
 import ru.noir74.shop.models.mappers.ProductMapper;
 import ru.noir74.shop.services.ProductService;
 
-import jakarta.validation.constraints.Pattern;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.util.Objects;

@@ -1,4 +1,4 @@
-package ru.noir74.shop.misc.exceptions;
+package ru.noir74.shop.misc.error.exceptions;
 
 import org.springframework.http.HttpStatus;
 

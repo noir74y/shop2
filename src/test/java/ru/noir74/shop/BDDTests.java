@@ -8,7 +8,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.noir74.shop.misc.enums.ProductSorting;
-import ru.noir74.shop.misc.exceptions.ProductIsUsedException;
+import ru.noir74.shop.misc.error.exceptions.NotFoundException;
+import ru.noir74.shop.misc.error.exceptions.ProductIsUsedException;
 import ru.noir74.shop.models.domain.Product;
 import ru.noir74.shop.repositories.*;
 import ru.noir74.shop.services.CartService;
@@ -121,8 +122,8 @@ class BDDTests {
                 )
                 .andExpect(status().is3xxRedirection());
 
-        assertNull(productService.get(productId));
-        assertNull(imageService.findImageById(productId));
+        assertThrows(NotFoundException.class, () -> productService.get(productId));
+        assertThrows(NotFoundException.class, () -> imageService.findImageById(productId));
     }
 
     @Test

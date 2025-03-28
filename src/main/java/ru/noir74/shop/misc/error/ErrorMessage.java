@@ -1,4 +1,4 @@
-package ru.noir74.shop.misc.exceptions;
+package ru.noir74.shop.misc.error;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

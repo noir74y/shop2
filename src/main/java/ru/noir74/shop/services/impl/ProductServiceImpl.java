@@ -7,7 +7,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.noir74.shop.misc.enums.ProductSorting;
-import ru.noir74.shop.misc.exceptions.ProductIsUsedException;
+import ru.noir74.shop.misc.error.exceptions.NotFoundException;
+import ru.noir74.shop.misc.error.exceptions.ProductIsUsedException;
 import ru.noir74.shop.models.domain.Product;
 import ru.noir74.shop.models.mappers.ProductMapper;
 import ru.noir74.shop.repositories.ImageRepository;
@@ -39,7 +40,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public Product get(Long id) {
-        return productMapper.entity2domain(productRepository.findById(id).orElse(null));
+        return productMapper.entity2domain(productRepository.findById(id).orElseThrow(() -> new NotFoundException("product is not found", "id=" + id)));
     }
 
     @Override

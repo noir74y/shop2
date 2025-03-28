@@ -1,7 +1,8 @@
-package ru.noir74.shop.misc.exceptions;
+package ru.noir74.shop.misc.error.exceptions;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
+import ru.noir74.shop.misc.error.ErrorMessage;
 
 
 public class AppException extends RuntimeException {
