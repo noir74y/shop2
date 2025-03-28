@@ -8,6 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.noir74.shop.models.domain.Image;
 import ru.noir74.shop.services.ImageService;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -18,7 +20,7 @@ public class ImageController {
     private final ImageService imageService;
 
     @GetMapping("{id}")
-    public void getImage(@PathVariable("id") Long productId, HttpServletResponse response) throws IOException {
+    public void getImage(@PathVariable("id") @NotEmpty @Pattern(regexp = "^[1-9]+$") Long productId, HttpServletResponse response) throws IOException {
         Optional.ofNullable(imageService.findImageById(productId)).ifPresent(image -> {
             response.setContentType("image/" + image.getImageType());
             try {
@@ -30,7 +32,7 @@ public class ImageController {
     }
 
     @PostMapping("{id}")
-    public String setImage(@PathVariable("id") Long productId, @RequestParam("file") MultipartFile file) throws IOException {
+    public String setImage(@PathVariable("id") @NotEmpty @Pattern(regexp = "^[1-9]+$") Long productId, @RequestParam("file") MultipartFile file) throws IOException {
         imageService.setImageById(Image.builder().productId(productId).image(file.getBytes()).imageName(file.getOriginalFilename()).build());
         return "products";
     }

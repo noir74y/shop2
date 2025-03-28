@@ -10,6 +10,8 @@ import ru.noir74.shop.models.dto.ProductDtoReq;
 import ru.noir74.shop.models.mappers.ProductMapper;
 import ru.noir74.shop.services.ProductService;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 import java.util.Objects;
 
 @Controller
@@ -22,9 +24,9 @@ public class ProductController {
 
     @GetMapping
     public String getPage(Model model,
-                          @RequestParam(required = false, name = "page") String page,
-                          @RequestParam(required = false, name = "size") String size,
-                          @RequestParam(required = false, name = "sort") String sort) {
+                          @RequestParam(required = false, name = "page") @Pattern(regexp = "^[1-9]+$") String page,
+                          @RequestParam(required = false, name = "size") @Pattern(regexp = "10|20|50|100") String size,
+                          @RequestParam(required = false, name = "sort") @Pattern(regexp = "^$") String sort) {
         var items = productMapper.bulkDomain2DtoResp(productService.getPage(
                 Objects.nonNull(page) ? Integer.parseInt(page) - 1 : appConfiguration.getDefaultPageNumber() - 1,
                 Objects.nonNull(size) ? Integer.parseInt(size) : appConfiguration.getDefaultPageSize(),
@@ -33,7 +35,7 @@ public class ProductController {
     }
 
     @GetMapping("{id}")
-    public String get(Model model, @PathVariable("id") Long id) {
+    public String get(Model model, @PathVariable("id") @NotEmpty @Pattern(regexp = "^[1-9]+$") Long id) {
         var item = productMapper.domain2dtoResp(productService.get(id));
         return "product";
     }
@@ -45,13 +47,13 @@ public class ProductController {
     }
 
     @PostMapping(value = "{id}")
-    public String update(@ModelAttribute ProductDtoReq productDtoReq, @PathVariable("id") Long id) {
+    public String update(@ModelAttribute ProductDtoReq productDtoReq, @PathVariable("id") @NotEmpty @Pattern(regexp = "^[1-9]+$") Long id) {
         productService.update(productMapper.dtoReq2domain(productDtoReq));
         return "redirect:/product";
     }
 
     @PostMapping(value = "{id}", params = "_method=delete")
-    public String delete(@PathVariable("id") Long id) {
+    public String delete(@PathVariable("id") @NotEmpty @Pattern(regexp = "^[1-9]+$") Long id) {
         productService.delete(id);
         return "redirect:/product";
     }

@@ -8,7 +8,6 @@ import ru.noir74.shop.misc.ProductSorting;
 @Configuration
 @Getter
 public class AppConfiguration {
-
     @Value("${product.default.page.number}")
     private Integer DefaultPageNumber;
 

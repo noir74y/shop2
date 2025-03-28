@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import ru.noir74.shop.models.mappers.OrderMapper;
 import ru.noir74.shop.services.OrderService;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
+
 @Controller
 @RequestMapping("/order")
 @RequiredArgsConstructor
@@ -26,7 +29,7 @@ public class OrderController {
 
     @GetMapping("{id}")
     @Transactional(readOnly = true)
-    public String get(Model model, @PathVariable("id") Long id) {
+    public String get(Model model, @PathVariable("id") @NotEmpty @Pattern(regexp = "^[1-9]+$") Long id) {
         var order = orderMapper.domain2dto(orderService.get(id));
         return "order";
     }
