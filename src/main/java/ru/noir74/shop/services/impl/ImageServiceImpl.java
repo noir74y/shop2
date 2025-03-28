@@ -16,13 +16,14 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     @Transactional(readOnly = true)
-    public Image findImageById(Long itemId) {
-        return imageMapper.entity2domain(imageRepository.findById(itemId).orElse(null));
+    public Image findImageById(Long productId) {
+        return imageMapper.entity2domain(imageRepository.findById(productId).orElse(null));
     }
 
     @Override
     @Transactional
     public void setImageById(Image image) {
-        imageRepository.save(imageMapper.domain2entity(image));
+        if (image.isImageReadyToBeSaved())
+            imageRepository.save(imageMapper.domain2entity(image));
     }
 }

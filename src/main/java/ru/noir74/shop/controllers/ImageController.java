@@ -18,8 +18,8 @@ public class ImageController {
     private final ImageService imageService;
 
     @GetMapping("{id}")
-    public void getImage(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-        Optional.ofNullable(imageService.findImageById(id)).ifPresent(image -> {
+    public void getImage(@PathVariable("id") Long productId, HttpServletResponse response) throws IOException {
+        Optional.ofNullable(imageService.findImageById(productId)).ifPresent(image -> {
             response.setContentType("image/" + image.getImageType());
             try {
                 response.getOutputStream().write(image.getImage());
@@ -30,8 +30,8 @@ public class ImageController {
     }
 
     @PostMapping("{id}")
-    public String setImage(@PathVariable("id") Long id, @RequestParam("file") MultipartFile file) throws IOException {
-        imageService.setImageById(Image.builder().id(id).image(file.getBytes()).imageName(file.getOriginalFilename()).build());
+    public String setImage(@PathVariable("id") Long productId, @RequestParam("file") MultipartFile file) throws IOException {
+        imageService.setImageById(Image.builder().productId(productId).image(file.getBytes()).imageName(file.getOriginalFilename()).build());
         return "products";
     }
 }

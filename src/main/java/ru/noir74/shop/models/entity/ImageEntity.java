@@ -15,11 +15,10 @@ public class ImageEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Lob
-    @Column(columnDefinition = "BYTEA")
+    @Column(name = "image", columnDefinition = "BYTEA")
     private byte[] image;
 
-    @Column(nullable = false)
+    @Column(name = "image_name", nullable = false)
     private String imageName;
 
     @OneToOne

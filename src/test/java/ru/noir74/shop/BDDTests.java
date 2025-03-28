@@ -4,9 +4,11 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.noir74.shop.misc.ProductSorting;
+import ru.noir74.shop.misc.exceptions.ProductIsUsedException;
 import ru.noir74.shop.models.domain.Product;
 import ru.noir74.shop.repositories.*;
 import ru.noir74.shop.services.CartService;
@@ -14,15 +16,14 @@ import ru.noir74.shop.services.ImageService;
 import ru.noir74.shop.services.OrderService;
 import ru.noir74.shop.services.ProductService;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.DisplayName.class)
-class ShopApplicationTests {
+class BDDTests {
     @Autowired
     ProductRepository productRepository;
     @Autowired
@@ -82,7 +83,7 @@ class ShopApplicationTests {
         product.setPrice(2);
         product.setDescription("description2");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/product/" + String.valueOf(productId))
+        mockMvc.perform(MockMvcRequestBuilders.post("/product/" + productId)
                         .param("title", product.getTitle())
                         .param("price", String.valueOf(product.getPrice()))
                         .param("description", product.getDescription()))
@@ -93,20 +94,35 @@ class ShopApplicationTests {
 
     @Test
     @DisplayName("03 step - set image for product")
-    void setImageForProduct() {
+    void setImageForProduct() throws Exception {
+        var mockMultipartFile = new MockMultipartFile(
+                "file",
+                "someFile.jpeg",
+                "image/jpeg",
+                new byte[]{(byte) 0x00});
 
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/image/" + productId)
+                        .file(mockMultipartFile)
+                        .param("id", String.valueOf(productId))
+                )
+                .andExpect(status().isOk());
+
+        var image = imageService.findImageById(productId);
+        assertArrayEquals(mockMultipartFile.getBytes(), image.getImage());
+        assertEquals(mockMultipartFile.getOriginalFilename(), image.getImageName());
     }
 
     @Test
     @DisplayName("04 step - delete product")
     void deleteProduct() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/product/" + String.valueOf(productId))
+        mockMvc.perform(MockMvcRequestBuilders.post("/product/" + productId)
                         .param("_method", "delete")
                         .param("id", String.valueOf(productId))
                 )
                 .andExpect(status().is3xxRedirection());
 
         assertNull(productService.get(productId));
+        assertNull(imageService.findImageById(productId));
     }
 
     @Test
@@ -118,7 +134,7 @@ class ShopApplicationTests {
     @Test
     @DisplayName("06 step - get product")
     void getProduct() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/product/" + String.valueOf(productId)))
+        mockMvc.perform(MockMvcRequestBuilders.get("/product/" + productId))
                 .andExpect(status().isOk());
     }
 
@@ -133,7 +149,7 @@ class ShopApplicationTests {
     @Test
     @DisplayName("08 step - add product to cart")
     void addProductToCart() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/cart/product/" + String.valueOf(productId) + "/add")
+        mockMvc.perform(MockMvcRequestBuilders.post("/cart/product/" + productId + "/add")
                         .param("id", String.valueOf(productId)))
                 .andExpect(status().is3xxRedirection());
 
@@ -145,7 +161,7 @@ class ShopApplicationTests {
     @Test
     @DisplayName("09 step - remove product from cart")
     void removeProductFromCart() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/cart/item/" + String.valueOf(productId) + "/remove")
+        mockMvc.perform(MockMvcRequestBuilders.post("/cart/item/" + productId + "/remove")
                         .param("id", String.valueOf(productId)))
                 .andExpect(status().is3xxRedirection());
 
@@ -162,7 +178,7 @@ class ShopApplicationTests {
     @DisplayName("11 step - change quantity of product in cart")
     void changeQuantityOfProductInCart() throws Exception {
         quantity = 2;
-        mockMvc.perform(MockMvcRequestBuilders.post("/cart/item/" + String.valueOf(productId) + "/quantity/" + String.valueOf(quantity))
+        mockMvc.perform(MockMvcRequestBuilders.post("/cart/item/" + productId + "/quantity/" + quantity)
                 .param("id", String.valueOf(productId))
                 .param("id", String.valueOf(quantity))
         ).andExpect(status().is3xxRedirection());
@@ -195,12 +211,18 @@ class ShopApplicationTests {
         var orderId = orderService.getAll().getFirst().getId();
         var item = orderService.get(orderId).getItems().getFirst();
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/order/" + String.valueOf(orderId))
+        mockMvc.perform(MockMvcRequestBuilders.get("/order/" + orderId)
                         .param("id", String.valueOf(orderId)))
                 .andExpect(status().isOk());
 
         assertEquals(product, item.getProduct());
         assertEquals(quantity, item.getQuantity());
+    }
+
+    @Test
+    @DisplayName("15th step - try to delete product")
+    void tryToDeleteProduct() {
+        assertThrows(ProductIsUsedException.class, () -> productService.delete(productId));
     }
 }
 

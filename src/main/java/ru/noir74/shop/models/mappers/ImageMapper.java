@@ -20,7 +20,7 @@ public class ImageMapper {
                 .map(obj -> modelMapper.map(obj, ImageEntity.class))
                 .orElse(null);
         Optional.ofNullable(entity).ifPresent(obj ->
-                obj.setProductEntity(productRepository.findById(domain.getItemId()).orElse(null))
+                obj.setProductEntity(productRepository.findById(domain.getProductId()).orElse(null))
         );
         return entity;
     }
@@ -29,7 +29,7 @@ public class ImageMapper {
         var domain = Optional.ofNullable(entity)
                 .map(obj -> modelMapper.map(obj, Image.class))
                 .orElse(null);
-        Optional.ofNullable(domain).ifPresent(obj -> obj.setItemId(entity.getProductEntity().getId()));
+        Optional.ofNullable(domain).ifPresent(obj -> obj.setProductId(entity.getProductEntity().getId()));
         return domain;
     }
 

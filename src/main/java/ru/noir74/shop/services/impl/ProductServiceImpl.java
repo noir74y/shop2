@@ -1,25 +1,33 @@
 package ru.noir74.shop.services.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.noir74.shop.misc.ProductSorting;
+import ru.noir74.shop.misc.exceptions.ProductIsUsedException;
 import ru.noir74.shop.models.domain.Product;
 import ru.noir74.shop.models.mappers.ProductMapper;
+import ru.noir74.shop.repositories.ImageRepository;
+import ru.noir74.shop.repositories.ItemRepository;
 import ru.noir74.shop.repositories.ProductRepository;
 import ru.noir74.shop.services.ProductService;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
+    private final ImageRepository imageRepository;
+    private final ItemRepository itemRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -49,6 +57,11 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public void delete(Long id) {
-        productRepository.deleteById(id);
+        if (Optional.ofNullable(itemRepository.isProductUsesInItems(id)).isPresent()) {
+            throw new ProductIsUsedException("product is used in some order(s)", "productId=" + id);
+        } else {
+            imageRepository.deleteById(id);
+            productRepository.deleteById(id);
+        }
     }
 }
