@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import ru.noir74.shop.misc.ProductSorting;
+import ru.noir74.shop.misc.enums.ProductSorting;
 import ru.noir74.shop.misc.exceptions.ProductIsUsedException;
 import ru.noir74.shop.models.domain.Product;
 import ru.noir74.shop.repositories.*;

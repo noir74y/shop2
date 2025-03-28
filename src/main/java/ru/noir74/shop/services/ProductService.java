@@ -1,6 +1,6 @@
 package ru.noir74.shop.services;
 
-import ru.noir74.shop.misc.ProductSorting;
+import ru.noir74.shop.misc.enums.ProductSorting;
 import ru.noir74.shop.models.domain.Product;
 
 import java.util.List;

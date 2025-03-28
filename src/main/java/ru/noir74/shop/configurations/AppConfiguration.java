@@ -3,7 +3,7 @@ package ru.noir74.shop.configurations;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import ru.noir74.shop.misc.ProductSorting;
+import ru.noir74.shop.misc.enums.ProductSorting;
 
 @Configuration
 @Getter

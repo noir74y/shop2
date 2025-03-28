@@ -6,7 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.noir74.shop.misc.ProductSorting;
+import ru.noir74.shop.misc.enums.ProductSorting;
 import ru.noir74.shop.misc.exceptions.ProductIsUsedException;
 import ru.noir74.shop.models.domain.Product;
 import ru.noir74.shop.models.mappers.ProductMapper;

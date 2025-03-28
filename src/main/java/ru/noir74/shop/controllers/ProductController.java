@@ -5,7 +5,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.noir74.shop.configurations.AppConfiguration;
-import ru.noir74.shop.misc.ProductSorting;
+import ru.noir74.shop.misc.enums.ProductSorting;
+import ru.noir74.shop.misc.validators.ValueOfEnumConstraint;
 import ru.noir74.shop.models.dto.ProductDtoReq;
 import ru.noir74.shop.models.mappers.ProductMapper;
 import ru.noir74.shop.services.ProductService;
@@ -26,7 +27,7 @@ public class ProductController {
     public String getPage(Model model,
                           @RequestParam(required = false, name = "page") @Pattern(regexp = "^[1-9]+$") String page,
                           @RequestParam(required = false, name = "size") @Pattern(regexp = "10|20|50|100") String size,
-                          @RequestParam(required = false, name = "sort") @Pattern(regexp = "^$") String sort) {
+                          @RequestParam(required = false, name = "sort") @ValueOfEnumConstraint(enumClass = ProductSorting.class) String sort) {
         var items = productMapper.bulkDomain2DtoResp(productService.getPage(
                 Objects.nonNull(page) ? Integer.parseInt(page) - 1 : appConfiguration.getDefaultPageNumber() - 1,
                 Objects.nonNull(size) ? Integer.parseInt(size) : appConfiguration.getDefaultPageSize(),
