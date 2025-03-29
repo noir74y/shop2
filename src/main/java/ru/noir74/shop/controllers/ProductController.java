@@ -57,7 +57,7 @@ public class ProductController {
         model.addAttribute("price", product.getPrice());
         model.addAttribute("description", product.getDescription());
 
-        return "product-form";
+        return "product";
     }
 
     @PostMapping
@@ -75,6 +75,27 @@ public class ProductController {
     @PostMapping(value = "{id}", params = "_method=delete")
     public String delete(@PathVariable("id") @NotEmpty @Positive Long id) {
         productService.delete(id);
+        return "redirect:/product";
+    }
+
+    @PostMapping(value = "item/{id}/add")
+    public String addToCart(@PathVariable("id") @NotEmpty @Positive Long productId) {
+        cartService.addToCart(productId);
+        cartService.setQuantity(productId, 1);
+        return "redirect:/product";
+    }
+
+    @PostMapping(value = "item/{id}/remove")
+    public String removeFromCart(@PathVariable("id") @NotEmpty @Positive Long productId) {
+        cartService.removeFromCart(productId);
+        return "redirect:/product";
+    }
+
+    @PostMapping(value = "item/{id}/quantity/{quantity}")
+    public String setQuantity(Model model,
+                              @PathVariable("id") @NotEmpty @Positive Long productId,
+                              @PathVariable("quantity") @NotEmpty @Positive Integer quantity) {
+        cartService.setQuantity(productId, quantity);
         return "redirect:/product";
     }
 }

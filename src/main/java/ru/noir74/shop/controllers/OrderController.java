@@ -26,7 +26,7 @@ public class OrderController {
     @Transactional(readOnly = true)
     public String getALl(Model model) {
         var orders = orderMapper.bulkDomain2Dto(orderService.getAll());
-        return "orders";
+        return "order-list";
     }
 
     @GetMapping("{id}")

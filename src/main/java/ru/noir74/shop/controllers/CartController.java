@@ -33,16 +33,16 @@ public class CartController {
     }
 
     @PostMapping(value = "item/{id}/remove")
-    public String removeFromCart(@PathVariable("id") @NotEmpty @Positive Long itemId) {
-        cartService.removeFromCart(itemId);
+    public String removeFromCart(@PathVariable("id") @NotEmpty @Positive Long productId) {
+        cartService.removeFromCart(productId);
         return "redirect:/cart";
     }
 
     @PostMapping(value = "item/{id}/quantity/{quantity}")
     public String setQuantity(Model model,
-                              @PathVariable("id") @NotEmpty @Positive Long itemId,
+                              @PathVariable("id") @NotEmpty @Positive Long productId,
                               @PathVariable("quantity") @NotEmpty @Positive Integer quantity) {
-        cartService.setQuantity(itemId, quantity);
+        cartService.setQuantity(productId, quantity);
         return "redirect:/cart";
     }
 

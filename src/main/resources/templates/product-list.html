@@ -55,17 +55,23 @@
         <td><a th:href="|/product/${product.id}|" th:text="${product.title}"></a></td>
         <td th:text="${product.price}"></td>
         <td>
-            <button>Добавить в корзину</button>
-            <br>
-            <button>Удалить из корзины</button>
-        </td>
-        <td th:text="${product.quantity}">
-            <form>
-                <label for="quantity"></label>
-                <input id="quantity" type="text" name="quantity" pattern="\d+" min=1 th:value="${product.quantity}"
-                       size=10>
+            <form th:id="|action-form-${product.id}|">
+                <input type="hidden" name="product_id" th:value="${product.id}">
+                <button type="button" onclick="addToCart(this.form)">Добавить в корзину</button>
                 <br>
-                <button>Сохранить</button>
+                <button type="button" onclick="removeFromCart(this.form)">Удалить из корзины</button>
+            </form>
+        </td>
+        <td>
+            <form th:id="|quantity-form-${product.id}|">
+                <input type="hidden" name="product_id" th:value="${product.id}">
+                <label>
+                    <input type="text" name="quantity" th:value="${product.quantity}" size=10 readonly>
+                </label>
+                <br>
+                <button onclick="changeQuantity(this.form, 1)" type="button">Больше</button>
+                <br>
+                <button onclick="changeQuantity(this.form, -1)" type="button">Меньше</button>
             </form>
         </td>
     </tr>
@@ -126,6 +132,46 @@
            document.getElementById('toggleNewProductFormButton').innerText = 'Добавить';
         }
     }
+
+    function addToCart(actionForm) {
+       quantityFormId = "quantity-form-" + actionForm.elements["product_id"].value;
+       quantityForm = document.getElementById(quantityFormId);
+       quantity = parseInt(quantityForm.elements["quantity"].value);
+       if(quantity == 0) {
+         let productId = actionForm.elements["product_id"].value;
+         fetch("/product/item/" + productId + "/add", {
+         method: 'POST',
+         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+         body: ''});
+       }
+    }
+
+    function removeFromCart(actionForm) {
+       let productId = actionForm.elements["product_id"].value;
+       fetch("/product/item/" + productId + "/remove", {
+       method: 'POST',
+       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+       body: ''});
+    }
+
+    function changeQuantity(quantityForm, delta) {
+       let value = parseInt(quantityForm.elements["quantity"].value) + delta
+       if (value == 0 ) {
+          actionFormId = "action-form-" + quantityForm.elements["product_id"].value;
+          actionForm = document.getElementById(actionFormId);
+          removeFromCart(actionForm);
+          return;
+       }
+       else {
+          quantityForm.elements["quantity"].value = value;
+          let productId = quantityForm.elements["product_id"].value;
+          fetch("/product/item/" + productId + "/quantity/" + value, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          body: ''});
+       }
+    }
+
 
 </script>
 

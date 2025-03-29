@@ -40,21 +40,21 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void removeFromCart(Long itemId) {
+    public void removeFromCart(Long productId) {
         cartRepository
                 .findAll()
                 .stream()
-                .filter(obj -> obj.getProductEntity().getId().equals(itemId))
+                .filter(obj -> obj.getProductEntity().getId().equals(productId))
                 .findFirst()
                 .ifPresent(cartRepository::delete);
     }
 
     @Override
-    public void setQuantity(Long itemId, Integer quantity) {
+    public void setQuantity(Long productId, Integer quantity) {
         cartRepository
                 .findAll()
                 .stream()
-                .filter(obj -> obj.getProductEntity().getId().equals(itemId))
+                .filter(obj -> obj.getProductEntity().getId().equals(productId))
                 .findFirst()
                 .ifPresent(obj -> {
                     obj.setQuantity(quantity);
