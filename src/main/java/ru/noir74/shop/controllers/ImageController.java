@@ -35,7 +35,7 @@ public class ImageController {
 
     @PostMapping("{id}")
     public String setImage(@PathVariable("id") @NotEmpty @Positive Long productId, @RequestParam("file") MultipartFile file) throws IOException {
-        imageService.setImageById(Image.builder().productId(productId).image(file.getBytes()).imageName(file.getOriginalFilename()).build());
-        return "products";
+        imageService.setImage(Image.builder().productId(productId).image(file.getBytes()).imageName(file.getOriginalFilename()).build());
+        return "product-list";
     }
 }

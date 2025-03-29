@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Продукт</title>
+    <style>
+        table {
+             border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid;
+        }
+    </style>
+</head>
+
+<body>
+<h1>Продукты</h1>
+
+
+<h2>Новый продукт</h2>
+<form id="newProductForm" enctype="multipart/form-data" action="" method="post" accept-charset="UTF-8">
+    <label for="title">Название</label>
+    <input type="text" id="title" name="title" th:value="${title}" required>
+
+    <p></p>
+    <label for="price">Цена</label>
+    <input type="text" id="price" name="price" pattern="\d+" min=1 required th:value="${price}">
+
+    <p></p>
+    <label for="description">Описание</label>
+    <textarea rows="5" name="description" id="description" th:text="${description}"></textarea>
+
+    <p></p>
+    <input id="fileInput" type="file" name="file" accept="image/*">
+    <img id="filePreview" alt="" th:src="|/image/${id}|" width="100" height="100">
+
+    <p></p>
+    <button type="submit">Сохранить</button>
+</form>
+
+
+<script defer type="text/javascript" th:inline="javascript">
+    const fileInput = document.getElementById('fileInput');
+    const filePreview = document.getElementById('filePreview');
+
+    fileInput.addEventListener('change', function(event) {
+        if (event.target.files && event.target.files[0]) {
+            const file = new FileReader();
+            file.onload = function(e) {
+                filePreview.src = e.target.result;
+            };
+            file.readAsDataURL(event.target.files[0]);
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @Builder
@@ -14,4 +15,5 @@ public class Product {
     private String title;
     private Integer price;
     private String description;
+    private MultipartFile file;
 }

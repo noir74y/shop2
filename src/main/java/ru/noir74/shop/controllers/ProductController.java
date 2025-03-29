@@ -16,6 +16,7 @@ import ru.noir74.shop.services.ProductService;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
+import java.io.IOException;
 import java.util.Objects;
 
 @Controller
@@ -42,25 +43,31 @@ public class ProductController {
 
         model.addAttribute("page", page);
         model.addAttribute("size", size);
-        model.addAttribute("products",products);
+        model.addAttribute("products", products);
 
-        return "products";
+        return "product-list";
     }
 
     @GetMapping("{id}")
     public String get(Model model, @PathVariable("id") @NotEmpty @Positive Long id) {
-        var item = productMapper.domain2dtoResp(productService.get(id));
-        return "product";
+        var product = productMapper.domain2dtoResp(productService.get(id));
+
+        model.addAttribute("id", product.getId());
+        model.addAttribute("title", product.getTitle());
+        model.addAttribute("price", product.getPrice());
+        model.addAttribute("description", product.getDescription());
+
+        return "product-form";
     }
 
     @PostMapping
-    public String create(@ModelAttribute ProductDtoReq productDtoReq) {
+    public String create(@ModelAttribute ProductDtoReq productDtoReq) throws IOException {
         productService.create(productMapper.dtoReq2domain(productDtoReq));
         return "redirect:/product";
     }
 
     @PostMapping(value = "{id}")
-    public String update(@ModelAttribute ProductDtoReq productDtoReq, @PathVariable("id") @NotEmpty @Positive Long id) {
+    public String update(@ModelAttribute ProductDtoReq productDtoReq, @PathVariable("id") @NotEmpty @Positive Long id) throws IOException {
         productService.update(productMapper.dtoReq2domain(productDtoReq));
         return "redirect:/product";
     }

@@ -18,10 +18,10 @@ public class ExceptionController {
 
         switch (exception) {
             case ProductIsUsedException productIsUsedException -> {
-                return "product-is-used.html";
+                return "error-is-used.html";
             }
             case NotFoundException notFoundException -> {
-                return "not-found.html";
+                return "error-not-found.html";
             }
             default -> {
                 return "error.html";

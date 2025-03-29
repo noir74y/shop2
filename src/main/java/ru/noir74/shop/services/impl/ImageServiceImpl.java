@@ -23,8 +23,17 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     @Transactional
-    public void setImageById(Image image) {
-        if (image.isImageReadyToBeSaved())
-            imageRepository.save(imageMapper.domain2entity(image));
+    public void setImage(Image image) {
+        imageRepository.findById(image.getProductId()).ifPresentOrElse(entity -> {
+                    entity.setImage(image.getImage());
+                    entity.setImageName(image.getImageName());
+                },
+                () -> imageRepository.save(imageMapper.domain2entity(image)));
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(Long id) {
+        imageRepository.deleteById(id);
     }
 }

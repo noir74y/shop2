@@ -6,18 +6,22 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import ru.noir74.shop.misc.enums.ProductSorting;
 import ru.noir74.shop.misc.error.exceptions.NotFoundException;
 import ru.noir74.shop.misc.error.exceptions.ProductIsUsedException;
+import ru.noir74.shop.models.domain.Image;
 import ru.noir74.shop.models.domain.Product;
 import ru.noir74.shop.models.mappers.ProductMapper;
-import ru.noir74.shop.repositories.ImageRepository;
 import ru.noir74.shop.repositories.ItemRepository;
 import ru.noir74.shop.repositories.ProductRepository;
+import ru.noir74.shop.services.ImageService;
 import ru.noir74.shop.services.ProductService;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -25,10 +29,11 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
+    private final ItemRepository itemRepository;
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
-    private final ImageRepository imageRepository;
-    private final ItemRepository itemRepository;
+    private final ImageService imageService;
+
 
     @Override
     @Transactional(readOnly = true)
@@ -48,14 +53,14 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public Product create(Product product) {
-        return productMapper.entity2domain(productRepository.save(productMapper.domain2entity(product)));
+    public Product create(Product product) throws IOException {
+        return save(product);
     }
 
     @Override
     @Transactional
-    public void update(Product product) {
-        productRepository.save(productMapper.domain2entity(product));
+    public void update(Product product) throws IOException {
+        save(product);
     }
 
     @Override
@@ -64,8 +69,31 @@ public class ProductServiceImpl implements ProductService {
         if (Optional.ofNullable(itemRepository.isProductUsesInItems(id)).isPresent()) {
             throw new ProductIsUsedException("product is used in some order(s)", "productId=" + id);
         } else {
-            imageRepository.deleteById(id);
+            imageService.deleteById(id);
             productRepository.deleteById(id);
         }
     }
+
+    @Transactional
+    private Product save(Product product) throws IOException {
+        MultipartFile file = product.getFile();
+        product = productMapper.entity2domain(productRepository.save(productMapper.domain2entity(product)));
+        saveImage(product.getId(), file);
+        return product;
+    }
+
+    @Transactional
+    private void saveImage(Long productId, MultipartFile file) throws IOException {
+        if (Objects.nonNull(file)) {
+            var image = Image.builder()
+                    .productId(productId)
+                    .image(file.getBytes())
+                    .imageName(file.getOriginalFilename()).build();
+            if (image.isImageReadyToBeSaved()) {
+                image.setProductId(productId);
+                imageService.setImage(image);
+            }
+        }
+    }
+
 }

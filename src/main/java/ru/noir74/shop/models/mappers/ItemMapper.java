@@ -12,10 +12,8 @@ import ru.noir74.shop.models.dto.ItemDto;
 import ru.noir74.shop.models.entity.ItemEntity;
 import ru.noir74.shop.models.entity.ProductEntity;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
