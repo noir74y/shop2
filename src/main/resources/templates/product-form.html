@@ -39,6 +39,12 @@
     <button type="submit">Сохранить</button>
 </form>
 
+<form th:action="${id}" method="post">
+    <p></p>
+    <input type="hidden" name="_method" value="delete">
+    <button>Удалить</button>
+</form>
+
 
 <script defer type="text/javascript" th:inline="javascript">
     const fileInput = document.getElementById('fileInput');
