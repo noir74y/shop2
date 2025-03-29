@@ -134,32 +134,48 @@
     }
 
     function addToCart(actionForm) {
-       quantityFormId = "quantity-form-" + actionForm.elements["product_id"].value;
+       let productId = actionForm.elements["product_id"].value;
+       quantityFormId = "quantity-form-" + productId;
        quantityForm = document.getElementById(quantityFormId);
        quantity = parseInt(quantityForm.elements["quantity"].value);
+
        if(quantity == 0) {
          let productId = actionForm.elements["product_id"].value;
          fetch("/product/item/" + productId + "/add", {
          method: 'POST',
          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
          body: ''});
+         window.location.href = window.location.href;
        }
     }
 
     function removeFromCart(actionForm) {
        let productId = actionForm.elements["product_id"].value;
-       fetch("/product/item/" + productId + "/remove", {
-       method: 'POST',
-       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-       body: ''});
+       quantityFormId = "quantity-form-" + productId;
+       quantityForm = document.getElementById(quantityFormId);
+       quantity = parseInt(quantityForm.elements["quantity"].value);
+
+       if (quantity > 0) {
+         fetch("/product/item/" + productId + "/remove", {
+         method: 'POST',
+         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+         body: ''});
+         window.location.href = window.location.href;
+       }
     }
 
     function changeQuantity(quantityForm, delta) {
        let value = parseInt(quantityForm.elements["quantity"].value) + delta
-       if (value == 0 ) {
+       if (delta == -1 && value <= 0) {
           actionFormId = "action-form-" + quantityForm.elements["product_id"].value;
           actionForm = document.getElementById(actionFormId);
           removeFromCart(actionForm);
+          return;
+       }
+       else if (delta == 1 && value == 1) {
+          actionFormId = "action-form-" + quantityForm.elements["product_id"].value;
+          actionForm = document.getElementById(actionFormId);
+          addToCart(actionForm);
           return;
        }
        else {

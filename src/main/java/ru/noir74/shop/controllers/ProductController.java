@@ -81,7 +81,6 @@ public class ProductController {
     @PostMapping(value = "item/{id}/add")
     public String addToCart(@PathVariable("id") @NotEmpty @Positive Long productId) {
         cartService.addToCart(productId);
-        cartService.setQuantity(productId, 1);
         return "redirect:/product";
     }
 

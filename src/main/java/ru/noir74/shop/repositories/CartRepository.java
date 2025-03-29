@@ -3,41 +3,37 @@ package ru.noir74.shop.repositories;
 import org.springframework.stereotype.Repository;
 import ru.noir74.shop.models.entity.ItemEntity;
 
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Repository
 public class CartRepository {
-    private final List<ItemEntity> cartStorage;
+    private final Map<Long, ItemEntity> cartStorage;
 
     public CartRepository() {
-        this.cartStorage = new LinkedList<ItemEntity>();
+        this.cartStorage = new HashMap<>();
     }
 
     public List<ItemEntity> findAll() {
-        return cartStorage;
+        return cartStorage.values().stream().toList();
     }
 
     public Integer getQuantityOfProduct(Long productId) {
-        return cartStorage.stream()
-                .filter(obj -> obj.getProductEntity().getId().equals(productId))
-                .map(ItemEntity::getQuantity)
-                .findFirst().orElse(0);
+        return cartStorage.getOrDefault(productId, ItemEntity.builder().quantity(0).build()).getQuantity();
     }
 
     public void insert(ItemEntity itemEntity) {
-        cartStorage.add(itemEntity);
+        cartStorage.put(itemEntity.getProductEntity().getId(), itemEntity);
     }
 
     public void delete(ItemEntity itemEntity) {
-        cartStorage.remove(itemEntity);
+        cartStorage.remove(itemEntity.getProductEntity().getId());
     }
 
     public void replace(ItemEntity itemEntity) {
-        cartStorage.stream()
-                .filter(obj -> obj.getProductEntity().getId().equals(itemEntity.getProductEntity().getId()))
-                .findFirst().ifPresent(obj -> cartStorage.set(cartStorage.indexOf(obj), itemEntity));
+        cartStorage.replace(itemEntity.getProductEntity().getId(), itemEntity);
     }
 
     public void deleteAll() {
