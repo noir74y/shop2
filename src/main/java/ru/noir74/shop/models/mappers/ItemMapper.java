@@ -8,6 +8,7 @@ import org.modelmapper.TypeMap;
 import org.springframework.stereotype.Component;
 import ru.noir74.shop.models.domain.Item;
 import ru.noir74.shop.models.domain.Product;
+import ru.noir74.shop.models.dto.ItemDto;
 import ru.noir74.shop.models.entity.ItemEntity;
 import ru.noir74.shop.models.entity.ProductEntity;
 
@@ -45,15 +46,20 @@ public class ItemMapper {
         return Optional.ofNullable(entity).map(obj -> modelMapper.map(obj, Item.class)).orElse(null);
     }
 
+    public ItemDto domain2dto(Item domain) {
+        return Optional.ofNullable(domain).map(obj -> modelMapper.map(obj, ItemDto.class)).orElse(null);
+    }
+
     public List<ItemEntity> bulkDomain2entity(List<Item> domains) {
-        return domains.stream()
-                .map(this::domain2entity)
-                .collect(Collectors.toCollection(LinkedList::new));
+        return domains.stream().map(this::domain2entity).toList();
     }
 
     public List<Item> bulkEntity2domain(List<ItemEntity> entities) {
-        return entities.stream()
-                .map(this::entity2domain)
-                .collect(Collectors.toCollection(LinkedList::new));
+        return entities.stream().map(this::entity2domain).toList();
     }
+
+    public List<ItemDto> bulkDomain2dto(List<Item> domains) {
+        return domains.stream().map(this::domain2dto).toList();
+    }
+
 }

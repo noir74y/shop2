@@ -11,6 +11,7 @@ import ru.noir74.shop.misc.enums.ProductSorting;
 import ru.noir74.shop.misc.validators.ValueOfEnumConstraint;
 import ru.noir74.shop.models.dto.ProductDtoReq;
 import ru.noir74.shop.models.mappers.ProductMapper;
+import ru.noir74.shop.services.CartService;
 import ru.noir74.shop.services.ProductService;
 
 import javax.validation.constraints.NotEmpty;
@@ -25,16 +26,24 @@ public class ProductController {
     private final AppConfiguration appConfiguration;
     private final ProductService productService;
     private final ProductMapper productMapper;
+    private final CartService cartService;
 
     @GetMapping
     public String getPage(Model model,
-                          @RequestParam(required = false, name = "page") @Pattern(regexp = "^[1-9]+$") String page,
+                          @RequestParam(defaultValue = "1", name = "page") @Pattern(regexp = "^([1-9]+)|$") String page,
                           @RequestParam(required = false, name = "size") @Pattern(regexp = "10|20|50|100") String size,
                           @RequestParam(required = false, name = "sort") @ValueOfEnumConstraint(enumClass = ProductSorting.class) String sort) {
-        var items = productMapper.bulkDomain2DtoResp(productService.getPage(
+        var products = productMapper.bulkDomain2DtoResp(productService.getPage(
                 Objects.nonNull(page) ? Integer.parseInt(page) - 1 : appConfiguration.getDefaultPageNumber() - 1,
                 Objects.nonNull(size) ? Integer.parseInt(size) : appConfiguration.getDefaultPageSize(),
                 Objects.nonNull(sort) ? ProductSorting.valueOf(sort) : appConfiguration.getDefaultPageSorting()));
+
+        products.forEach(productDtoResp -> productDtoResp.setQuantity(cartService.getQuantityOfProduct(productDtoResp.getId())));
+
+        model.addAttribute("page", page);
+        model.addAttribute("size", size);
+        model.addAttribute("products",products);
+
         return "products";
     }
 

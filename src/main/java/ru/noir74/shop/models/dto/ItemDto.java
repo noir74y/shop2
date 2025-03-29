@@ -4,15 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.noir74.shop.models.domain.Product;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductDtoResp {
-    private Long id;
-    private String title;
-    private Integer price;
-    private String description;
+public class ItemDto {
+    private Product product;
     private Integer quantity;
 }

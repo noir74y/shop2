@@ -12,10 +12,8 @@ import ru.noir74.shop.models.dto.OrderDto;
 import ru.noir74.shop.models.entity.ItemEntity;
 import ru.noir74.shop.models.entity.OrderEntity;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -59,14 +57,10 @@ public class OrderMapper {
     }
 
     public List<Order> bulkEntity2domain(List<OrderEntity> entities) {
-        return entities.stream()
-                .map(this::entity2domain)
-                .collect(Collectors.toCollection(LinkedList::new));
+        return entities.stream().map(this::entity2domain).toList();
     }
 
     public List<OrderDto> bulkDomain2Dto(List<Order> domains) {
-        return domains.stream()
-                .map(this::domain2dto)
-                .collect(Collectors.toCollection(LinkedList::new));
+        return domains.stream().map(this::domain2dto).toList();
     }
 }

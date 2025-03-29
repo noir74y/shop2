@@ -6,6 +6,7 @@ import ru.noir74.shop.models.entity.ItemEntity;
 import java.util.LinkedList;
 import java.util.List;
 
+
 @Repository
 public class CartRepository {
     private final List<ItemEntity> cartStorage;
@@ -16,6 +17,13 @@ public class CartRepository {
 
     public List<ItemEntity> findAll() {
         return cartStorage;
+    }
+
+    public Integer getQuantityOfProduct(Long productId) {
+        return cartStorage.stream()
+                .filter(obj -> obj.getProductEntity().getId().equals(productId))
+                .map(ItemEntity::getQuantity)
+                .findFirst().orElse(0);
     }
 
     public void insert(ItemEntity itemEntity) {

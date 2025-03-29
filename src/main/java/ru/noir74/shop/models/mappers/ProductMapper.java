@@ -7,6 +7,7 @@ import ru.noir74.shop.models.domain.Product;
 import ru.noir74.shop.models.dto.ProductDtoReq;
 import ru.noir74.shop.models.dto.ProductDtoResp;
 import ru.noir74.shop.models.entity.ProductEntity;
+import ru.noir74.shop.services.CartService;
 
 import java.util.LinkedList;
 import java.util.List;

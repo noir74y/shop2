@@ -22,7 +22,7 @@ public class CartController {
 
     @GetMapping
     public String get(Model model) {
-        var cart = cartService.get();
+        var cart = cartService.findAll();
         return "cart";
     }
 

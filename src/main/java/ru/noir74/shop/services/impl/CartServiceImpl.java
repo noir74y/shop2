@@ -21,8 +21,13 @@ public class CartServiceImpl implements CartService {
     private final ItemMapper itemMapper;
 
     @Override
-    public List<Item> get() {
+    public List<Item> findAll() {
         return itemMapper.bulkEntity2domain(cartRepository.findAll());
+    }
+
+    @Override
+    public Integer getQuantityOfProduct(Long productId) {
+        return cartRepository.getQuantityOfProduct(productId);
     }
 
     @Override

@@ -32,16 +32,16 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(readOnly = true)
     public Order get(Long id) {
-        return orderMapper.entity2domain(orderRepository.findById(id).orElseThrow(() -> new NotFoundException("order is not found", "id=" + id)));
+        return orderMapper.entity2domain(orderRepository
+                .findById(id)
+                .orElseThrow(() -> new NotFoundException("order is not found", "id=" + id)));
     }
 
     @Override
     @Transactional
     public Order create(List<Item> items) {
         return orderMapper.entity2domain(orderRepository.save(
-                OrderEntity
-                        .builder()
-                        .itemEntities(itemRepository.saveAll(itemMapper.bulkDomain2entity(items)))
-                        .build()));
+                OrderEntity.builder()
+                        .itemEntities(itemRepository.saveAll(itemMapper.bulkDomain2entity(items))).build()));
     }
 }

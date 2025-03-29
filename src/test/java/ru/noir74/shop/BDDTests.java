@@ -72,17 +72,15 @@ class BDDTests {
                         .param("description", product.getDescription()))
                 .andExpect(status().is3xxRedirection());
 
-        productId = productService.getPage(0, 10, ProductSorting.TITLE).getFirst().getId();
-        product.setId(productId);
+        product = productService.getPage(0, 10, ProductSorting.TITLE).getFirst();
+        productId = product.getId();
         assertEquals(product, productService.get(productId));
     }
 
     @Test
     @DisplayName("02 step - change product")
     void changeProduct() throws Exception {
-        product.setTitle("product2");
-        product.setPrice(2);
-        product.setDescription("description2");
+        product = Product.builder().id(productId).title("product2").price(2).description("description2").build();
 
         mockMvc.perform(MockMvcRequestBuilders.post("/product/" + productId)
                         .param("title", product.getTitle())
@@ -155,7 +153,7 @@ class BDDTests {
                         .param("id", String.valueOf(productId)))
                 .andExpect(status().is3xxRedirection());
 
-        var item = cartService.get().getFirst();
+        var item = cartService.findAll().getFirst();
         assertEquals(1, item.getQuantity());
         assertEquals(product, item.getProduct());
     }
@@ -167,7 +165,7 @@ class BDDTests {
                         .param("id", String.valueOf(productId)))
                 .andExpect(status().is3xxRedirection());
 
-        assertEquals(0, cartService.get().size());
+        assertEquals(0, cartService.findAll().size());
     }
 
     @Test
@@ -185,7 +183,7 @@ class BDDTests {
                 .param("id", String.valueOf(quantity))
         ).andExpect(status().is3xxRedirection());
 
-        assertEquals(quantity, cartService.get().getFirst().getQuantity());
+        assertEquals(quantity, cartService.findAll().getFirst().getQuantity());
     }
 
     @Test
