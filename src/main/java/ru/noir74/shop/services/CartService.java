@@ -17,5 +17,7 @@ public interface CartService {
 
     void setQuantity(Long productId, Integer quantity);
 
+    Integer getTotal();
+
     void makeOrder();
 }

@@ -14,9 +14,23 @@
 </head>
 
 <body>
+<div style="overflow: hidden;">
+    <a href="/product" style="float: right; margin: 20px">
+        Продукты
+    </a>
+</div>
+<div style="overflow: hidden;">
+    <a href="/cart" style="float: right; margin: 20px">
+        Корзина
+    </a>
+</div>
+<div style="overflow: hidden;">
+    <a href="/order" style="float: right; margin: 20px">
+        Заказы
+    </a>
+</div>
 
 <h1>Продукты</h1>
-
 
 <form action="" method="get">
     <p>
@@ -99,6 +113,8 @@
         <p></p>
         <input id="fileInput" type="file" name="file" accept="image/*">
         <img id="filePreview" alt="" src="" width="100" height="100">
+
+        <label for="quantity"></label><input id="quantity" type="text" name="quantity" value="0" hidden>
 
         <p></p>
         <button type="submit">Сохранить</button>

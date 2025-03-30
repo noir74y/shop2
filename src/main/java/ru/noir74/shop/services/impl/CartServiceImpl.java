@@ -36,6 +36,7 @@ public class CartServiceImpl implements CartService {
                 .ifPresent(obj -> cartRepository.insert(ItemEntity.builder()
                         .productEntity(obj)
                         .quantity(1)
+                        .price(obj.getPrice())
                         .build()));
     }
 
@@ -45,6 +46,7 @@ public class CartServiceImpl implements CartService {
                 .ifPresent(obj -> cartRepository.insert(ItemEntity.builder()
                         .productEntity(obj)
                         .quantity(quantity)
+                        .price(obj.getPrice())
                         .build()));
     }
 
@@ -69,6 +71,11 @@ public class CartServiceImpl implements CartService {
                     obj.setQuantity(quantity);
                     cartRepository.replace(obj);
                 });
+    }
+
+    @Override
+    public Integer getTotal() {
+        return findAll().stream().mapToInt(obj -> obj.getPrice() * obj.getQuantity()).sum();
     }
 
     @Override

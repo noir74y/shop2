@@ -82,21 +82,21 @@ public class ProductController {
         return "redirect:/product";
     }
 
-    @PostMapping(value = "item/{id}/add")
-    public String addToCart(@PathVariable("id") @NotEmpty @Positive Long productId) {
+    @PostMapping(value = "item/{productId}/add")
+    public String addToCart(@PathVariable("productId") @NotEmpty @Positive Long productId) {
         cartService.addToCart(productId);
         return "redirect:/product";
     }
 
-    @PostMapping(value = "item/{id}/remove")
-    public String removeFromCart(@PathVariable("id") @NotEmpty @Positive Long productId) {
+    @PostMapping(value = "item/{productId}/remove")
+    public String removeFromCart(@PathVariable("productId") @NotEmpty @Positive Long productId) {
         cartService.removeFromCart(productId);
         return "redirect:/product";
     }
 
-    @PostMapping(value = "item/{id}/quantity/{quantity}")
+    @PostMapping(value = "item/{productId}/quantity/{quantity}")
     public String setQuantity(Model model,
-                              @PathVariable("id") @NotEmpty @Positive Long productId,
+                              @PathVariable("productId") @NotEmpty @Positive Long productId,
                               @PathVariable("quantity") @NotEmpty @Positive Integer quantity) {
         cartService.setQuantity(productId, quantity);
         return "redirect:/product";

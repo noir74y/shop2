@@ -1,10 +1,108 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Корзина</title>
+    <style>
+        table {
+             border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid;
+        }
+    </style>
 </head>
+
 <body>
 
+<div style="overflow: hidden;">
+    <a href="/product" style="float: right; margin: 20px">
+        Продукты
+    </a>
+</div>
+<div style="overflow: hidden;">
+    <a href="/cart" style="float: right; margin: 20px">
+        Корзина
+    </a>
+</div>
+<div style="overflow: hidden;">
+    <a href="/order" style="float: right; margin: 20px">
+        Заказы
+    </a>
+</div>
+
+<h1>Корзина</h1>
+
+<table id='itemsTable'>
+    <thead>
+    <tr>
+        <th>Картинка</th>
+        <th>Название</th>
+        <th>Цена</th>
+        <th>Действия</th>
+        <th>Количество в корзине</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr th:each="item : ${items}">
+        <td><img th:src="|/image/${item.product.id}|" alt="" width="100" height="100"></td>
+        <td><a th:href="|/product/${item.product.id}|" th:text="${item.product.title}"></a></td>
+        <td th:text="${item.price}"></td>
+        <td>
+            <form th:id="|action-form-${item.product.id}|">
+                <input type="hidden" name="product_id" th:value="${item.product.id}">
+                <button type="button" onclick="removeFromCart(this.form)">Удалить из корзины</button>
+            </form>
+        </td>
+        <td>
+            <form th:id="|quantity-form-${item.product.id}|">
+                <input type="hidden" name="product_id" th:value="${item.product.id}">
+                <label>
+                    <input type="text" name="quantity" th:value="${item.quantity}" size=10 readonly>
+                </label>
+                <br>
+                <button onclick="changeQuantity(this.form, 1)" type="button">Больше</button>
+                <br>
+                <button onclick="changeQuantity(this.form, -1)" type="button">Меньше</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<p></p>
+<label for="total">Стоимость</label>
+<input type="text" id="total" name="total" readonly th:value="${total}">
+
+<script defer type="text/javascript" th:inline="javascript">
+
+    function removeFromCart(form) {
+        let productId = form.elements["product_id"].value;
+        fetch("/cart/item/" + productId + "/remove", {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: ''});
+        window.location.href = window.location.href;
+    }
+
+    function changeQuantity(form, delta) {
+       let currentValue = parseInt(form.elements["quantity"].value);
+
+       if (currentValue > 1 && delta == -1 || delta == 1) {
+          currentValue += delta;
+          let productId = form.elements["product_id"].value;
+          fetch("/cart/item/" + productId + "/quantity/" + currentValue, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          body: ''});
+          window.location.href = window.location.href;
+       }
+    }
+
+</script>
+
+
 </body>
+
 </html>

@@ -15,6 +15,22 @@
 </head>
 
 <body>
+<div style="overflow: hidden;">
+    <a href="/product" style="float: right; margin: 20px">
+        Продукты
+    </a>
+</div>
+<div style="overflow: hidden;">
+    <a href="/cart" style="float: right; margin: 20px">
+        Корзина
+    </a>
+</div>
+<div style="overflow: hidden;">
+    <a href="/order" style="float: right; margin: 20px">
+        Заказы
+    </a>
+</div>
+
 <h1>Продукт</h1>
 
 <form id="productForm" enctype="multipart/form-data" action="" method="post" accept-charset="UTF-8">
@@ -42,11 +58,11 @@
 
     <p></p>
     <label for="quantity">Количество в корзине</label>
-         <input id="quantity" type="text" name="quantity" th:value="${quantity}" size=10 readonly>
+    <input id="quantity" type="text" name="quantity" th:value="${quantity}" size=10 readonly>
     <br>
-     <button onclick="changeQuantity(this.form, 1)" type="button">Больше</button>
-     <br>
-     <button onclick="changeQuantity(this.form, -1)" type="button">Меньше</button>
+    <button onclick="changeQuantity(this.form, 1)" type="button">Больше</button>
+    <br>
+    <button onclick="changeQuantity(this.form, -1)" type="button">Меньше</button>
 
     <p></p>
     <button type="submit">Сохранить</button>
