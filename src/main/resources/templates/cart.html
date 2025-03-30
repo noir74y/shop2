@@ -75,6 +75,11 @@
 <label for="total">Стоимость</label>
 <input type="text" id="total" name="total" readonly th:value="${total}">
 
+<form action="/cart/order" method="post">
+    <p></p>
+    <button>Заказать</button>
+</form>
+
 <script defer type="text/javascript" th:inline="javascript">
 
     function removeFromCart(form) {

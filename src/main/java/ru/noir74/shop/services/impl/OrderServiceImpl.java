@@ -40,8 +40,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public Order create(List<Item> items) {
-        return orderMapper.entity2domain(orderRepository.save(
-                OrderEntity.builder()
-                        .itemEntities(itemRepository.saveAll(itemMapper.bulkDomain2entity(items))).build()));
+        var orderEntity = orderRepository.save(OrderEntity.builder().build());
+        var itemEntities = itemMapper.bulkDomain2entity(items).stream().peek(obj -> obj.setOrderId(orderEntity.getId())).toList();
+        orderEntity.setItemEntities(itemRepository.saveAll(itemEntities));
+        return orderMapper.entity2domain(orderEntity);
     }
 }

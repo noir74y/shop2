@@ -1,14 +1,13 @@
 package ru.noir74.shop.misc.error;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import ru.noir74.shop.misc.error.exceptions.AppException;
 import ru.noir74.shop.misc.error.exceptions.NotFoundException;
 import ru.noir74.shop.misc.error.exceptions.ProductIsUsedException;
 
 @Slf4j
-@ControllerAdvice
+//@ControllerAdvice
 public class ExceptionController {
     @ExceptionHandler(Exception.class)
     public String exceptionController(Exception exception) {

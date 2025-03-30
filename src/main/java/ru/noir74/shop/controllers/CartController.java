@@ -51,9 +51,9 @@ public class CartController {
     }
 
     @PostMapping(value = "order")
-    public String makeOrder(Model model) {
+    public String makeOrder() {
         cartService.makeOrder();
-        return "orders";
+        return "redirect:/order";
     }
 
 }

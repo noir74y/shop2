@@ -141,7 +141,7 @@ class BDDTests {
     @DisplayName("07 step - list products")
     void listProducts() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/product")
-                        .param("size","10")
+                        .param("size", "10")
                         .param("sort", "TITLE"))
                 .andExpect(status().isOk());
     }
