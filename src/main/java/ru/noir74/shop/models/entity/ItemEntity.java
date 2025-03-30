@@ -26,4 +26,9 @@ public class ItemEntity {
     @Positive
     @Column(nullable = false)
     private Integer quantity;
+
+    @Positive
+    @Column(nullable = false)
+    private Integer price;
+
 }

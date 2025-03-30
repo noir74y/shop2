@@ -13,4 +13,5 @@ import ru.noir74.shop.models.domain.Product;
 public class ItemDto {
     private Product product;
     private Integer quantity;
+    private Integer price;
 }

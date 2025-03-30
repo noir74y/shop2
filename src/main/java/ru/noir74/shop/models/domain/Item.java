@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class Item {
     private Product product;
     private Integer quantity;
+    private Integer price;
 }
