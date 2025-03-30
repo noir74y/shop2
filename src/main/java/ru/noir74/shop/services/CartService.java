@@ -11,6 +11,8 @@ public interface CartService {
 
     void addToCart(Long productId);
 
+    void addToCart(Long productId, Integer quantity);
+
     void removeFromCart(Long productId);
 
     void setQuantity(Long productId, Integer quantity);

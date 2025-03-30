@@ -40,6 +40,15 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    public void addToCart(Long productId, Integer quantity) {
+        productRepository.findById(productId)
+                .ifPresent(obj -> cartRepository.insert(ItemEntity.builder()
+                        .productEntity(obj)
+                        .quantity(quantity)
+                        .build()));
+    }
+
+    @Override
     public void removeFromCart(Long productId) {
         cartRepository
                 .findAll()

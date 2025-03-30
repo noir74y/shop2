@@ -16,4 +16,5 @@ public class ProductDtoReq {
     private Integer price;
     private String description;
     private MultipartFile file;
+    private Integer quantity;
 }

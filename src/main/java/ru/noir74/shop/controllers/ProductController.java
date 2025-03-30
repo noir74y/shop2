@@ -56,19 +56,23 @@ public class ProductController {
         model.addAttribute("title", product.getTitle());
         model.addAttribute("price", product.getPrice());
         model.addAttribute("description", product.getDescription());
+        model.addAttribute("quantity", cartService.getQuantityOfProduct(id));
 
         return "product";
     }
 
     @PostMapping
     public String create(@ModelAttribute ProductDtoReq productDtoReq) throws IOException {
-        productService.create(productMapper.dtoReq2domain(productDtoReq));
+        var product = productService.create(productMapper.dtoReq2domain(productDtoReq));
+        if (productDtoReq.getQuantity() != 0) cartService.addToCart(product.getId(), productDtoReq.getQuantity());
         return "redirect:/product";
     }
 
     @PostMapping(value = "{id}")
     public String update(@ModelAttribute ProductDtoReq productDtoReq, @PathVariable("id") @NotEmpty @Positive Long id) throws IOException {
         productService.update(productMapper.dtoReq2domain(productDtoReq));
+        if (productDtoReq.getQuantity() != 0) cartService.addToCart(productDtoReq.getId(), productDtoReq.getQuantity());
+        else cartService.removeFromCart(productDtoReq.getId());
         return "redirect:/product";
     }
 
