@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -60,15 +61,21 @@ class BDDTests {
     Product product;
     Long productId;
     Integer quantity;
+    MockMultipartFile mockMultipartFile;
 
     @Test
     @DisplayName("01 step - create product")
     void createProduct() throws Exception {
-        product = Product.builder().title("product").price(1).description("description").build();
+        product = Product.builder()
+                .title("product")
+                .price(1)
+                .description("description")
+                .build();
 
         mockMvc.perform(MockMvcRequestBuilders.post("/product")
                         .param("title", product.getTitle())
                         .param("price", String.valueOf(product.getPrice()))
+                        .param("quantity", "1")
                         .param("description", product.getDescription()))
                 .andExpect(status().is3xxRedirection());
 
@@ -86,19 +93,19 @@ class BDDTests {
                         .param("title", product.getTitle())
                         .param("price", String.valueOf(product.getPrice()))
                         .param("description", product.getDescription()))
-                .andExpect(status().is3xxRedirection());
+                .andExpect(status().isOk());
 
         assertEquals(product, productService.get(productId));
     }
 
     @Test
-    @DisplayName("03 step - set image for product")
+    @DisplayName("03.1 step - set image for product")
     void setImageForProduct() throws Exception {
-        var mockMultipartFile = new MockMultipartFile(
+       mockMultipartFile = new MockMultipartFile(
                 "file",
                 "someFile.jpeg",
                 "image/jpeg",
-                new byte[]{(byte) 0x00});
+                "fileContent".getBytes());
 
         mockMvc.perform(MockMvcRequestBuilders.multipart("/image/" + productId)
                         .file(mockMultipartFile)
@@ -112,14 +119,31 @@ class BDDTests {
     }
 
     @Test
-    @DisplayName("04 step - delete product")
+    @DisplayName("03.3 step - get image for product")
+    void getImageForProduct() throws Exception {
+        MockHttpServletResponse mockHttpServletResponse = mockMvc.perform(
+                        MockMvcRequestBuilders.get("/image/" + productId))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+
+        assertEquals("fileContent", new String(mockHttpServletResponse.getContentAsByteArray()));
+    }
+
+    @Test
+    @DisplayName("04.1 step - try ot delete product which is in cart")
+    void tryToDeleteProductWhichIsInCart() throws Exception {
+        assertThrows(ProductIsUsedException.class, () -> productService.delete(productId));
+        cartRepository.deleteAll();
+    }
+
+    @Test
+    @DisplayName("04.2 step - delete product")
     void deleteProduct() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/product/" + productId)
                         .param("_method", "delete")
                         .param("id", String.valueOf(productId))
                 )
                 .andExpect(status().is3xxRedirection());
-
         assertThrows(NotFoundException.class, () -> productService.get(productId));
         assertThrows(NotFoundException.class, () -> imageService.findImageById(productId));
     }
@@ -175,10 +199,45 @@ class BDDTests {
     }
 
     @Test
-    @DisplayName("11 step - change quantity of product in cart")
+    @DisplayName("11.1 step - change quantity of product in cart")
     void changeQuantityOfProductInCart() throws Exception {
         quantity = 2;
         mockMvc.perform(MockMvcRequestBuilders.post("/cart/item/" + productId + "/quantity/" + quantity)
+                .param("id", String.valueOf(productId))
+                .param("id", String.valueOf(quantity))
+        ).andExpect(status().is3xxRedirection());
+
+        assertEquals(quantity, cartService.findAll().getFirst().getQuantity());
+    }
+
+    @Test
+    @DisplayName("11.2 step - remove product from cart again")
+    void removeProductFromCartAgain() throws Exception {
+        quantity = 2;
+        mockMvc.perform(MockMvcRequestBuilders.post("/product/item/" + productId + "/remove")
+                .param("id", String.valueOf(productId))
+        ).andExpect(status().is3xxRedirection());
+
+        assertEquals(0, cartService.findAll().size());
+    }
+
+    @Test
+    @DisplayName("11.3 step - add product to cart again2")
+    void addProductToCartAgain2() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/product/item/" + productId + "/add")
+                        .param("id", String.valueOf(productId)))
+                .andExpect(status().is3xxRedirection());
+
+        var item = cartService.findAll().getFirst();
+        assertEquals(1, item.getQuantity());
+        assertEquals(product, item.getProduct());
+    }
+
+    @Test
+    @DisplayName("11.4 step - change quantity of product in cart again")
+    void changeQuantityOfProductInCartAgain() throws Exception {
+        quantity = 2;
+        mockMvc.perform(MockMvcRequestBuilders.post("/product/item/" + productId + "/quantity/" + quantity)
                 .param("id", String.valueOf(productId))
                 .param("id", String.valueOf(quantity))
         ).andExpect(status().is3xxRedirection());
@@ -197,7 +256,7 @@ class BDDTests {
     @DisplayName("13th step - make order")
     void makeOrder() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/cart/order"))
-                .andExpect(status().isOk());
+                .andExpect(status().is3xxRedirection());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/order"))
                 .andExpect(status().isOk());
