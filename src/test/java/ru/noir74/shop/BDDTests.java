@@ -99,9 +99,29 @@ class BDDTests {
     }
 
     @Test
-    @DisplayName("03.1 step - set image for product")
+    @DisplayName("03 step - set image for product")
     void setImageForProduct() throws Exception {
        mockMultipartFile = new MockMultipartFile(
+                "file",
+                "someFile.jpeg",
+                "image/jpeg",
+                "something".getBytes());
+
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/image/" + productId)
+                        .file(mockMultipartFile)
+                        .param("id", String.valueOf(productId))
+                )
+                .andExpect(status().isOk());
+
+        var image = imageService.findImageById(productId);
+        assertArrayEquals(mockMultipartFile.getBytes(), image.getImage());
+        assertEquals(mockMultipartFile.getOriginalFilename(), image.getImageName());
+    }
+
+    @Test
+    @DisplayName("04 step - set image for product again")
+    void setImageForProductAgain() throws Exception {
+        mockMultipartFile = new MockMultipartFile(
                 "file",
                 "someFile.jpeg",
                 "image/jpeg",
@@ -119,7 +139,7 @@ class BDDTests {
     }
 
     @Test
-    @DisplayName("03.3 step - get image for product")
+    @DisplayName("05 step - get image for product")
     void getImageForProduct() throws Exception {
         MockHttpServletResponse mockHttpServletResponse = mockMvc.perform(
                         MockMvcRequestBuilders.get("/image/" + productId))
@@ -130,14 +150,14 @@ class BDDTests {
     }
 
     @Test
-    @DisplayName("04.1 step - try ot delete product which is in cart")
+    @DisplayName("06 step - try ot delete product which is in cart")
     void tryToDeleteProductWhichIsInCart() throws Exception {
         assertThrows(ProductIsUsedException.class, () -> productService.delete(productId));
         cartRepository.deleteAll();
     }
 
     @Test
-    @DisplayName("04.2 step - delete product")
+    @DisplayName("07 step - delete product")
     void deleteProduct() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/product/" + productId)
                         .param("_method", "delete")
@@ -149,20 +169,20 @@ class BDDTests {
     }
 
     @Test
-    @DisplayName("05 step - add product again")
+    @DisplayName("08 step - add product again")
     void addProductAgain() throws Exception {
         createProduct();
     }
 
     @Test
-    @DisplayName("06 step - get product")
+    @DisplayName("09 step - get product")
     void getProduct() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/product/" + productId))
                 .andExpect(status().isOk());
     }
 
     @Test
-    @DisplayName("07 step - list products")
+    @DisplayName("10 step - list products")
     void listProducts() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/product")
                         .param("size", "10")
@@ -171,7 +191,7 @@ class BDDTests {
     }
 
     @Test
-    @DisplayName("08 step - add product to cart")
+    @DisplayName("11 step - add product to cart")
     void addProductToCart() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/cart/product/" + productId + "/add")
                         .param("id", String.valueOf(productId)))
@@ -183,7 +203,7 @@ class BDDTests {
     }
 
     @Test
-    @DisplayName("09 step - remove product from cart")
+    @DisplayName("12 step - remove product from cart")
     void removeProductFromCart() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/cart/item/" + productId + "/remove")
                         .param("id", String.valueOf(productId)))
@@ -193,13 +213,13 @@ class BDDTests {
     }
 
     @Test
-    @DisplayName("10 step - add product to cart again")
+    @DisplayName("13 step - add product to cart again")
     void addProductToCartAgain() throws Exception {
         addProductToCart();
     }
 
     @Test
-    @DisplayName("11.1 step - change quantity of product in cart")
+    @DisplayName("14 step - change quantity of product in cart")
     void changeQuantityOfProductInCart() throws Exception {
         quantity = 2;
         mockMvc.perform(MockMvcRequestBuilders.post("/cart/item/" + productId + "/quantity/" + quantity)
@@ -211,7 +231,7 @@ class BDDTests {
     }
 
     @Test
-    @DisplayName("11.2 step - remove product from cart again")
+    @DisplayName("15 step - remove product from cart again")
     void removeProductFromCartAgain() throws Exception {
         quantity = 2;
         mockMvc.perform(MockMvcRequestBuilders.post("/product/item/" + productId + "/remove")
@@ -222,7 +242,7 @@ class BDDTests {
     }
 
     @Test
-    @DisplayName("11.3 step - add product to cart again2")
+    @DisplayName("16 step - add product to cart again2")
     void addProductToCartAgain2() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/product/item/" + productId + "/add")
                         .param("id", String.valueOf(productId)))
@@ -234,7 +254,7 @@ class BDDTests {
     }
 
     @Test
-    @DisplayName("11.4 step - change quantity of product in cart again")
+    @DisplayName("17 step - change quantity of product in cart again")
     void changeQuantityOfProductInCartAgain() throws Exception {
         quantity = 2;
         mockMvc.perform(MockMvcRequestBuilders.post("/product/item/" + productId + "/quantity/" + quantity)
@@ -246,14 +266,14 @@ class BDDTests {
     }
 
     @Test
-    @DisplayName("12th step - list cart")
+    @DisplayName("18 step - list cart")
     void listCart() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/cart"))
                 .andExpect(status().isOk());
     }
 
     @Test
-    @DisplayName("13th step - make order")
+    @DisplayName("19 step - make order")
     void makeOrder() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/cart/order"))
                 .andExpect(status().is3xxRedirection());
@@ -265,7 +285,7 @@ class BDDTests {
     }
 
     @Test
-    @DisplayName("14th step - list orders")
+    @DisplayName("20 step - list orders")
     void listOrders() throws Exception {
         var orderId = orderService.findAll().getFirst().getId();
         var item = orderService.findById(orderId).getItems().getFirst();
@@ -279,7 +299,7 @@ class BDDTests {
     }
 
     @Test
-    @DisplayName("15th step - try to delete product")
+    @DisplayName("21 step - try to delete product")
     void tryToDeleteProduct() {
         assertThrows(ProductIsUsedException.class, () -> productService.delete(productId));
     }
