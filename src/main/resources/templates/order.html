@@ -1,10 +1,62 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Заказ</title>
+    <style>
+        table {
+             border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid;
+        }
+    </style>
 </head>
+
 <body>
 
+<div style="overflow: hidden;">
+    <a href="/product" style="float: right; margin: 20px">
+        Продукты
+    </a>
+</div>
+<div style="overflow: hidden;">
+    <a href="/cart" style="float: right; margin: 20px">
+        Корзина
+    </a>
+</div>
+<div style="overflow: hidden;">
+    <a href="/order" style="float: right; margin: 20px">
+        Заказы
+    </a>
+</div>
+
+<h1>Заказ</h1>
+
+<table id='itemsTable'>
+    <thead>
+    <tr>
+        <th>Картинка</th>
+        <th>Название</th>
+        <th>Количество</th>
+        <th>Цена</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr th:each="item : ${items}">
+        <td><img th:src="|/image/${item.product.id}|" alt="" width="100" height="100"></td>
+        <td th:text="${item.product.title}"></td>
+        <td th:text="${item.quantity}"></td>
+        <td th:text="${item.price}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<p></p>
+<label for="total">Стоимость</label>
+<input type="text" id="total" name="total" readonly th:value="${total}">
+
 </body>
+
 </html>

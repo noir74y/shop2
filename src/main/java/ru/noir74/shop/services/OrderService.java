@@ -6,9 +6,11 @@ import ru.noir74.shop.models.domain.Order;
 import java.util.List;
 
 public interface OrderService {
-    List<Order> getAll();
+    List<Order> findAll();
 
-    Order get(Long id);
+    Order findById(Long id);
 
-    Order create(List<Item> itemList);
+    void create(List<Item> itemList);
+
+    Integer getTotal();
 }

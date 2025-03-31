@@ -25,14 +25,18 @@ public class OrderController {
     @GetMapping
     @Transactional(readOnly = true)
     public String getALl(Model model) {
-        var orders = orderMapper.bulkDomain2Dto(orderService.getAll());
+        var orderDtoList = orderMapper.bulkDomain2Dto(orderService.findAll());
+        model.addAttribute("orders", orderDtoList);
+        model.addAttribute("total", orderService.getTotal());
         return "order-list";
     }
 
     @GetMapping("{id}")
     @Transactional(readOnly = true)
     public String get(Model model, @PathVariable("id") @NotEmpty @Positive Long id) {
-        var order = orderMapper.domain2dto(orderService.get(id));
+        var orderDto = orderMapper.domain2dto(orderService.findById(id));
+        model.addAttribute("items", orderDto.getItemsDto());
+        model.addAttribute("total", orderDto.getTotal());
         return "order";
     }
 }

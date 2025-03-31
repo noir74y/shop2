@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Заказы</title>
+    <title>Корзина</title>
     <style>
         table {
              border-collapse: collapse;
@@ -14,6 +14,7 @@
 </head>
 
 <body>
+
 <div style="overflow: hidden;">
     <a href="/product" style="float: right; margin: 20px">
         Продукты
@@ -30,182 +31,28 @@
     </a>
 </div>
 
+
 <h1>Заказы</h1>
 
-<!--<form action="" method="get">-->
-<!--    <p>-->
-<!--        <label for="size">Количество продуктов на странице:</label>-->
-<!--        <select id="size" name="size">-->
-<!--            <option th:selected="(${size}==10)">10</option>-->
-<!--            <option th:selected="(${size}==20)">20</option>-->
-<!--            <option th:selected="(${size}==50)">50</option>-->
-<!--            <option th:selected="(${size}==100)">100</option>-->
-<!--        </select>-->
-<!--    </p>-->
-<!--    <p>-->
-<!--        <label for="page">Страница:</label>-->
-<!--        <input id="page" type="text" name="page" pattern="\d+" min=1 th:value="${page}" size=10>-->
-<!--    </p>-->
+<table id='itemsTable'>
+    <thead>
+    <tr>
+        <th>Номер</th>
+        <th>Стоимость</th>
+    </tr>
+    </thead>
 
-<!--    <p>-->
-<!--        <button>Показать продукты</button>-->
-<!--    </p>-->
-<!--</form>-->
+    <tbody>
+    <tr th:each="order : ${orders}">
+        <td><a th:href="|/order/${order.id}|" th:text="${order.id}"></a></td>
+        <td th:text="${order.total}"></td>
+    </tr>
+    </tbody>
+</table>
 
-<!--<table id='productsTable'>-->
-<!--    <thead>-->
-<!--    <tr>-->
-<!--        <th>Картинка</th>-->
-<!--        <th>Название</th>-->
-<!--        <th>Цена</th>-->
-<!--        <th>Действия</th>-->
-<!--        <th>Количество в корзине</th>-->
-<!--    </tr>-->
-<!--    </thead>-->
-
-<!--    <tbody>-->
-<!--    <tr th:each="product : ${products}">-->
-<!--        <td><img th:src="|/image/${product.id}|" alt="" width="100" height="100"></td>-->
-<!--        <td><a th:href="|/product/${product.id}|" th:text="${product.title}"></a></td>-->
-<!--        <td th:text="${product.price}"></td>-->
-<!--        <td>-->
-<!--            <form th:id="|action-form-${product.id}|">-->
-<!--                <input type="hidden" name="product_id" th:value="${product.id}">-->
-<!--                <button type="button" onclick="addToCart(this.form)">Добавить в корзину</button>-->
-<!--                <br>-->
-<!--                <button type="button" onclick="removeFromCart(this.form)">Удалить из корзины</button>-->
-<!--            </form>-->
-<!--        </td>-->
-<!--        <td>-->
-<!--            <form th:id="|quantity-form-${product.id}|">-->
-<!--                <input type="hidden" name="product_id" th:value="${product.id}">-->
-<!--                <label>-->
-<!--                    <input type="text" name="quantity" th:value="${product.quantity}" size=10 readonly>-->
-<!--                </label>-->
-<!--                <br>-->
-<!--                <button onclick="changeQuantity(this.form, 1)" type="button">Больше</button>-->
-<!--                <br>-->
-<!--                <button onclick="changeQuantity(this.form, -1)" type="button">Меньше</button>-->
-<!--            </form>-->
-<!--        </td>-->
-<!--    </tr>-->
-<!--    </tbody>-->
-<!--</table>-->
-
-<!--<p>-->
-<!--    <button id="toggleNewProductFormButton" onclick="toggleNewProductForm()">Добавить</button>-->
-<!--</p>-->
-
-<!--<div class="new-product-form" style="display: none;" id="newProductFormClass">-->
-<!--    <h2>Новый продукт</h2>-->
-<!--    <form id="newProductForm" enctype="multipart/form-data" action="" method="post" accept-charset="UTF-8">-->
-<!--        <label for="title">Название</label>-->
-<!--        <input type="text" id="title" name="title" required>-->
-
-<!--        <p></p>-->
-<!--        <label for="price">Цена</label>-->
-<!--        <input type="text" id="price" name="price" pattern="\d+" min=1 required>-->
-
-<!--        <p></p>-->
-<!--        <label for="description">Описание</label>-->
-<!--        <textarea rows="5" name="description" id="description"></textarea>-->
-
-<!--        <p></p>-->
-<!--        <input id="fileInput" type="file" name="file" accept="image/*">-->
-<!--        <img id="filePreview" alt="" src="" width="100" height="100">-->
-
-<!--        <label for="quantity"></label><input id="quantity" type="text" name="quantity" value="0" hidden>-->
-
-<!--        <p></p>-->
-<!--        <button type="submit">Сохранить</button>-->
-<!--    </form>-->
-<!--</div>-->
-
-<!--<script defer type="text/javascript" th:inline="javascript">-->
-<!--    const fileInput = document.getElementById('fileInput');-->
-<!--    const filePreview = document.getElementById('filePreview');-->
-
-<!--    fileInput.addEventListener('change', function(event) {-->
-<!--        if (event.target.files && event.target.files[0]) {-->
-<!--            const file = new FileReader();-->
-<!--            file.onload = function(e) {-->
-<!--                filePreview.src = e.target.result;-->
-<!--            };-->
-<!--            file.readAsDataURL(event.target.files[0]);-->
-<!--        }-->
-<!--    });-->
-
-<!--    const newPostForm = document.getElementById('newProductFormClass');-->
-<!--    const newPostFormClass = document.getElementById('newProductFormClass');-->
-
-<!--    function toggleNewProductForm() {-->
-<!--        if (newProductFormClass.style.display === 'none') {-->
-<!--           newProductFormClass.style.display = 'block';-->
-<!--           document.getElementById('toggleNewProductFormButton').innerText = 'Скрыть';-->
-<!--        }-->
-<!--        else {-->
-<!--           newProductFormClass.style.display = 'none';-->
-<!--           document.getElementById('toggleNewProductFormButton').innerText = 'Добавить';-->
-<!--        }-->
-<!--    }-->
-
-<!--    function addToCart(actionForm) {-->
-<!--       let productId = actionForm.elements["product_id"].value;-->
-<!--       quantityFormId = "quantity-form-" + productId;-->
-<!--       quantityForm = document.getElementById(quantityFormId);-->
-<!--       quantity = parseInt(quantityForm.elements["quantity"].value);-->
-
-<!--       if(quantity == 0) {-->
-<!--         let productId = actionForm.elements["product_id"].value;-->
-<!--         fetch("/product/item/" + productId + "/add", {-->
-<!--         method: 'POST',-->
-<!--         headers: {'Content-Type': 'application/x-www-form-urlencoded'},-->
-<!--         body: ''});-->
-<!--         window.location.href = window.location.href;-->
-<!--       }-->
-<!--    }-->
-
-<!--    function removeFromCart(actionForm) {-->
-<!--       let productId = actionForm.elements["product_id"].value;-->
-<!--       quantityFormId = "quantity-form-" + productId;-->
-<!--       quantityForm = document.getElementById(quantityFormId);-->
-<!--       quantity = parseInt(quantityForm.elements["quantity"].value);-->
-
-<!--       if (quantity > 0) {-->
-<!--         fetch("/product/item/" + productId + "/remove", {-->
-<!--         method: 'POST',-->
-<!--         headers: {'Content-Type': 'application/x-www-form-urlencoded'},-->
-<!--         body: ''});-->
-<!--         window.location.href = window.location.href;-->
-<!--       }-->
-<!--    }-->
-
-<!--    function changeQuantity(quantityForm, delta) {-->
-<!--       let value = parseInt(quantityForm.elements["quantity"].value) + delta-->
-<!--       if (delta == -1 && value <= 0) {-->
-<!--          actionFormId = "action-form-" + quantityForm.elements["product_id"].value;-->
-<!--          actionForm = document.getElementById(actionFormId);-->
-<!--          removeFromCart(actionForm);-->
-<!--          return;-->
-<!--       }-->
-<!--       else if (delta == 1 && value == 1) {-->
-<!--          actionFormId = "action-form-" + quantityForm.elements["product_id"].value;-->
-<!--          actionForm = document.getElementById(actionFormId);-->
-<!--          addToCart(actionForm);-->
-<!--          return;-->
-<!--       }-->
-<!--       else {-->
-<!--          quantityForm.elements["quantity"].value = value;-->
-<!--          let productId = quantityForm.elements["product_id"].value;-->
-<!--          fetch("/product/item/" + productId + "/quantity/" + value, {-->
-<!--          method: 'POST',-->
-<!--          headers: {'Content-Type': 'application/x-www-form-urlencoded'},-->
-<!--          body: ''});-->
-<!--       }-->
-<!--    }-->
-
-
-<!--</script>-->
+<p></p>
+<label for="total">Стоимость</label>
+<input type="text" id="total" name="total" readonly th:value="${total}">
 
 </body>
 </html>

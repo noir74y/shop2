@@ -202,14 +202,14 @@ class BDDTests {
         mockMvc.perform(MockMvcRequestBuilders.get("/order"))
                 .andExpect(status().isOk());
 
-        assertEquals(1, orderService.getAll().size());
+        assertEquals(1, orderService.findAll().size());
     }
 
     @Test
     @DisplayName("14th step - list orders")
     void listOrders() throws Exception {
-        var orderId = orderService.getAll().getFirst().getId();
-        var item = orderService.get(orderId).getItems().getFirst();
+        var orderId = orderService.findAll().getFirst().getId();
+        var item = orderService.findById(orderId).getItems().getFirst();
 
         mockMvc.perform(MockMvcRequestBuilders.get("/order/" + orderId)
                         .param("id", String.valueOf(orderId)))

@@ -25,13 +25,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Order> getAll() {
+    public List<Order> findAll() {
         return orderMapper.bulkEntity2domain(orderRepository.findAll());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Order get(Long id) {
+    public Order findById(Long id) {
         return orderMapper.entity2domain(orderRepository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException("order is not found", "id=" + id)));
@@ -39,10 +39,16 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public Order create(List<Item> items) {
-        var orderEntity = orderRepository.save(OrderEntity.builder().build());
+    public void create(List<Item> items) {
+        var total = items.stream().mapToInt(item -> item.getPrice() * item.getQuantity()).sum();
+        var orderEntity = orderRepository.save(OrderEntity.builder().total(total).build());
         var itemEntities = itemMapper.bulkDomain2entity(items).stream().peek(obj -> obj.setOrderId(orderEntity.getId())).toList();
         orderEntity.setItemEntities(itemRepository.saveAll(itemEntities));
-        return orderMapper.entity2domain(orderEntity);
+        orderMapper.entity2domain(orderEntity);
+    }
+
+    @Override
+    public Integer getTotal() {
+        return findAll().stream().mapToInt(Order::getTotal).sum();
     }
 }

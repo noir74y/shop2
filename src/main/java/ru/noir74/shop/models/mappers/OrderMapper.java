@@ -8,6 +8,7 @@ import org.modelmapper.TypeMap;
 import org.springframework.stereotype.Component;
 import ru.noir74.shop.models.domain.Item;
 import ru.noir74.shop.models.domain.Order;
+import ru.noir74.shop.models.dto.ItemDto;
 import ru.noir74.shop.models.dto.OrderDto;
 import ru.noir74.shop.models.entity.ItemEntity;
 import ru.noir74.shop.models.entity.OrderEntity;
@@ -25,15 +26,22 @@ public class OrderMapper {
     private void setup() {
         Converter<List<Item>, List<ItemEntity>> domains2entitiesConverter =
                 list -> itemMapper.bulkDomain2entity(list.getSource());
+        Converter<List<Item>, List<ItemDto>> domains2dtosConverter =
+                list -> itemMapper.bulkDomain2dto(list.getSource());
         Converter<List<ItemEntity>, List<Item>> entities2domainsConverter =
                 list -> itemMapper.bulkEntity2domain(list.getSource());
 
         TypeMap<Order, OrderEntity> domain2entityMapper = modelMapper.createTypeMap(Order.class, OrderEntity.class);
+        TypeMap<Order, OrderDto> domain2dtoMapper = modelMapper.createTypeMap(Order.class, OrderDto.class);
         TypeMap<OrderEntity, Order> entity2domainMapper = modelMapper.createTypeMap(OrderEntity.class, Order.class);
 
         domain2entityMapper.addMappings(modelMapper ->
                 modelMapper.using(domains2entitiesConverter)
                         .map(Order::getItems, OrderEntity::setItemEntities));
+
+        domain2dtoMapper.addMappings(modelMapper ->
+                modelMapper.using(domains2dtosConverter)
+                        .map(Order::getItems, OrderDto::setItemsDto));
 
         entity2domainMapper.addMappings(modelMapper ->
                 modelMapper.using(entities2domainsConverter)
