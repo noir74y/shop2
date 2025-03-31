@@ -15,6 +15,7 @@ import ru.noir74.shop.models.domain.Product;
 import ru.noir74.shop.models.mappers.ProductMapper;
 import ru.noir74.shop.repositories.ItemRepository;
 import ru.noir74.shop.repositories.ProductRepository;
+import ru.noir74.shop.services.CartService;
 import ru.noir74.shop.services.ImageService;
 import ru.noir74.shop.services.ProductService;
 
@@ -33,6 +34,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
     private final ImageService imageService;
+    private final CartService cartService;
 
 
     @Override
@@ -66,7 +68,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public void delete(Long id) {
-        if (Optional.ofNullable(itemRepository.isProductUsesInItems(id)).isPresent()) {
+        if (cartService.ifProductInCart(id)) {
+            throw new ProductIsUsedException("product is present in cart", "productId=" + id);
+        } else if (Optional.ofNullable(itemRepository.isProductUsesInItems(id)).isPresent()) {
             throw new ProductIsUsedException("product is used in some order(s)", "productId=" + id);
         } else {
             imageService.deleteById(id);

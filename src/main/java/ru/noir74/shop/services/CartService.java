@@ -20,4 +20,6 @@ public interface CartService {
     Integer getTotal();
 
     void makeOrder();
+
+    boolean ifProductInCart(Long productId);
 }

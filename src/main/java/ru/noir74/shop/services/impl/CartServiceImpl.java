@@ -83,4 +83,9 @@ public class CartServiceImpl implements CartService {
         orderService.create(itemMapper.bulkEntity2domain(cartRepository.findAll()));
         cartRepository.deleteAll();
     }
+
+    @Override
+    public boolean ifProductInCart(Long productId) {
+        return cartRepository.ifProductInCart(productId);
+    }
 }

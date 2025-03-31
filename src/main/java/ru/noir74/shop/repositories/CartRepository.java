@@ -39,4 +39,8 @@ public class CartRepository {
     public void deleteAll() {
         cartStorage.clear();
     }
+
+    public boolean ifProductInCart(Long productId) {
+        return cartStorage.containsKey(productId);
+    }
 }
