@@ -16,6 +16,8 @@ http://localhost:9092
 ---
 #### Как запускать:
 ##### Локально
-##### .\gradlew clean build bootJar  
-##### cd .\build\libs\  
-##### java -jar .\shop-0.0.1-SNAPSHOT.jar 
+###### .\gradlew clean build bootJar  
+###### cd .\build\libs\  
+###### java -jar .\shop-0.0.1-SNAPSHOT.jar 
+##### Докер
+###### docker compose up
