@@ -3,6 +3,8 @@ package ru.noir74.shop.services.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import ru.noir74.shop.misc.error.exceptions.NotFoundException;
 import ru.noir74.shop.models.domain.Item;
 import ru.noir74.shop.models.domain.Order;
@@ -25,13 +27,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Order> findAll() {
+    public Flux<Order> findAll() {
         return orderMapper.bulkEntity2domain(orderRepository.findAll());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Order findById(Long id) {
+    public Mono<Order> findById(Long id) {
         return orderMapper.entity2domain(orderRepository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException("order is not found", "id=" + id)));

@@ -16,34 +16,34 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class ProductMapper {
-    private final ModelMapper modelMapper;
+//    private final ModelMapper modelMapper;
 
-    public Product dtoReq2domain(ProductDtoReq dtoReq) {
-        return Optional.ofNullable(dtoReq).map(obj -> modelMapper.map(obj, Product.class)).orElse(null);
-    }
-
-    public ProductDtoResp domain2dtoResp(Product domain) {
-        return Optional.ofNullable(domain).map(obj -> modelMapper.map(obj, ProductDtoResp.class)).orElse(null);
-    }
-
-    public ProductEntity domain2entity(Product domain) {
-        return Optional.ofNullable(domain).map(obj -> modelMapper.map(obj, ProductEntity.class)).orElse(null);
-    }
-
-    public Product entity2domain(ProductEntity entity) {
-        return Optional.ofNullable(entity).map(obj -> modelMapper.map(obj, Product.class)).orElse(null);
-    }
-
-    public List<Product> bulkEntity2domain(List<ProductEntity> entities) {
-        return entities.stream()
-                .map(this::entity2domain)
-                .collect(Collectors.toCollection(LinkedList::new));
-    }
-
-    public List<ProductDtoResp> bulkDomain2DtoResp(List<Product> domains) {
-        return domains.stream()
-                .map(this::domain2dtoResp)
-                .collect(Collectors.toCollection(LinkedList::new));
-    }
+//    public Product dtoReq2domain(ProductDtoReq dtoReq) {
+//        return Optional.ofNullable(dtoReq).map(obj -> modelMapper.map(obj, Product.class)).orElse(null);
+//    }
+//
+//    public ProductDtoResp domain2dtoResp(Product domain) {
+//        return Optional.ofNullable(domain).map(obj -> modelMapper.map(obj, ProductDtoResp.class)).orElse(null);
+//    }
+//
+//    public ProductEntity domain2entity(Product domain) {
+//        return Optional.ofNullable(domain).map(obj -> modelMapper.map(obj, ProductEntity.class)).orElse(null);
+//    }
+//
+//    public Product entity2domain(ProductEntity entity) {
+//        return Optional.ofNullable(entity).map(obj -> modelMapper.map(obj, Product.class)).orElse(null);
+//    }
+//
+//    public List<Product> bulkEntity2domain(List<ProductEntity> entities) {
+//        return entities.stream()
+//                .map(this::entity2domain)
+//                .collect(Collectors.toCollection(LinkedList::new));
+//    }
+//
+//    public List<ProductDtoResp> bulkDomain2DtoResp(List<Product> domains) {
+//        return domains.stream()
+//                .map(this::domain2dtoResp)
+//                .collect(Collectors.toCollection(LinkedList::new));
+//    }
 
 }

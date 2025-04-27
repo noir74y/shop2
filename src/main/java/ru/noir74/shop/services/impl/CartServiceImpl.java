@@ -20,72 +20,73 @@ public class CartServiceImpl implements CartService {
     private final OrderService orderService;
     private final ItemMapper itemMapper;
 
-    @Override
-    public List<Item> findAll() {
-        return itemMapper.bulkEntity2domain(cartRepository.findAll());
-    }
-
-    @Override
-    public Integer getQuantityOfProduct(Long productId) {
-        return cartRepository.getQuantityOfProduct(productId);
-    }
-
-    @Override
-    public void addToCart(Long productId) {
-        productRepository.findById(productId)
-                .ifPresent(obj -> cartRepository.insert(ItemEntity.builder()
-                        .productEntity(obj)
-                        .quantity(1)
-                        .price(obj.getPrice())
-                        .build()));
-    }
-
-    @Override
-    public void addToCart(Long productId, Integer quantity) {
-        productRepository.findById(productId)
-                .ifPresent(obj -> cartRepository.insert(ItemEntity.builder()
-                        .productEntity(obj)
-                        .quantity(quantity)
-                        .price(obj.getPrice())
-                        .build()));
-    }
-
-    @Override
-    public void removeFromCart(Long productId) {
-        cartRepository
-                .findAll()
-                .stream()
-                .filter(obj -> obj.getProductEntity().getId().equals(productId))
-                .findFirst()
-                .ifPresent(cartRepository::delete);
-    }
-
-    @Override
-    public void setQuantity(Long productId, Integer quantity) {
-        cartRepository
-                .findAll()
-                .stream()
-                .filter(obj -> obj.getProductEntity().getId().equals(productId))
-                .findFirst()
-                .ifPresent(obj -> {
-                    obj.setQuantity(quantity);
-                    cartRepository.replace(obj);
-                });
-    }
-
-    @Override
-    public Integer getTotal() {
-        return findAll().stream().mapToInt(obj -> obj.getPrice() * obj.getQuantity()).sum();
-    }
-
-    @Override
-    public void makeOrder() {
-        orderService.create(itemMapper.bulkEntity2domain(cartRepository.findAll()));
-        cartRepository.deleteAll();
-    }
-
-    @Override
-    public boolean ifProductInCart(Long productId) {
-        return cartRepository.ifProductInCart(productId);
-    }
+//    @Override
+//    public List<Item> findAll() {
+//        return itemMapper.bulkEntity2domain(cartRepository.findAll());
+//    }
+//
+//    @Override
+//    public Integer getQuantityOfProduct(Long productId) {
+//        return cartRepository.getQuantityOfProduct(productId);
+//    }
+//
+//    @Override
+//    public void addToCart(Long productId) {
+//        productRepository.findById(productId)
+//                .ifPresent(obj -> cartRepository.insert(ItemEntity.builder()
+//                        .productEntity(obj)
+//                        .quantity(1)
+//                        .price(obj.getPrice())
+//                        .build()));
+//    }
+//
+//    @Override
+//    public void addToCart(Long productId, Integer quantity) {
+//        productRepository.findById(productId)
+//                .ifPresent(obj -> cartRepository.insert(ItemEntity.builder()
+//                        .productEntity(obj)
+//                        .quantity(quantity)
+//                        .price(obj.getPrice())
+//                        .build()));
+//    }
+//
+//    @Override
+//    public void removeFromCart(Long productId) {
+//        cartRepository
+//                .findAll()
+//                .stream()
+//                .filter(obj -> obj.getProductEntity().getId().equals(productId))
+//                .findFirst()
+//                .ifPresent(cartRepository::delete);
+//    }
+//
+//    @Override
+//    public void setQuantity(Long productId, Integer quantity) {
+//        cartRepository
+//                .findAll()
+//                .stream()
+//                .filter(obj -> obj.getProductEntity().getId().equals(productId))
+//                .findFirst()
+//                .ifPresent(obj -> {
+//                    obj.setQuantity(quantity);
+//                    cartRepository.replace(obj);
+//                });
+//    }
+//
+//    @Override
+//    public Integer getTotal() {
+//        return findAll().stream().mapToInt(obj -> obj.getPrice() * obj.getQuantity()).sum();
+//    }
+//
+//    @Override
+//    public void makeOrder() {
+//        //  TODO переделать на реактивное использование
+//        //orderService.create(itemMapper.bulkEntity2domain(cartRepository.findAll()));
+//        cartRepository.deleteAll();
+//    }
+//
+//    @Override
+//    public boolean ifProductInCart(Long productId) {
+//        return cartRepository.ifProductInCart(productId);
+//    }
 }

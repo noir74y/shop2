@@ -7,13 +7,13 @@ import java.io.IOException;
 import java.util.List;
 
 public interface ProductService {
-    List<Product> getPage(Integer page, Integer size, ProductSorting sort);
-
-    Product get(Long id);
-
-    Product create(Product product) throws IOException;
-
-    void update(Product product) throws IOException;
-
-    void delete(Long id);
+//    List<Product> getPage(Integer page, Integer size, ProductSorting sort);
+//
+//    Product get(Long id);
+//
+//    Product create(Product product) throws IOException;
+//
+//    void update(Product product) throws IOException;
+//
+//    void delete(Long id);
 }
