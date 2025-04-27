@@ -28,27 +28,31 @@ bootJar {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation group: 'org.hibernate', name: 'hibernate-core', version: '6.6.11.Final'
-	implementation("org.hibernate.validator:hibernate-validator:8.0.2.Final")
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+//	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+//	implementation group: 'org.hibernate', name: 'hibernate-core', version: '6.6.11.Final'
+//	implementation("org.hibernate.validator:hibernate-validator:8.0.2.Final")
+//	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
 //	implementation 'org.springframework.boot:spring-boot-starter-web'
+//	runtimeOnly 'org.postgresql:postgresql'
 
-//	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-r2dbc', version: '3.4.5'
-//	implementation group: 'org.postgresql', name: 'r2dbc-postgresql', version: '1.0.7.RELEASE'
-//	implementation group: 'io.r2dbc', name: 'r2dbc-spi', version: '1.0.0.RELEASE'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-r2dbc', version: '3.4.5'
+	implementation group: 'org.postgresql', name: 'r2dbc-postgresql', version: '1.0.7.RELEASE'
+	implementation group: 'io.r2dbc', name: 'r2dbc-spi', version: '1.0.0.RELEASE'
+
 	implementation group: 'org.reactivestreams', name: 'reactive-streams', version: '1.0.4'
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux', version: '3.4.5'
 
-	runtimeOnly 'org.postgresql:postgresql'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+//	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+//	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
 	implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.2.2'
+	implementation group: 'org.mapstruct', name: 'mapstruct', version: '1.6.3'
+	implementation group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.6.3'
+
 	implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '3.4.4'
 }
