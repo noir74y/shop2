@@ -43,15 +43,17 @@ dependencies {
 	implementation group: 'org.reactivestreams', name: 'reactive-streams', version: '1.0.4'
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux', version: '3.4.5'
 
-//	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-//	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
 	implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.2.2'
+
 	implementation group: 'org.mapstruct', name: 'mapstruct', version: '1.6.3'
-	implementation group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.6.3'
+	annotationProcessor  group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.6.3'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
 	implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '3.4.4'
