@@ -1,7 +1,10 @@
 package ru.noir74.shop.models.entity;
 
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
+import ru.noir74.shop.models.generic.GenericEntity;
 
 @Builder
 @NoArgsConstructor
@@ -9,24 +12,16 @@ import org.springframework.data.relational.core.mapping.Table;
 @Setter
 @Getter
 @Table(name = "items", schema = "store")
-public class ItemEntity {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.AUTO)
-//    private Long id;
-//
-//    @Column(name = "order_id")
-//    private Long orderId;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "product_id")
-//    private ProductEntity productEntity;
-//
-//    @Positive
-//    @Column(nullable = false)
-//    private Integer quantity;
-//
-//    @Positive
-//    @Column(nullable = false)
-//    private Integer price;
+public class ItemEntity extends GenericEntity {
+    @Id
+    private Long id;
 
+    @Column("order_id")
+    private Long orderId;
+
+    @Column("product_id")
+    private Long productId;
+
+    private Integer quantity;
+    private Integer price;
 }
