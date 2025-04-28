@@ -13,6 +13,8 @@ import ru.noir74.shop.misc.error.exceptions.NotFoundException;
 import ru.noir74.shop.misc.error.exceptions.ProductIsUsedException;
 import ru.noir74.shop.models.domain.Item;
 import ru.noir74.shop.models.domain.Product;
+import ru.noir74.shop.models.entity.ItemEntity;
+import ru.noir74.shop.models.mappers.ItemMapper;
 import ru.noir74.shop.repositories.*;
 import ru.noir74.shop.services.CartService;
 import ru.noir74.shop.services.ImageService;
@@ -22,11 +24,21 @@ import ru.noir74.shop.services.ProductService;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-//@SpringBootTest
 //@AutoConfigureMockMvc
 //@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 //@TestMethodOrder(MethodOrderer.DisplayName.class)
+//@SpringBootTest
 class BDDTests {
+//    @Autowired
+//    private ItemMapper itemMapper;
+//
+//    @Test
+//    void test() {
+//        Item item = new Item();
+//        ItemEntity itemEntity = new ItemEntity();
+//        itemEntity = itemMapper.domainToEntity(item);
+//    }
+}
 //    @Autowired
 //    ProductRepository productRepository;
 //    @Autowired
@@ -310,6 +322,6 @@ class BDDTests {
 //    void tryToDeleteProduct() {
 //        assertThrows(ProductIsUsedException.class, () -> productService.delete(productId));
 //    }
-}
+//}
 
 
