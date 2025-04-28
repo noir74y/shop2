@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.noir74.shop.models.generic.GenericDomain;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -13,7 +12,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Image extends GenericDomain {
+public class Image {
     private Long id;
     private byte[] image;
     private String imageName;

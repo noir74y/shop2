@@ -5,13 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
-import ru.noir74.shop.models.generic.GenericDomain;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Product extends GenericDomain {
+public class Product {
     private Long id;
     private String title;
     private Integer price;

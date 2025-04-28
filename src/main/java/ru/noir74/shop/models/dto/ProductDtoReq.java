@@ -5,13 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
-import ru.noir74.shop.models.generic.GenericDtoReq;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductDtoReq extends GenericDtoReq {
+public class ProductDtoReq {
     private Long id;
     private String title;
     private Integer price;

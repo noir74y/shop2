@@ -1,49 +1,35 @@
 package ru.noir74.shop.models.mappers;
 
-import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import ru.noir74.shop.models.domain.Product;
 import ru.noir74.shop.models.dto.ProductDtoReq;
 import ru.noir74.shop.models.dto.ProductDtoResp;
 import ru.noir74.shop.models.entity.ProductEntity;
+import ru.noir74.shop.models.mappers.generic.GenericProductMapper;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+public interface ProductMapper extends GenericProductMapper {
+    default Mono<Product> dtoReq2domain(Mono<ProductDtoReq> input) {
+        return input.map(this::dtoReq2domain);
+    }
 
-@Component
-@RequiredArgsConstructor
-public class ProductMapper {
-//    private final ModelMapper modelMapper;
+    default Mono<ProductDtoResp> domain2dtoResp(Mono<Product> input) {
+        return input.map(this::domain2dtoResp);
+    }
 
-//    public Product dtoReq2domain(ProductDtoReq dtoReq) {
-//        return Optional.ofNullable(dtoReq).map(obj -> modelMapper.map(obj, Product.class)).orElse(null);
-//    }
-//
-//    public ProductDtoResp domain2dtoResp(Product domain) {
-//        return Optional.ofNullable(domain).map(obj -> modelMapper.map(obj, ProductDtoResp.class)).orElse(null);
-//    }
-//
-//    public ProductEntity domain2entity(Product domain) {
-//        return Optional.ofNullable(domain).map(obj -> modelMapper.map(obj, ProductEntity.class)).orElse(null);
-//    }
-//
-//    public Product entity2domain(ProductEntity entity) {
-//        return Optional.ofNullable(entity).map(obj -> modelMapper.map(obj, Product.class)).orElse(null);
-//    }
-//
-//    public List<Product> bulkEntity2domain(List<ProductEntity> entities) {
-//        return entities.stream()
-//                .map(this::entity2domain)
-//                .collect(Collectors.toCollection(LinkedList::new));
-//    }
-//
-//    public List<ProductDtoResp> bulkDomain2DtoResp(List<Product> domains) {
-//        return domains.stream()
-//                .map(this::domain2dtoResp)
-//                .collect(Collectors.toCollection(LinkedList::new));
-//    }
+    default Mono<ProductEntity> domain2entity(Mono<Product> input) {
+        return input.map(this::domain2entity);
+    }
 
+    default Mono<Product> entity2domain(Mono<ProductEntity> input) {
+        return input.map(this::entity2domain);
+    }
+
+    default Flux<Product> bulkEntity2domain(Flux<ProductEntity> input) {
+        return input.map(this::entity2domain);
+    }
+
+    default Flux<ProductDtoResp> bulkDomain2DtoResp(Flux<Product> input) {
+        return input.map(this::domain2dtoResp);
+    }
 }

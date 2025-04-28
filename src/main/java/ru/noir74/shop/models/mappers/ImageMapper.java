@@ -1,36 +1,18 @@
 package ru.noir74.shop.models.mappers;
 
-import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import reactor.core.publisher.Mono;
 import ru.noir74.shop.models.domain.Image;
 import ru.noir74.shop.models.entity.ImageEntity;
-import ru.noir74.shop.repositories.ProductRepository;
+import ru.noir74.shop.models.mappers.generic.GenericImageMapper;
 
-import java.util.Optional;
+@Mapper(componentModel = "spring")
+public interface ImageMapper extends GenericImageMapper {
+    default Mono<ImageEntity> domain2entity(Mono<Image> input) {
+        return input.map(this::domain2entity);
+    }
 
-@Component
-@RequiredArgsConstructor
-public class ImageMapper {
-//    private final ModelMapper modelMapper;
-//    private final ProductRepository productRepository;
-//
-//    public ImageEntity domain2entity(Image domain) {
-//        var entity = Optional.ofNullable(domain)
-//                .map(obj -> modelMapper.map(obj, ImageEntity.class))
-//                .orElse(null);
-//        Optional.ofNullable(entity).ifPresent(obj ->
-//                obj.setProductEntity(productRepository.findById(domain.getProductId()).orElse(null))
-//        );
-//        return entity;
-//    }
-//
-//    public Image entity2domain(ImageEntity entity) {
-//        var domain = Optional.ofNullable(entity)
-//                .map(obj -> modelMapper.map(obj, Image.class))
-//                .orElse(null);
-//        Optional.ofNullable(domain).ifPresent(obj -> obj.setProductId(entity.getProductEntity().getId()));
-//        return domain;
-//    }
-
+    default Mono<Image> entity2domain(Mono<ImageEntity> input) {
+        return input.map(this::entity2domain);
+    }
 }

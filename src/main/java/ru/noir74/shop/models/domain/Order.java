@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.noir74.shop.models.generic.GenericDomain;
 
 import java.util.List;
 
@@ -12,7 +11,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Order extends GenericDomain {
+public class Order {
     private Long id;
     private List<Item> items;
     private Integer total;
