@@ -2,29 +2,12 @@ package ru.noir74.shop.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-import ru.noir74.shop.misc.enums.ProductSorting;
-import ru.noir74.shop.misc.error.exceptions.NotFoundException;
-import ru.noir74.shop.misc.error.exceptions.ProductIsUsedException;
-import ru.noir74.shop.models.domain.Image;
-import ru.noir74.shop.models.domain.Product;
-import ru.noir74.shop.models.mappers.ProductMapper;
 import ru.noir74.shop.repositories.ItemRepository;
 import ru.noir74.shop.repositories.ProductRepository;
 import ru.noir74.shop.services.CartService;
 import ru.noir74.shop.services.ImageService;
 import ru.noir74.shop.services.ProductService;
-
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -32,7 +15,6 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService {
     private final ItemRepository itemRepository;
     private final ProductRepository productRepository;
-    private final ProductMapper productMapper;
     private final ImageService imageService;
     private final CartService cartService;
 

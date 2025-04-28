@@ -2,10 +2,6 @@ package ru.noir74.shop.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import ru.noir74.shop.misc.error.exceptions.NotFoundException;
-import ru.noir74.shop.models.domain.Image;
-import ru.noir74.shop.models.mappers.ImageMapper;
 import ru.noir74.shop.repositories.ImageRepository;
 import ru.noir74.shop.services.ImageService;
 
@@ -13,7 +9,6 @@ import ru.noir74.shop.services.ImageService;
 @RequiredArgsConstructor
 public class ImageServiceImpl implements ImageService {
     private final ImageRepository imageRepository;
-    private final ImageMapper imageMapper;
 
 //    @Override
 //    @Transactional(readOnly = true)

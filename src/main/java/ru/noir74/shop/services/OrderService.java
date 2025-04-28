@@ -8,11 +8,11 @@ import ru.noir74.shop.models.domain.Order;
 import java.util.List;
 
 public interface OrderService {
-    Flux<Order> findAll();
-
-    Mono<Order> findById(Long id);
-
-    void create(List<Item> itemList);
-
-    Integer getTotal();
+//    Flux<Order> findAll();
+//
+//    Mono<Order> findById(Long id);
+//
+//    void create(List<Item> itemList);
+//
+//    Integer getTotal();
 }

@@ -2,15 +2,10 @@ package ru.noir74.shop.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.noir74.shop.models.domain.Item;
-import ru.noir74.shop.models.entity.ItemEntity;
-import ru.noir74.shop.models.mappers.ItemMapper;
 import ru.noir74.shop.repositories.CartRepository;
 import ru.noir74.shop.repositories.ProductRepository;
 import ru.noir74.shop.services.CartService;
 import ru.noir74.shop.services.OrderService;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +13,6 @@ public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     public final ProductRepository productRepository;
     private final OrderService orderService;
-    private final ItemMapper itemMapper;
 
 //    @Override
 //    public List<Item> findAll() {
