@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
+import ru.noir74.shop.models.generic.GenericEntity;
 
 @Builder
 @NoArgsConstructor
@@ -11,7 +12,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Setter
 @Getter
 @Table(name = "images", schema = "store")
-public class ImageEntity {
+public class ImageEntity extends GenericEntity {
     @Id
     private Long id;
 

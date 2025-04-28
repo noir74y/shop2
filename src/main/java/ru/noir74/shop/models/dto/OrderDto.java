@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.noir74.shop.models.generic.GenericDto;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderDto {
+public class OrderDto extends GenericDto {
     private Long id;
     private List<ItemDto> itemsDto;
     private Integer total;
