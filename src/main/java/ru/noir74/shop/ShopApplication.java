@@ -5,13 +5,13 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import ru.noir74.shop.models.dto.ItemDto;
-import ru.noir74.shop.models.mappers.ItemMapper;
+import ru.noir74.shop.models.mappers.generic.GenericItemMapper;
 
 @SpringBootApplication
 public class ShopApplication implements CommandLineRunner {
 
     @Autowired
-    private ItemMapper itemMapper;
+    private GenericItemMapper itemMapper;
 
     public static void main(String[] args) {
         SpringApplication.run(ShopApplication.class, args);

@@ -2,13 +2,12 @@ package ru.noir74.shop.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.noir74.shop.repositories.ImageRepository;
 import ru.noir74.shop.services.ImageService;
 
 @Service
 @RequiredArgsConstructor
 public class ImageServiceImpl implements ImageService {
-    private final ImageRepository imageRepository;
+//    private final ImageRepository imageRepository;
 
 //    @Override
 //    @Transactional(readOnly = true)

@@ -2,85 +2,99 @@ package ru.noir74.shop.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import ru.noir74.shop.models.domain.Item;
+import ru.noir74.shop.models.entity.ItemEntity;
+import ru.noir74.shop.models.mappers.ItemMapper;
 import ru.noir74.shop.repositories.CartRepository;
 import ru.noir74.shop.repositories.ProductRepository;
 import ru.noir74.shop.services.CartService;
 import ru.noir74.shop.services.OrderService;
 
+
 @Service
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
+    private final ItemMapper itemMapper;
     private final CartRepository cartRepository;
     public final ProductRepository productRepository;
     private final OrderService orderService;
 
-//    @Override
-//    public List<Item> findAll() {
-//        return itemMapper.bulkEntity2domain(cartRepository.findAll());
-//    }
-//
-//    @Override
-//    public Integer getQuantityOfProduct(Long productId) {
-//        return cartRepository.getQuantityOfProduct(productId);
-//    }
-//
-//    @Override
-//    public void addToCart(Long productId) {
-//        productRepository.findById(productId)
-//                .ifPresent(obj -> cartRepository.insert(ItemEntity.builder()
-//                        .productEntity(obj)
-//                        .quantity(1)
-//                        .price(obj.getPrice())
-//                        .build()));
-//    }
-//
-//    @Override
-//    public void addToCart(Long productId, Integer quantity) {
-//        productRepository.findById(productId)
-//                .ifPresent(obj -> cartRepository.insert(ItemEntity.builder()
-//                        .productEntity(obj)
-//                        .quantity(quantity)
-//                        .price(obj.getPrice())
-//                        .build()));
-//    }
-//
-//    @Override
-//    public void removeFromCart(Long productId) {
-//        cartRepository
-//                .findAll()
-//                .stream()
-//                .filter(obj -> obj.getProductEntity().getId().equals(productId))
-//                .findFirst()
-//                .ifPresent(cartRepository::delete);
-//    }
-//
-//    @Override
-//    public void setQuantity(Long productId, Integer quantity) {
-//        cartRepository
-//                .findAll()
-//                .stream()
-//                .filter(obj -> obj.getProductEntity().getId().equals(productId))
-//                .findFirst()
-//                .ifPresent(obj -> {
-//                    obj.setQuantity(quantity);
-//                    cartRepository.replace(obj);
-//                });
-//    }
-//
-//    @Override
-//    public Integer getTotal() {
-//        return findAll().stream().mapToInt(obj -> obj.getPrice() * obj.getQuantity()).sum();
-//    }
-//
-//    @Override
-//    public void makeOrder() {
-//        //  TODO переделать на реактивное использование
-//        //orderService.create(itemMapper.bulkEntity2domain(cartRepository.findAll()));
-//        cartRepository.deleteAll();
-//    }
-//
-//    @Override
-//    public boolean ifProductInCart(Long productId) {
-//        return cartRepository.ifProductInCart(productId);
-//    }
+    @Override
+    public Flux<Item> findAll() {
+        return itemMapper.bulkEntity2domain(cartRepository.findAll());
+    }
+
+    @Override
+    public Mono<Integer> getQuantityOfProduct(Long productId) {
+        return cartRepository.getQuantityOfProduct(productId);
+    }
+
+    @Override
+    public Mono<Void> addToCart(Long productId) {
+        return productRepository.findById(productId)
+                .flatMap(productEntity ->
+                        cartRepository.insert(
+                                ItemEntity.builder()
+                                        .productId(productEntity.getId())
+                                        .quantity(1)
+                                        .price(productEntity.getPrice())
+                                        .build()
+                        )
+                );
+    }
+
+    @Override
+    public Mono<Void> addToCart(Long productId, Integer quantity) {
+        return productRepository.findById(productId)
+                .flatMap(productEntity ->
+                        cartRepository.insert(
+                                ItemEntity.builder()
+                                        .productId(productEntity.getId())
+                                        .quantity(quantity)
+                                        .price(productEntity.getPrice())
+                                        .build()
+                        )
+                );
+    }
+
+    @Override
+    public Mono<Void> removeFromCart(Long productId) {
+        return Mono.just(
+                cartRepository
+                        .findAll()
+                        .filter(itemEntity -> itemEntity.getProductId().equals(productId))
+                        .flatMap(cartRepository::delete)
+        ).then();
+    }
+
+    @Override
+    public Mono<Void> setQuantity(Long productId, Integer quantity) {
+        return Mono.just(cartRepository
+                .findAll()
+                .filter(itemEntity -> itemEntity.getProductId().equals(productId))
+                .flatMap(itemEntity -> {
+                    itemEntity.setQuantity(quantity);
+                    return cartRepository.replace(itemEntity);
+                })).then();
+    }
+
+    @Override
+    public Mono<Integer> getTotal() {
+        return Mono.just(findAll().map(Item::getPrice).reduce(0, Integer::sum)).block();
+    }
+
+    @Override
+    public Mono<Void> makeOrder() {
+        return cartRepository.findAll()
+                .transform(itemMapper::bulkEntity2domain)
+                .transform(orderService::create)  // Предполагаем, что create принимает Flux
+                .then(cartRepository.deleteAll());
+    }
+
+    @Override
+    public Mono<Boolean> ifProductInCart(Long productId) {
+        return cartRepository.ifProductInCart(productId);
+    }
 }

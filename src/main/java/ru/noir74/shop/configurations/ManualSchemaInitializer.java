@@ -1,4 +1,4 @@
-package ru.noir74.shop.repositories;
+package ru.noir74.shop.configurations;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;

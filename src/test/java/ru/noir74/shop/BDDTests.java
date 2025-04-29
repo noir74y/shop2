@@ -1,29 +1,5 @@
 package ru.noir74.shop;
 
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import ru.noir74.shop.misc.enums.ProductSorting;
-import ru.noir74.shop.misc.error.exceptions.NotFoundException;
-import ru.noir74.shop.misc.error.exceptions.ProductIsUsedException;
-import ru.noir74.shop.models.domain.Item;
-import ru.noir74.shop.models.domain.Product;
-import ru.noir74.shop.models.entity.ItemEntity;
-import ru.noir74.shop.models.mappers.ItemMapper;
-import ru.noir74.shop.repositories.*;
-import ru.noir74.shop.services.CartService;
-import ru.noir74.shop.services.ImageService;
-import ru.noir74.shop.services.OrderService;
-import ru.noir74.shop.services.ProductService;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 //@AutoConfigureMockMvc
 //@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 //@TestMethodOrder(MethodOrderer.DisplayName.class)

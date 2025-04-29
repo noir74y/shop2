@@ -3,20 +3,16 @@ package ru.noir74.shop.services.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.noir74.shop.repositories.ItemRepository;
-import ru.noir74.shop.repositories.ProductRepository;
-import ru.noir74.shop.services.CartService;
-import ru.noir74.shop.services.ImageService;
 import ru.noir74.shop.services.ProductService;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
-    private final ItemRepository itemRepository;
-    private final ProductRepository productRepository;
-    private final ImageService imageService;
-    private final CartService cartService;
+//    private final ItemRepository itemRepository;
+//    private final ProductRepository productRepository;
+//    private final ImageService imageService;
+//    private final CartService cartService;
 
 
 //    @Override

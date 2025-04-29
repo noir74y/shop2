@@ -1,25 +1,25 @@
 package ru.noir74.shop.services;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import ru.noir74.shop.models.domain.Item;
 
-import java.util.List;
-
 public interface CartService {
-//    List<Item> findAll();
-//
-//    Integer getQuantityOfProduct(Long id);
-//
-//    void addToCart(Long productId);
-//
-//    void addToCart(Long productId, Integer quantity);
-//
-//    void removeFromCart(Long productId);
-//
-//    void setQuantity(Long productId, Integer quantity);
-//
-//    Integer getTotal();
-//
-//    void makeOrder();
-//
-//    boolean ifProductInCart(Long productId);
+    Flux<Item> findAll();
+
+    Mono<Integer> getQuantityOfProduct(Long id);
+
+    Mono<Void> addToCart(Long productId);
+
+    Mono<Void> addToCart(Long productId, Integer quantity);
+
+    Mono<Void> removeFromCart(Long productId);
+
+    Mono<Void> setQuantity(Long productId, Integer quantity);
+
+    Mono<Integer> getTotal();
+
+    Mono<Void> makeOrder();
+
+    Mono<Boolean> ifProductInCart(Long productId);
 }

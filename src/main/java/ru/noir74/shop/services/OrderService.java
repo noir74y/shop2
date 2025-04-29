@@ -5,14 +5,12 @@ import reactor.core.publisher.Mono;
 import ru.noir74.shop.models.domain.Item;
 import ru.noir74.shop.models.domain.Order;
 
-import java.util.List;
-
 public interface OrderService {
-//    Flux<Order> findAll();
-//
-//    Mono<Order> findById(Long id);
-//
-//    void create(List<Item> itemList);
-//
-//    Integer getTotal();
+    Flux<Order> findAll();
+
+    Mono<Order> findById(Long id);
+
+    Mono<Void> create(Flux<Item> items);
+
+    Mono<Integer> getTotal();
 }

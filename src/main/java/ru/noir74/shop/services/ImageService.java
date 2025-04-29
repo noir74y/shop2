@@ -1,11 +1,12 @@
 package ru.noir74.shop.services;
 
+import reactor.core.publisher.Mono;
 import ru.noir74.shop.models.domain.Image;
 
 public interface ImageService {
-//    Image findImageById(Long id);
-//
-//    void setImage(Image Image);
-//
-//    void deleteById(Long id);
+    Mono<Image> findImageById(Long id);
+
+    Mono<Void> setImage(Image Image);
+
+    Mono<Void> deleteById(Long id);
 }

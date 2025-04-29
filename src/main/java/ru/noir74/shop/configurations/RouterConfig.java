@@ -7,9 +7,6 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import ru.noir74.shop.handlers.FaviconHandler;
 
-import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
-import static org.springframework.web.reactive.function.server.RouterFunctions.route;
-
 @Configuration
 public class RouterConfig {
     @Bean
