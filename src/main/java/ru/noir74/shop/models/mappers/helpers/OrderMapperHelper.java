@@ -7,7 +7,6 @@ import reactor.core.publisher.Mono;
 import ru.noir74.shop.models.domain.Item;
 import ru.noir74.shop.models.dto.ItemDto;
 import ru.noir74.shop.models.mappers.ItemMapper;
-import ru.noir74.shop.models.mappers.generic.GenericItemMapper;
 import ru.noir74.shop.repositories.ItemRepository;
 
 import java.util.List;
@@ -18,7 +17,6 @@ public class OrderMapperHelper {
     private final ItemMapper itemMapper;
     private final ItemRepository itemRepository;
     private final ItemMapperHelper itemMapperHelper;
-    private final GenericItemMapper genericItemMapper;
 
     @Named("getItems")
     public Mono<List<Item>> getItems(Long orderId) {
@@ -30,6 +28,6 @@ public class OrderMapperHelper {
 
     @Named("getItemsDto")
     public List<ItemDto> getItemsDto(List<Item> items) {
-        return items.stream().map(genericItemMapper::domain2dto).toList();
+        return items.stream().map(itemMapper::domain2dto).toList();
     }
 }

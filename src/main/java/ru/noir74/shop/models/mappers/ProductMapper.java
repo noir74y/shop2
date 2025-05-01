@@ -1,14 +1,26 @@
 package ru.noir74.shop.models.mappers;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.noir74.shop.models.domain.Product;
 import ru.noir74.shop.models.dto.ProductDtoReq;
 import ru.noir74.shop.models.dto.ProductDtoResp;
 import ru.noir74.shop.models.entity.ProductEntity;
-import ru.noir74.shop.models.mappers.generic.GenericProductMapper;
 
-public interface ProductMapper extends GenericProductMapper {
+@Mapper(componentModel = "spring")
+public interface ProductMapper {
+    Product dtoReq2domain(ProductDtoReq input);
+
+    @Mapping(target = "quantity", ignore = true)
+    ProductDtoResp domain2dtoResp(Product input);
+
+    ProductEntity domain2entity(Product input);
+
+    @Mapping(target = "file", ignore = true)
+    Product entity2domain(ProductEntity input);
+
     default Mono<Product> monoDtoReq2monoDomain(Mono<ProductDtoReq> input) {
         return input.map(this::dtoReq2domain);
     }

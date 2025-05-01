@@ -4,10 +4,13 @@ import org.mapstruct.Mapper;
 import reactor.core.publisher.Mono;
 import ru.noir74.shop.models.domain.Image;
 import ru.noir74.shop.models.entity.ImageEntity;
-import ru.noir74.shop.models.mappers.generic.GenericImageMapper;
 
 @Mapper(componentModel = "spring")
-public interface ImageMapper extends GenericImageMapper {
+public interface ImageMapper {
+    ImageEntity domain2entity(Image input);
+
+    Image entity2domain(ImageEntity input);
+
     default Mono<ImageEntity> monoDomain2monoEntity(Mono<Image> input) {
         return input.map(this::domain2entity);
     }
