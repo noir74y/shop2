@@ -15,9 +15,9 @@ public interface ItemMapper extends GenericItemMapper {
         return input.map(this::domain2entity);
     }
 
-    default Mono<Item> monoEntity2monoDomain(Mono<ItemEntity> input, ItemMapperHelper mappingForProduct) {
+    default Mono<Item> monoEntity2monoDomain(Mono<ItemEntity> input, ItemMapperHelper itemMapperHelper) {
         return input.flatMap(itemEntity ->
-                mappingForProduct.getProduct(itemEntity.getProductId())
+                itemMapperHelper.getProduct(itemEntity.getProductId())
                         .map(product -> {
                             Item item = entity2domain(itemEntity);
                             item.setProduct(product);
@@ -34,9 +34,9 @@ public interface ItemMapper extends GenericItemMapper {
         return input.map(this::domain2entity);
     }
 
-    default Flux<Item> fluxEntity2fluxDomain(Flux<ItemEntity> input, ItemMapperHelper mappingForProduct) {
+    default Flux<Item> fluxEntity2fluxDomain(Flux<ItemEntity> input, ItemMapperHelper itemMapperHelper) {
         return input.flatMap(itemEntity ->
-                mappingForProduct.getProduct(itemEntity.getProductId())
+                itemMapperHelper.getProduct(itemEntity.getProductId())
                         .map(product -> {
                             Item item = entity2domain(itemEntity);
                             item.setProduct(product);

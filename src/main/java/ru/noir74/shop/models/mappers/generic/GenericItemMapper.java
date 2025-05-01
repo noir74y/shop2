@@ -9,11 +9,7 @@ import ru.noir74.shop.models.mappers.helpers.ItemMapperHelper;
 
 @Mapper(componentModel = "spring", uses = ItemMapperHelper.class)
 public interface GenericItemMapper {
-    @Mapping(
-            source = "product",
-            target = "productId",
-            qualifiedByName = "getProductId"
-    )
+    @Mapping(source = "product", target = "productId", qualifiedByName = "getProductId")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "orderId", ignore = true)
     ItemEntity domain2entity(Item input);

@@ -5,10 +5,11 @@ import org.mapstruct.Mapping;
 import ru.noir74.shop.models.domain.Order;
 import ru.noir74.shop.models.dto.OrderDto;
 import ru.noir74.shop.models.entity.OrderEntity;
+import ru.noir74.shop.models.mappers.helpers.OrderMapperHelper;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = OrderMapperHelper.class)
 public interface GenericOrderMapper {
-    @Mapping(target = "itemsDto", ignore = true)
+    @Mapping(source = "items", target = "itemsDto", qualifiedByName = "getItemsDto")
     OrderDto domain2dto(Order input);
 
     @Mapping(target = "items", ignore = true)

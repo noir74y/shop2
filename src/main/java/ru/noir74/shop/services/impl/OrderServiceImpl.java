@@ -12,6 +12,7 @@ import ru.noir74.shop.models.entity.ItemEntity;
 import ru.noir74.shop.models.entity.OrderEntity;
 import ru.noir74.shop.models.mappers.ItemMapper;
 import ru.noir74.shop.models.mappers.OrderMapper;
+import ru.noir74.shop.models.mappers.helpers.OrderMapperHelper;
 import ru.noir74.shop.repositories.ItemRepository;
 import ru.noir74.shop.repositories.OrderRepository;
 import ru.noir74.shop.services.OrderService;
@@ -21,13 +22,15 @@ import ru.noir74.shop.services.OrderService;
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
+    private final OrderMapperHelper orderMapperHelper;
     private final ItemRepository itemRepository;
     private final ItemMapper itemMapper;
 
     @Override
     @Transactional(readOnly = true)
     public Flux<Order> findAll() {
-        return orderRepository.findAll().as(orderMapper::fluxEntity2fluxDomain);
+        return orderRepository.findAll()
+                .as(fluxOrderEntity -> orderMapper.fluxEntity2fluxDomain(fluxOrderEntity, orderMapperHelper));
     }
 
     @Override
@@ -35,7 +38,7 @@ public class OrderServiceImpl implements OrderService {
     public Mono<Order> findById(Long id) {
         return orderRepository.findById(id)
                 .switchIfEmpty(Mono.error(new NotFoundException("order is not found", "id=" + id)))
-                .as(orderMapper::monoEntity2monoDomain);
+                .as(monoOrderEntity -> orderMapper.monoEntity2monoDomain(monoOrderEntity, orderMapperHelper));
     }
 
     @Override
