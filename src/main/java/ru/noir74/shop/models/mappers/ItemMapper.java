@@ -7,15 +7,23 @@ import ru.noir74.shop.models.domain.Item;
 import ru.noir74.shop.models.dto.ItemDto;
 import ru.noir74.shop.models.entity.ItemEntity;
 import ru.noir74.shop.models.mappers.generic.GenericItemMapper;
+import ru.noir74.shop.models.mappers.helpers.ItemMapperHelper;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = ItemMapperHelper.class)
 public interface ItemMapper extends GenericItemMapper {
     default Mono<ItemEntity> monoDomain2monoEntity(Mono<Item> input) {
         return input.map(this::domain2entity);
     }
 
-    default Mono<Item> monoEntity2monoDomain(Mono<ItemEntity> input) {
-        return input.map(this::entity2domain);
+    default Mono<Item> monoEntity2monoDomain(Mono<ItemEntity> input, ItemMapperHelper mappingForProduct) {
+        return input.flatMap(itemEntity ->
+                mappingForProduct.getProduct(itemEntity.getProductId())
+                        .map(product -> {
+                            Item item = entity2domain(itemEntity);
+                            item.setProduct(product);
+                            return item;
+                        })
+        );
     }
 
     default Mono<ItemDto> monoDto2monoDomain(Mono<Item> input) {
@@ -26,12 +34,18 @@ public interface ItemMapper extends GenericItemMapper {
         return input.map(this::domain2entity);
     }
 
-    default Flux<Item> fluxEntity2fluxDomain(Flux<ItemEntity> input) {
-        return input.map(this::entity2domain);
+    default Flux<Item> fluxEntity2fluxDomain(Flux<ItemEntity> input, ItemMapperHelper mappingForProduct) {
+        return input.flatMap(itemEntity ->
+                mappingForProduct.getProduct(itemEntity.getProductId())
+                        .map(product -> {
+                            Item item = entity2domain(itemEntity);
+                            item.setProduct(product);
+                            return item;
+                        })
+        );
     }
 
     default Flux<ItemDto> fluxDomain2fluxDto(Flux<Item> input) {
         return input.map(this::domain2dto);
     }
-
 }

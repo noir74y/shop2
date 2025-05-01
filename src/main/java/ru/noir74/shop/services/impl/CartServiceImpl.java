@@ -7,6 +7,7 @@ import reactor.core.publisher.Mono;
 import ru.noir74.shop.models.domain.Item;
 import ru.noir74.shop.models.entity.ItemEntity;
 import ru.noir74.shop.models.mappers.ItemMapper;
+import ru.noir74.shop.models.mappers.helpers.ItemMapperHelper;
 import ru.noir74.shop.repositories.CartRepository;
 import ru.noir74.shop.repositories.ProductRepository;
 import ru.noir74.shop.services.CartService;
@@ -17,13 +18,16 @@ import ru.noir74.shop.services.OrderService;
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
     private final ItemMapper itemMapper;
+    private final ItemMapperHelper itemMapperHelper;
     private final CartRepository cartRepository;
     public final ProductRepository productRepository;
     private final OrderService orderService;
 
     @Override
     public Flux<Item> findAll() {
-        return itemMapper.fluxEntity2fluxDomain(cartRepository.findAll());
+        return cartRepository
+                .findAll()
+                .as(fluxItemEntity -> itemMapper.fluxEntity2fluxDomain(fluxItemEntity, itemMapperHelper));
     }
 
     @Override
@@ -88,7 +92,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public Mono<Void> makeOrder() {
         return cartRepository.findAll()
-                .as(itemMapper::fluxEntity2fluxDomain)
+                .as(fluxItemEntity -> itemMapper.fluxEntity2fluxDomain(fluxItemEntity, itemMapperHelper))
                 .transform(orderService::create)
                 .then(cartRepository.deleteAll());
     }

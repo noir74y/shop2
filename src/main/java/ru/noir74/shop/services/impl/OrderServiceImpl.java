@@ -51,9 +51,9 @@ public class OrderServiceImpl implements OrderService {
                                 .flatMap(order ->
                                         cachedItems
                                                 .map(item -> {
-                                                    ItemEntity entity = itemMapper.domain2entity(item);
-                                                    entity.setOrderId(order.getId());
-                                                    return entity;
+                                                    ItemEntity itemEntity = itemMapper.domain2entity(item);
+                                                    itemEntity.setOrderId(order.getId());
+                                                    return itemEntity;
                                                 })
                                                 .transform(itemRepository::saveAll)
                                                 .then()

@@ -13,7 +13,6 @@ import org.springframework.data.relational.core.mapping.Table;
 public class ProductEntity {
     @Id
     private Long id;
-
     private String title;
     private Integer price;
     private String description;
