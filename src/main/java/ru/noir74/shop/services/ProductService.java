@@ -12,9 +12,9 @@ public interface ProductService {
 
     Mono<Product> get(Long id);
 
-    Mono<Product> create(Product product) throws IOException;
+    Mono<Product> create(Mono<Product> product) throws IOException;
 
-    Mono<Void> update(Product product) throws IOException;
+    Mono<Void> update(Mono<Product> product) throws IOException;
 
     Mono<Void> delete(Long id);
 }

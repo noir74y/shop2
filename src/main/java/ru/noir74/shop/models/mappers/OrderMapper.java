@@ -10,27 +10,27 @@ import ru.noir74.shop.models.mappers.generic.GenericOrderMapper;
 
 @Mapper(componentModel = "spring")
 public interface OrderMapper extends GenericOrderMapper {
-    default Mono<OrderDto> domain2dto(Mono<Order> input) {
+    default Mono<OrderDto> monoDomain2monoDto(Mono<Order> input) {
         return input.map(this::domain2dto);
     }
 
-    default Mono<Order> dto2domain(Mono<OrderDto> input) {
+    default Mono<Order> monoDto2monoDomain(Mono<OrderDto> input) {
         return input.map(this::dto2domain);
     }
 
-    default Mono<OrderEntity> domain2entity(Mono<Order> input) {
+    default Mono<OrderEntity> monoDomain2monoEntity(Mono<Order> input) {
         return input.map(this::domain2entity);
     }
 
-    default Mono<Order> entity2domain(Mono<OrderEntity> input) {
+    default Mono<Order> monoEntity2monoDomain(Mono<OrderEntity> input) {
         return input.map(this::entity2domain);
     }
 
-    default Flux<Order> entity2domain(Flux<OrderEntity> input) {
+    default Flux<Order> fluxEntity2fluxDomain(Flux<OrderEntity> input) {
         return input.map(this::entity2domain);
     }
 
-    default Flux<OrderDto> domain2dto(Flux<Order> input) {
+    default Flux<OrderDto> fluxDomain2fluxDto(Flux<Order> input) {
         return input.map(this::domain2dto);
     }
 }

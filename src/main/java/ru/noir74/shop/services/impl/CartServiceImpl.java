@@ -23,7 +23,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Flux<Item> findAll() {
-        return itemMapper.bulkEntity2domain(cartRepository.findAll());
+        return itemMapper.fluxEntity2fluxDomain(cartRepository.findAll());
     }
 
     @Override
@@ -88,8 +88,8 @@ public class CartServiceImpl implements CartService {
     @Override
     public Mono<Void> makeOrder() {
         return cartRepository.findAll()
-                .transform(itemMapper::bulkEntity2domain)
-                .transform(orderService::create)  // Предполагаем, что create принимает Flux
+                .as(itemMapper::fluxEntity2fluxDomain)
+                .transform(orderService::create)
                 .then(cartRepository.deleteAll());
     }
 

@@ -3,79 +3,105 @@ package ru.noir74.shop.services.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import ru.noir74.shop.misc.enums.ProductSorting;
+import ru.noir74.shop.misc.error.exceptions.NotFoundException;
+import ru.noir74.shop.misc.error.exceptions.ProductIsUsedException;
+import ru.noir74.shop.models.domain.Image;
+import ru.noir74.shop.models.domain.Product;
+import ru.noir74.shop.models.mappers.ProductMapper;
+import ru.noir74.shop.repositories.ItemRepository;
+import ru.noir74.shop.repositories.ProductRepository;
+import ru.noir74.shop.services.CartService;
+import ru.noir74.shop.services.ImageService;
 import ru.noir74.shop.services.ProductService;
+
+import java.io.IOException;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
-//    private final ItemRepository itemRepository;
-//    private final ProductRepository productRepository;
-//    private final ImageService imageService;
-//    private final CartService cartService;
+    private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
+    private final ImageService imageService;
+    private final CartService cartService;
+    private final ItemRepository itemRepository;
 
 
-//    @Override
-//    @Transactional(readOnly = true)
-//    public List<Product> getPage(Integer page, Integer size, ProductSorting sort) {
-//        var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "title"));
-//        return productMapper.bulkEntity2domain(productRepository
-//                .findAll(pageable)
-//                .stream()
-//                .collect(Collectors.toCollection(LinkedList::new)));
-//    }
-//
-//    @Override
-//    @Transactional(readOnly = true)
-//    public Product get(Long id) {
-//        return productMapper.entity2domain(productRepository.findById(id).orElseThrow(() -> new NotFoundException("product is not found", "id=" + id)));
-//    }
-//
-//    @Override
-//    @Transactional
-//    public Product create(Product product) throws IOException {
-//        return save(product);
-//    }
-//
-//    @Override
-//    @Transactional
-//    public void update(Product product) throws IOException {
-//        save(product);
-//    }
-//
-//    @Override
-//    @Transactional
-//    public void delete(Long id) {
-//        if (cartService.ifProductInCart(id)) {
-//            throw new ProductIsUsedException("product is present in cart", "productId=" + id);
-//        } else if (Optional.ofNullable(itemRepository.isProductUsesInItems(id)).isPresent()) {
-//            throw new ProductIsUsedException("product is used in some order(s)", "productId=" + id);
-//        } else {
-//            imageService.deleteById(id);
-//            productRepository.deleteById(id);
-//        }
-//    }
-//
-//    @Transactional
-//    private Product save(Product product) throws IOException {
-//        MultipartFile file = product.getFile();
-//        product = productMapper.entity2domain(productRepository.save(productMapper.domain2entity(product)));
-//        saveImage(product.getId(), file);
-//        return product;
-//    }
-//
-//    @Transactional
-//    private void saveImage(Long productId, MultipartFile file) throws IOException {
-//        if (Objects.nonNull(file)) {
-//            var image = Image.builder()
-//                    .productId(productId)
-//                    .image(file.getBytes())
-//                    .imageName(file.getOriginalFilename()).build();
-//            if (image.isImageReadyToBeSaved()) {
-//                image.setProductId(productId);
-//                imageService.setImage(image);
-//            }
-//        }
-//    }
+    @Override
+    @Transactional(readOnly = true)
+    public Flux<Product> getPage(Integer page, Integer size, ProductSorting sort) {
+        return productRepository
+                .findAllWithSortAndPagination(sort.name(), (long) size * (page - 1), size)
+                .as(productMapper::fluxEntity2fluxDomain);
+    }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Mono<Product> get(Long id) {
+        return productRepository.findById(id)
+                .switchIfEmpty(Mono.error(new NotFoundException("product is not found", "id=" + id)))
+                .as(productMapper::monoEntity2monoDomain);
+    }
+
+    @Override
+    @Transactional
+    public Mono<Product> create(Mono<Product> product) {
+        return save(product);
+    }
+
+    @Override
+    @Transactional
+    public Mono<Void> update(Mono<Product> product) {
+        return save(product).then();
+    }
+
+    @Override
+    @Transactional
+    public Mono<Void> delete(Long id) {
+        return cartService.ifProductInCart(id)
+                .flatMap(inCart -> {
+                    if (inCart)
+                        return Mono.error(new ProductIsUsedException("product is present in cart", "productId=" + id));
+                    return itemRepository.isProductUsedInItems(id);
+                })
+                .flatMap(productIsUsedInItems -> {
+                    if (productIsUsedInItems)
+                        return Mono.error(new ProductIsUsedException("product is used in some order(s)", "productId=" + id));
+                    return imageService.deleteById(id).then(productRepository.deleteById(id));
+                });
+    }
+
+    private Mono<Product> save(Mono<Product> product) {
+        return productMapper.monoDomain2monoEntity(product)
+                .flatMap(productRepository::save)
+                .as(productMapper::monoEntity2monoDomain)
+                .flatMap(savedProduct ->
+                        saveImage(savedProduct)
+                                .then(Mono.just(savedProduct))
+                );
+    }
+
+    private Mono<Void> saveImage(Product product) {
+        return Mono.justOrEmpty(product.getFile())
+                .flatMap(file -> {
+                    try {
+                        Image image = Image.builder()
+                                .productId(product.getId())
+                                .image(file.getBytes())
+                                .imageName(file.getOriginalFilename())
+                                .build();
+
+                        return image.isImageReadyToBeSaved()
+                                ? imageService.setImage(image)
+                                : Mono.empty();
+
+                    } catch (IOException e) {
+                        return Mono.error(new RuntimeException("Failed to save image", e));
+                    }
+                });
+    }
 }

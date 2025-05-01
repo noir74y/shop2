@@ -31,7 +31,6 @@ public class CartRepository {
 
     public Mono<Void> delete(ItemEntity itemEntity) {
         return Mono.just(Objects.requireNonNull(cartStorage.remove(itemEntity.getProductId()))).then();
-
     }
 
     public Mono<Void> replace(ItemEntity itemEntity) {

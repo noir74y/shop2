@@ -10,27 +10,27 @@ import ru.noir74.shop.models.mappers.generic.GenericItemMapper;
 
 @Mapper(componentModel = "spring")
 public interface ItemMapper extends GenericItemMapper {
-    default Mono<ItemEntity> domain2entity(Mono<Item> input) {
+    default Mono<ItemEntity> monoDomain2monoEntity(Mono<Item> input) {
         return input.map(this::domain2entity);
     }
 
-    default Mono<Item> entity2domain(Mono<ItemEntity> input) {
+    default Mono<Item> monoEntity2monoDomain(Mono<ItemEntity> input) {
         return input.map(this::entity2domain);
     }
 
-    default Mono<ItemDto> dto2domain(Mono<Item> input) {
+    default Mono<ItemDto> monoDto2monoDomain(Mono<Item> input) {
         return input.map(this::domain2dto);
     }
 
-    default Flux<ItemEntity> bulkDomain2entity(Flux<Item> input) {
+    default Flux<ItemEntity> fluxDomain2fluxEntity(Flux<Item> input) {
         return input.map(this::domain2entity);
     }
 
-    default Flux<Item> bulkEntity2domain(Flux<ItemEntity> input) {
+    default Flux<Item> fluxEntity2fluxDomain(Flux<ItemEntity> input) {
         return input.map(this::entity2domain);
     }
 
-    default Flux<ItemDto> bulkDomain2dto(Flux<Item> input) {
+    default Flux<ItemDto> fluxDomain2fluxDto(Flux<Item> input) {
         return input.map(this::domain2dto);
     }
 
