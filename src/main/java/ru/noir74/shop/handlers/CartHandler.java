@@ -10,7 +10,6 @@ import ru.noir74.shop.models.dto.ItemDto;
 import ru.noir74.shop.models.mappers.ItemMapper;
 import ru.noir74.shop.services.CartService;
 
-import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
 

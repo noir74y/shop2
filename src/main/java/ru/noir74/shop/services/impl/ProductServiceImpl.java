@@ -55,8 +55,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public Mono<Void> update(Mono<Product> product) {
-        return save(product).then();
+    public Mono<Product> update(Mono<Product> product) {
+        return save(product);
     }
 
     @Override

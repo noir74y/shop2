@@ -14,7 +14,7 @@ public interface ProductService {
 
     Mono<Product> create(Mono<Product> product) throws IOException;
 
-    Mono<Void> update(Mono<Product> product) throws IOException;
+    Mono<Product> update(Mono<Product> product) throws IOException;
 
     Mono<Void> delete(Long id);
 }
