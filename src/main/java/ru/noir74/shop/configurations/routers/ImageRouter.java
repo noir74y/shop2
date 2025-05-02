@@ -10,7 +10,7 @@ import ru.noir74.shop.handlers.ImageHandler;
 @Configuration
 public class ImageRouter {
     @Bean
-    public RouterFunction<ServerResponse> faviconRoute(ImageHandler handler) {
+    public RouterFunction<ServerResponse> imageRoute(ImageHandler handler) {
         return RouterFunctions.route()
                 .path("/image", builder -> builder
                         .GET("/{id}", handler::getImage)
