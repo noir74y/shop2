@@ -10,7 +10,7 @@ import ru.noir74.shop.handlers.OrderHandler;
 @Configuration
 public class OrderRouter {
     @Bean
-    public RouterFunction<ServerResponse> imageRoute(OrderHandler handler) {
+    public RouterFunction<ServerResponse> orderRoute(OrderHandler handler) {
         return RouterFunctions.route()
                 .path("/order", builder -> builder
                         .GET("", handler::getAllOrders)

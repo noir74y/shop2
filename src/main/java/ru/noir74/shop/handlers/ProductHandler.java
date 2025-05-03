@@ -1,9 +1,7 @@
 package ru.noir74.shop.handlers;
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.result.view.Rendering;
@@ -20,7 +18,6 @@ import java.net.URI;
 
 @Component
 @RequiredArgsConstructor
-@Validated
 public class ProductHandler {
     private final AppConfiguration appConfiguration;
     private final ProductService productService;
@@ -74,7 +71,6 @@ public class ProductHandler {
                 });
     }
 
-    @SneakyThrows
     public Mono<ServerResponse> createProduct(ServerRequest request) {
         var monoProductDtoReq = request.bodyToMono(ProductDtoReq.class);
         return monoProductDtoReq
@@ -92,7 +88,6 @@ public class ProductHandler {
                 .then(ServerResponse.seeOther(URI.create("/product")).build());
     }
 
-    @SneakyThrows
     public Mono<ServerResponse> updateProduct(ServerRequest request) {
         Long id = Long.parseLong(request.pathVariable("id"));
         var monoProductDtoReq = request.bodyToMono(ProductDtoReq.class);

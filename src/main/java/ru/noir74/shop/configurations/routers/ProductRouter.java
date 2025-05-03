@@ -12,9 +12,9 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 @Configuration
 public class ProductRouter {
     @Bean
-    public RouterFunction<ServerResponse> cartRoutes(ProductHandler productHandler) {
+    public RouterFunction<ServerResponse> productRoutes(ProductHandler productHandler) {
         return route()
-                .path("/product", builder1 -> builder1
+                .path("/product2", builder1 -> builder1
                         .GET("", productHandler::getProductsPage)
                         .POST("", productHandler::createProduct)
                         .path("/{id}", builder2 -> builder2

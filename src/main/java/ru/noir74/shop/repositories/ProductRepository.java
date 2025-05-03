@@ -8,6 +8,6 @@ import ru.noir74.shop.models.entity.ProductEntity;
 
 @Repository
 public interface ProductRepository extends ReactiveCrudRepository<ProductEntity, Long> {
-    @Query("SELECT * FROM products ORDER BY :sort OFFSET :offset LIMIT :limit")
+    @Query("SELECT * FROM store.products ORDER BY :sort OFFSET :offset LIMIT :limit")
     Flux<ProductEntity> findAllWithSortAndPagination(String sort, long offset, int limit);
 }
