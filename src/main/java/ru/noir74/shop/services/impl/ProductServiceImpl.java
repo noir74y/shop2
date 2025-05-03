@@ -48,18 +48,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public Mono<Product> create(Mono<Product> product) {
-        return save(product);
-    }
-
-    @Override
-    @Transactional
-    public Mono<Product> update(Mono<Product> product) {
-        return save(product);
-    }
-
-    @Override
-    @Transactional
     public Mono<Void> delete(Long id) {
         return cartService.ifProductInCart(id)
                 .flatMap(inCart -> {
@@ -74,41 +62,43 @@ public class ProductServiceImpl implements ProductService {
                 });
     }
 
-    private Mono<Product> save(Mono<Product> product) {
-        return productMapper.monoDomain2monoEntity(product)
+    public Mono<Product> save(Mono<Product> productMono) {
+        return productMono
+                .as(productMapper::monoDomain2monoEntity)
                 .flatMap(productRepository::save)
                 .as(productMapper::monoEntity2monoDomain)
-                .flatMap(savedProduct ->
-                        saveImage(savedProduct)
-                                .then(Mono.just(savedProduct))
+                .zipWith(productMono)
+                .flatMap(pair -> {
+                            var savedProduct = pair.getT1();
+                            var file = pair.getT2().getFile();
+                            savedProduct.setFile(file);
+                            return Product.isFileReadyToBeSaved(savedProduct.getFile())
+                                    ? saveImage(savedProduct).thenReturn(savedProduct)
+                                    : Mono.just(savedProduct);
+                        }
                 );
     }
 
     private Mono<Void> saveImage(Product product) {
-        return Mono.justOrEmpty(product.getFile())
-                .flatMap(filePart -> DataBufferUtils.join(filePart.content())
-                        .flatMap(dataBuffer -> {
-                            try {
-                                byte[] imageBytes = new byte[dataBuffer.readableByteCount()];
-                                dataBuffer.read(imageBytes);
-                                DataBufferUtils.release(dataBuffer);
-
-                                Image image = Image.builder()
-                                        .productId(product.getId())
-                                        .image(imageBytes)
-                                        .imageName(filePart.filename())
-                                        .build();
-
-                                return image.isImageReadyToBeSaved()
-                                        ? imageService.setImage(image)
-                                        : Mono.empty();
-                            } catch (Exception e) {
-                                DataBufferUtils.release(dataBuffer); // Освобождаем в случае ошибки
-                                return Mono.error(new RuntimeException("Failed to save image", e));
-                            } finally {
-                                DataBufferUtils.release(dataBuffer);
-                            }
-                        })
-                );
+        return Mono.fromSupplier(product::getFile)
+                .flatMap(file -> DataBufferUtils.join(file.content())
+                        .flatMap(dataBuffer ->
+                                Mono.using(
+                                        () -> dataBuffer,
+                                        buffer -> {
+                                            byte[] imageBytes = new byte[buffer.readableByteCount()];
+                                            buffer.read(imageBytes);
+                                            return imageService.setImage(
+                                                    Image.builder()
+                                                            .productId(product.getId())
+                                                            .image(imageBytes)
+                                                            .imageName(file.filename())
+                                                            .build());
+                                        },
+                                        DataBufferUtils::release
+                                )
+                        )
+                        .onErrorResume(e -> Mono.error(new RuntimeException("Failed to save image", e)))
+                        .then());
     }
 }

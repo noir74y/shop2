@@ -65,23 +65,22 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Mono<Void> removeFromCart(Long productId) {
-        return Mono.just(
-                cartRepository
-                        .findAll()
-                        .filter(itemEntity -> itemEntity.getProductId().equals(productId))
-                        .flatMap(cartRepository::delete)
-        ).then();
+        return cartRepository
+                .findAll()
+                .filter(itemEntity -> itemEntity.getProductId().equals(productId))
+                .flatMap(obj -> cartRepository.delete(obj).then())
+                .then();
     }
 
     @Override
     public Mono<Void> setQuantity(Long productId, Integer quantity) {
-        return Mono.just(cartRepository
+        return cartRepository
                 .findAll()
                 .filter(itemEntity -> itemEntity.getProductId().equals(productId))
                 .flatMap(itemEntity -> {
                     itemEntity.setQuantity(quantity);
                     return cartRepository.replace(itemEntity);
-                })).then();
+                }).then();
     }
 
     @Override

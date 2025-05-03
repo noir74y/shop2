@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 @Data
 @Builder
@@ -17,13 +16,6 @@ public class Image {
     private byte[] image;
     private String imageName;
     private Long productId;
-
-    public boolean isImageReadyToBeSaved() {
-        return Objects.nonNull(image) &&
-                image.length != 0 &&
-                Objects.nonNull(imageName) &&
-                imageName.matches("^.+\\.\\w+$");
-    }
 
     public String getImageType() {
         return Arrays.stream(imageName.split("\\."))

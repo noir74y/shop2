@@ -10,9 +10,7 @@ public interface ProductService {
 
     Mono<Product> get(Long id);
 
-    Mono<Product> create(Mono<Product> product);
-
-    Mono<Product> update(Mono<Product> product);
-
     Mono<Void> delete(Long id);
+
+    Mono<Product> save(Mono<Product> product);
 }

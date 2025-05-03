@@ -7,7 +7,6 @@ import ru.noir74.shop.models.entity.ItemEntity;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @Repository
 public class CartRepository {
@@ -26,15 +25,15 @@ public class CartRepository {
     }
 
     public Mono<Void> insert(ItemEntity itemEntity) {
-        return Mono.just(Objects.requireNonNull(cartStorage.put(itemEntity.getProductId(), itemEntity))).then();
+        return Mono.justOrEmpty(cartStorage.put(itemEntity.getProductId(), itemEntity)).then();
     }
 
     public Mono<Void> delete(ItemEntity itemEntity) {
-        return Mono.just(Objects.requireNonNull(cartStorage.remove(itemEntity.getProductId()))).then();
+        return Mono.justOrEmpty(cartStorage.remove(itemEntity.getProductId())).then();
     }
 
     public Mono<Void> replace(ItemEntity itemEntity) {
-        return Mono.just(Objects.requireNonNull(cartStorage.replace(itemEntity.getProductId(), itemEntity))).then();
+        return Mono.justOrEmpty(cartStorage.replace(itemEntity.getProductId(), itemEntity)).then();
     }
 
     public Mono<Void> deleteAll() {
