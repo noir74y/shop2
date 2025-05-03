@@ -13,8 +13,8 @@ public class OrderRouter {
     public RouterFunction<ServerResponse> orderRoute(OrderHandler handler) {
         return RouterFunctions.route()
                 .path("/order", builder -> builder
-                        .GET("", handler::getAllOrders)
                         .GET("/{id}", handler::getOrderById)
+                        .GET("", handler::getAllOrders)
                 ).build();
     }
 }

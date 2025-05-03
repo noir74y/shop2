@@ -14,9 +14,7 @@ public class ProductRouter {
     @Bean
     public RouterFunction<ServerResponse> productRoutes(ProductHandler productHandler) {
         return route()
-                .path("/product2", builder1 -> builder1
-                        .GET("", productHandler::getProductsPage)
-                        .POST("", productHandler::createProduct)
+                .path("/product_test", builder1 -> builder1
                         .path("/{id}", builder2 -> builder2
                                 .GET("", productHandler::getProduct)
                                 .POST("", productHandler::updateProduct)
@@ -27,6 +25,8 @@ public class ProductRouter {
                                 .POST("/remove", productHandler::removeFromCart)
                                 .POST("/quantity/{quantity}", productHandler::setQuantity)
                         )
+                        .GET("", productHandler::getProductsPage)
+                        .POST("", productHandler::createProduct)
                 ).build();
     }
 }
