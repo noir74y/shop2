@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.codec.multipart.FilePart;
 
 @Data
 @Builder
@@ -15,6 +15,6 @@ public class ProductDtoReq {
     private String title;
     private Integer price;
     private String description;
-    private MultipartFile file;
+    private FilePart file;
     private Integer quantity;
 }

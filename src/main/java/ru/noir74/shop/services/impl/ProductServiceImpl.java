@@ -2,6 +2,7 @@ package ru.noir74.shop.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -17,8 +18,6 @@ import ru.noir74.shop.repositories.ProductRepository;
 import ru.noir74.shop.services.CartService;
 import ru.noir74.shop.services.ImageService;
 import ru.noir74.shop.services.ProductService;
-
-import java.io.IOException;
 
 @Slf4j
 @Service
@@ -87,21 +86,29 @@ public class ProductServiceImpl implements ProductService {
 
     private Mono<Void> saveImage(Product product) {
         return Mono.justOrEmpty(product.getFile())
-                .flatMap(file -> {
-                    try {
-                        Image image = Image.builder()
-                                .productId(product.getId())
-                                .image(file.getBytes())
-                                .imageName(file.getOriginalFilename())
-                                .build();
+                .flatMap(filePart -> DataBufferUtils.join(filePart.content())
+                        .flatMap(dataBuffer -> {
+                            try {
+                                byte[] imageBytes = new byte[dataBuffer.readableByteCount()];
+                                dataBuffer.read(imageBytes);
+                                DataBufferUtils.release(dataBuffer);
 
-                        return image.isImageReadyToBeSaved()
-                                ? imageService.setImage(image)
-                                : Mono.empty();
+                                Image image = Image.builder()
+                                        .productId(product.getId())
+                                        .image(imageBytes)
+                                        .imageName(filePart.filename())
+                                        .build();
 
-                    } catch (IOException e) {
-                        return Mono.error(new RuntimeException("Failed to save image", e));
-                    }
-                });
+                                return image.isImageReadyToBeSaved()
+                                        ? imageService.setImage(image)
+                                        : Mono.empty();
+                            } catch (Exception e) {
+                                DataBufferUtils.release(dataBuffer); // Освобождаем в случае ошибки
+                                return Mono.error(new RuntimeException("Failed to save image", e));
+                            } finally {
+                                DataBufferUtils.release(dataBuffer);
+                            }
+                        })
+                );
     }
 }

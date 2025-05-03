@@ -1,7 +1,7 @@
 package ru.noir74.shop.handlers;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Component;
@@ -40,29 +40,33 @@ public class ImageHandler {
                     .map(parts -> parts.getFirst("file"))
                     .cast(FilePart.class);
 
-            return filePartMono.flatMap(filePart -> {
-                try {
-                    return filePart.content().collectList().flatMap(dataBuffers -> {
-                        byte[] bytes = new byte[dataBuffers.stream().mapToInt(DataBuffer::readableByteCount).sum()];
-                        int offset = 0;
-                        for (org.springframework.core.io.buffer.DataBuffer dataBuffer : dataBuffers) {
-                            int length = dataBuffer.readableByteCount();
-                            dataBuffer.read(bytes, offset, length);
-                            offset += length;
-                            org.springframework.core.io.buffer.DataBufferUtils.release(dataBuffer);
-                        }
-                        Image image = Image.builder()
-                                .productId(productId)
-                                .image(bytes)
-                                .imageName(filePart.filename())
-                                .build();
-                        return imageService.setImage(image)
-                                .then(ServerResponse.ok().contentType(MediaType.TEXT_PLAIN).bodyValue("product-list"));
-                    });
-                } catch (Exception e) {
-                    return ServerResponse.status(500).bodyValue("Failed to read file: " + e.getMessage());
-                }
-            }).switchIfEmpty(ServerResponse.badRequest().bodyValue("File must be provided."));
+            return filePartMono.flatMap(filePart ->
+                            DataBufferUtils.join(filePart.content())
+                                    .flatMap(dataBuffer -> {
+                                        try {
+                                            byte[] imageBytes = new byte[dataBuffer.readableByteCount()];
+                                            dataBuffer.read(imageBytes);
+
+                                            Image image = Image.builder()
+                                                    .productId(productId)
+                                                    .image(imageBytes)
+                                                    .imageName(filePart.filename())
+                                                    .build();
+
+                                            return imageService.setImage(image)
+                                                    .then(ServerResponse.ok()
+                                                            .contentType(MediaType.TEXT_PLAIN)
+                                                            .bodyValue("product-list"));
+                                        } catch (Exception e) {
+                                            return ServerResponse.status(500)
+                                                    .bodyValue("Failed to read file: " + e.getMessage());
+                                        } finally {
+                                            DataBufferUtils.release(dataBuffer);
+                                        }
+                                    })
+                    )
+                    .switchIfEmpty(ServerResponse.badRequest()
+                            .bodyValue("File must be provided."));
 
         } catch (Exception e) {
             return ServerResponse.badRequest().build();
