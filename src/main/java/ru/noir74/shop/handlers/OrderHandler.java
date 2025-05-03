@@ -5,10 +5,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.reactive.result.view.Rendering;
 import reactor.core.publisher.Mono;
 import ru.noir74.shop.models.mappers.OrderMapper;
 import ru.noir74.shop.services.OrderService;
+
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -28,10 +29,7 @@ public class OrderHandler {
 
                     return ServerResponse.ok()
                             .render("order-list",
-                                    Rendering.view("order-list")
-                                            .modelAttribute("orders", dtoList)
-                                            .modelAttribute("total", total)
-                                            .build());
+                                    Map.of("orders", dtoList, "total", total));
                 });
     }
 
@@ -43,9 +41,7 @@ public class OrderHandler {
                 .flatMap(dto ->
                         ServerResponse.ok()
                                 .render("order",
-                                        Rendering.view("order")
-                                                .modelAttribute("items", dto.getItemsDto())
-                                                .modelAttribute("total", dto.getTotal())
-                                                .build()));
+                                        Map.of("items", dto.getItemsDto(), "total", dto.getTotal())));
+
     }
 }

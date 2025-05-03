@@ -68,7 +68,7 @@
     <button type="submit">Сохранить</button>
 </form>
 
-<form th:action="${id}" method="post">
+<form th:action="|${id}/delete|" method="post">
     <p></p>
     <input type="hidden" name="_method" value="delete">
     <button>Удалить</button>

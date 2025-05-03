@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Optional;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -15,4 +17,8 @@ public class ProductDtoResp {
     private Integer price;
     private String description;
     private Integer quantity;
+
+    public Integer getQuantity() {
+        return Optional.ofNullable(quantity).orElse(0);
+    }
 }

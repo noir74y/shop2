@@ -97,7 +97,7 @@ public class ProductController {
                 .thenReturn("redirect:/product");
     }
 
-    @PostMapping(value = "{id}", params = "_method=delete")
+    @PostMapping(value = "{id}/delete")
     public Mono<String> deleteProduct(@PathVariable("id") @NotNull @Positive Long id) {
         return productService.delete(id)
                 .thenReturn("redirect:/product");

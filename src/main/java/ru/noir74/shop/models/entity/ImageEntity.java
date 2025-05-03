@@ -12,12 +12,14 @@ import org.springframework.data.relational.core.mapping.Table;
 @Getter
 @Table(name = "images", schema = "store")
 public class ImageEntity {
+    @Id
+    private Long id;
+
     private byte[] image;
 
     @Column("image_name")
     private String imageName;
 
-    @Id
     @Column("product_id")
     private Long productId;
 }

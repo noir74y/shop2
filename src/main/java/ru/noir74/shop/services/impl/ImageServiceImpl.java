@@ -2,6 +2,7 @@ package ru.noir74.shop.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 import ru.noir74.shop.misc.error.exceptions.NotFoundException;
@@ -25,7 +26,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRED)
     public Mono<Void> setImage(Image image) {
         return imageRepository.findById(image.getProductId())
                 .flatMap(imageEntity -> {
@@ -37,7 +38,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRED)
     public Mono<Void> deleteById(Long id) {
         return imageRepository.deleteById(id);
     }

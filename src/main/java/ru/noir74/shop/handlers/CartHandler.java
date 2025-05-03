@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.reactive.result.view.Rendering;
 import reactor.core.publisher.Mono;
 import ru.noir74.shop.models.dto.ItemDto;
 import ru.noir74.shop.models.mappers.ItemMapper;
@@ -12,6 +11,7 @@ import ru.noir74.shop.services.CartService;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -29,11 +29,7 @@ public class CartHandler {
                     Integer total = tuple.getT2();
 
                     return ServerResponse.ok()
-                            .render("cart",
-                                    Rendering.view("cart")
-                                            .modelAttribute("items", items)
-                                            .modelAttribute("total", total)
-                                            .build());
+                            .render("cart", Map.of("items", items, "total", total));
                 });
     }
 

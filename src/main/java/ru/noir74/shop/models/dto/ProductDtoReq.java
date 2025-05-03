@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.http.codec.multipart.FilePart;
 
+import java.util.Optional;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -17,4 +19,8 @@ public class ProductDtoReq {
     private String description;
     private FilePart file;
     private Integer quantity;
+
+    public Integer getQuantity() {
+        return Optional.ofNullable(quantity).orElse(0);
+    }
 }
