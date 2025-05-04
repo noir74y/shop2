@@ -27,14 +27,6 @@ public interface OrderMapper {
         return input.map(this::domain2dto);
     }
 
-    default Mono<Order> monoDto2monoDomain(Mono<OrderDto> input) {
-        return input.map(this::dto2domain);
-    }
-
-    default Mono<OrderEntity> monoDomain2monoEntity(Mono<Order> input) {
-        return input.map(this::domain2entity);
-    }
-
     default Mono<Order> monoEntity2monoDomain(Mono<OrderEntity> input, OrderMapperHelper orderMapperHelper) {
         return input.flatMap(orderEntity ->
                 orderMapperHelper.getItems(orderEntity.getId())

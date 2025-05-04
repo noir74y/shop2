@@ -11,10 +11,6 @@ public interface ImageMapper {
 
     Image entity2domain(ImageEntity input);
 
-    default Mono<ImageEntity> monoDomain2monoEntity(Mono<Image> input) {
-        return input.map(this::domain2entity);
-    }
-
     default Mono<Image> monoEntity2monoDomain(Mono<ImageEntity> input) {
         return input.map(this::entity2domain);
     }

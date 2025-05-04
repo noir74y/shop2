@@ -14,7 +14,6 @@ public class ImageRouter {
         return RouterFunctions.route()
                 .path("/image", builder -> builder
                         .GET("/{id}", handler::getImage)
-                        .POST("/{id}", handler::setImage)
                 ).build();
     }
 }

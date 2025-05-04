@@ -23,25 +23,6 @@ public interface ItemMapper {
     @Mapping(target = "total", expression = "java(input.getTotal())")
     ItemDto domain2dto(Item input);
 
-    default Mono<ItemEntity> monoDomain2monoEntity(Mono<Item> input, Long orderId) {
-        return input.flatMap(item -> Mono.just(this.domain2entity(item, orderId)));
-    }
-
-    default Mono<Item> monoEntity2monoDomain(Mono<ItemEntity> input, ItemMapperHelper itemMapperHelper) {
-        return input.flatMap(itemEntity ->
-                itemMapperHelper.getProduct(itemEntity.getProductId())
-                        .map(product -> {
-                            Item item = entity2domain(itemEntity);
-                            item.setProduct(product);
-                            return item;
-                        })
-        );
-    }
-
-    default Mono<ItemDto> monoDto2monoDomain(Mono<Item> input) {
-        return input.map(this::domain2dto);
-    }
-
     default Flux<ItemEntity> fluxDomain2fluxEntity(Flux<Item> input, Long orderId) {
         return input.flatMap(item -> Mono.just(this.domain2entity(item, orderId)));
     }
