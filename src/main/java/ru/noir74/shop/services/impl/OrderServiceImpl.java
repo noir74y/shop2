@@ -8,7 +8,6 @@ import reactor.core.publisher.Mono;
 import ru.noir74.shop.misc.error.exceptions.NotFoundException;
 import ru.noir74.shop.models.domain.Item;
 import ru.noir74.shop.models.domain.Order;
-import ru.noir74.shop.models.entity.ItemEntity;
 import ru.noir74.shop.models.entity.OrderEntity;
 import ru.noir74.shop.models.mappers.ItemMapper;
 import ru.noir74.shop.models.mappers.OrderMapper;
@@ -43,24 +42,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public Mono<Void> create(Flux<Item> items) {
-        Flux<Item> cachedItems = items.cache();
-
-        return cachedItems
-                .map(item -> item.getPrice() * item.getQuantity())
-                .reduce(0, Integer::sum)
-                .flatMap(total ->
-                        orderRepository.save(OrderEntity.builder().total(total).build())
-                                .flatMap(order ->
-                                        cachedItems
-                                                .map(item -> {
-                                                    ItemEntity itemEntity = itemMapper.domain2entity(item);
-                                                    itemEntity.setOrderId(order.getId());
-                                                    return itemEntity;
-                                                })
-                                                .transform(itemRepository::saveAll)
-                                                .then()
-                                )
+    public Mono<Void> save(Flux<Item> items) {
+        return orderRepository.save(OrderEntity.builder().build())
+                .flatMap(orderEntity ->
+                        items
+                                .transform(flux -> itemMapper.fluxDomain2fluxEntity(flux, orderEntity.getId()))
+                                .transform(itemRepository::saveAll)
+                                .then()
                 );
     }
 

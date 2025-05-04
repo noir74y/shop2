@@ -38,10 +38,10 @@ public class OrderHandler {
 
         return orderService.findById(id)
                 .as(orderMapper::monoDomain2monoDto)
-                .flatMap(dto ->
+                .flatMap(orderDto ->
                         ServerResponse.ok()
                                 .render("order",
-                                        Map.of("items", dto.getItemsDto(), "total", dto.getTotal())));
+                                        Map.of("items", orderDto.getItemsDto(), "total", orderDto.getTotal())));
 
     }
 }

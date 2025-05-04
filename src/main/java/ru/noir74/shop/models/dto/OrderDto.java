@@ -15,8 +15,4 @@ public class OrderDto {
     private Long id;
     private List<ItemDto> itemsDto;
     private Integer total;
-
-    public Integer getOrderCost() {
-        return itemsDto.stream().mapToInt(obj -> obj.getProduct().getPrice() * obj.getQuantity()).sum();
-    }
 }

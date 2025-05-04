@@ -10,7 +10,7 @@ public interface OrderService {
 
     Mono<Order> findById(Long id);
 
-    Mono<Void> create(Flux<Item> items);
+    Mono<Void> save(Flux<Item> items);
 
     Mono<Integer> getTotal();
 }

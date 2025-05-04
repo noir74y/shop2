@@ -14,5 +14,8 @@ import java.util.List;
 public class Order {
     private Long id;
     private List<Item> items;
-    private Integer total;
+
+    public Integer getTotal() {
+        return items.stream().mapToInt(Item::getTotal).sum();
+    }
 }

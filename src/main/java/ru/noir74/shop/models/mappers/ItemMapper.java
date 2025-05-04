@@ -1,5 +1,6 @@
 package ru.noir74.shop.models.mappers;
 
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import reactor.core.publisher.Flux;
@@ -11,18 +12,19 @@ import ru.noir74.shop.models.mappers.helpers.ItemMapperHelper;
 
 @Mapper(componentModel = "spring", uses = ItemMapperHelper.class)
 public interface ItemMapper {
-    @Mapping(source = "product", target = "productId", qualifiedByName = "getProductId")
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "orderId", ignore = true)
-    ItemEntity domain2entity(Item input);
+    @Mapping(source = "product", target = "productId", qualifiedByName = "getProductId")
+    @Mapping(target = "orderId", expression = "java(orderId)")
+    ItemEntity domain2entity(Item input, @Context Long orderId);
 
     @Mapping(target = "product", ignore = true)
     Item entity2domain(ItemEntity input);
 
+    @Mapping(target = "total", expression = "java(input.getTotal())")
     ItemDto domain2dto(Item input);
 
-    default Mono<ItemEntity> monoDomain2monoEntity(Mono<Item> input) {
-        return input.map(this::domain2entity);
+    default Mono<ItemEntity> monoDomain2monoEntity(Mono<Item> input, Long orderId) {
+        return input.flatMap(item -> Mono.just(this.domain2entity(item, orderId)));
     }
 
     default Mono<Item> monoEntity2monoDomain(Mono<ItemEntity> input, ItemMapperHelper itemMapperHelper) {
@@ -40,8 +42,8 @@ public interface ItemMapper {
         return input.map(this::domain2dto);
     }
 
-    default Flux<ItemEntity> fluxDomain2fluxEntity(Flux<Item> input) {
-        return input.map(this::domain2entity);
+    default Flux<ItemEntity> fluxDomain2fluxEntity(Flux<Item> input, Long orderId) {
+        return input.flatMap(item -> Mono.just(this.domain2entity(item, orderId)));
     }
 
     default Flux<Item> fluxEntity2fluxDomain(Flux<ItemEntity> input, ItemMapperHelper itemMapperHelper) {

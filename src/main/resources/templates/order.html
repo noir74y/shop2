@@ -46,7 +46,12 @@
     <tbody>
     <tr th:each="item : ${items}">
         <td><img th:src="|/image/${item.product.id}|" alt="" width="100" height="100"></td>
-        <td th:text="${item.product.title}"></td>
+        <td>
+            <a
+                    th:href="|/product/${item.product.id}|"
+                    th:text="${item.product.title}">
+                ></a>
+        </td>
         <td th:text="${item.quantity}"></td>
         <td th:text="${item.price}"></td>
     </tr>

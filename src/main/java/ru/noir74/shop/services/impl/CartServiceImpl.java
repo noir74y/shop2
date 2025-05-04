@@ -85,14 +85,14 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Mono<Integer> getTotal() {
-        return Mono.just(findAll().map(Item::getPrice).reduce(0, Integer::sum)).block();
+        return findAll().map(Item::getTotal).reduce(0, Integer::sum);
     }
 
     @Override
     public Mono<Void> makeOrder() {
         return cartRepository.findAll()
                 .as(fluxItemEntity -> itemMapper.fluxEntity2fluxDomain(fluxItemEntity, itemMapperHelper))
-                .transform(orderService::create)
+                .transform(orderService::save)
                 .then(cartRepository.deleteAll());
     }
 

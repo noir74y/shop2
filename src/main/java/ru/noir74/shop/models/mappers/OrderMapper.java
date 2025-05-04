@@ -12,6 +12,7 @@ import ru.noir74.shop.models.mappers.helpers.OrderMapperHelper;
 @Mapper(componentModel = "spring", uses = OrderMapperHelper.class)
 public interface OrderMapper {
     @Mapping(source = "items", target = "itemsDto", qualifiedByName = "getItemsDto")
+    @Mapping(target = "total", expression = "java(input.getTotal())")
     OrderDto domain2dto(Order input);
 
     @Mapping(target = "items", ignore = true)
