@@ -25,6 +25,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest
 @AutoConfigureWebTestClient
+
 public class ProductControllerTest {
 
     @Autowired
