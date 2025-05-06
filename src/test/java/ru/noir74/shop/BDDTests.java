@@ -1,5 +1,7 @@
 package ru.noir74.shop;
 
+import org.springframework.boot.test.context.SpringBootTest;
+
 //@AutoConfigureMockMvc
 //@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 //@TestMethodOrder(MethodOrderer.DisplayName.class)
@@ -14,7 +16,7 @@ class BDDTests {
 //        ItemEntity itemEntity = new ItemEntity();
 //        itemEntity = itemMapper.domainToEntity(item);
 //    }
-}
+//}
 //    @Autowired
 //    ProductRepository productRepository;
 //    @Autowired
@@ -299,5 +301,5 @@ class BDDTests {
 //        assertThrows(ProductIsUsedException.class, () -> productService.delete(productId));
 //    }
 //}
-
+}
 

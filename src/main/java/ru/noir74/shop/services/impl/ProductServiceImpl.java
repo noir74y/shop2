@@ -62,6 +62,7 @@ public class ProductServiceImpl implements ProductService {
                 });
     }
 
+    @Override
     public Mono<Product> save(Mono<Product> productMono) {
         return productMono
                 .as(productMapper::monoDomain2monoEntity)

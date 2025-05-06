@@ -78,10 +78,6 @@ public class ProductController {
         return Mono.just(productDtoReq)
                 .transform(productMapper::monoDtoReq2monoDomain)
                 .transform(productService::save)
-                .then(productDtoReq.getQuantity() != 0
-                        ? cartService.addToCart(productDtoReq.getId(), productDtoReq.getQuantity())
-                        : Mono.empty()
-                )
                 .thenReturn("redirect:/product");
     }
 
