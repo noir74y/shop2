@@ -14,12 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import ru.noir74.shop.misc.error.exceptions.NotFoundException;
 import ru.noir74.shop.models.domain.Product;
 import ru.noir74.shop.repositories.ProductRepository;
+import ru.noir74.shop.services.CartService;
 import ru.noir74.shop.services.ProductService;
 
 import java.io.IOException;
-import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -37,29 +38,26 @@ public class ProductControllerTest {
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private CartService cartService;
+
+    private Product product;
+
     @BeforeEach
     @Transactional
-    public void setUP() {
-        productRepository.deleteAll().as(StepVerifier::create).verifyComplete();
-    }
+    public void setUP() throws IOException {
+        productRepository.deleteAll().block();
 
-    @Test
-    void getProductsPage_ShouldReturnOk() throws IOException {
-        productService.save(Mono.just(Product.builder()
+        product = productService.save(Mono.just(Product.builder()
                 .title("title1")
                 .price(3333)
                 .description("description1")
                 .file(new FilePartForTest("shlisselburg-krepost.jpg"))
                 .build())).block();
+    }
 
-        productService.save(Mono.just(Product.builder()
-                .title("title2")
-                .price(3333)
-                .description("description2")
-                .file(new FilePartForTest("shlisselburg-krepost.jpg"))
-                .build())).block();
-
-
+    @Test
+    void getProductsPage_ShouldReturnOk() {
         webTestClient.get()
                 .uri("/product")
                 .exchange()
@@ -69,19 +67,11 @@ public class ProductControllerTest {
                     String responseBody = response.getResponseBody();
                     assert responseBody != null && responseBody.contains("<html") && responseBody.contains("products");
                     assert responseBody.contains("title1");
-                    assert responseBody.contains("title2");
                 });
     }
 
     @Test
     void getProduct_ShouldReturnProductPage() throws IOException {
-        var product = productService.save(Mono.just(Product.builder()
-                .title("title")
-                .price(3333)
-                .description("description")
-                .file(new FilePartForTest("shlisselburg-krepost.jpg"))
-                .build())).block();
-
         webTestClient.get()
                 .uri("/product/" + product.getId())
                 .exchange()
@@ -89,7 +79,7 @@ public class ProductControllerTest {
                 .expectBody(String.class)
                 .consumeWith(response -> {
                     String responseBody = response.getResponseBody();
-                    assert responseBody.contains("title");
+                    assert responseBody.contains("title1");
                 });
     }
 
@@ -117,13 +107,6 @@ public class ProductControllerTest {
 
     @Test
     void updateProduct_ShouldRedirect() throws IOException {
-        var product = productService.save(Mono.just(Product.builder()
-                .title("title")
-                .price(3333)
-                .description("description")
-                .file(new FilePartForTest("shlisselburg-krepost.jpg"))
-                .build())).block();
-
         Assertions.assertNotNull(product);
         webTestClient.post()
                 .uri("/product/" + product.getId())
@@ -136,11 +119,72 @@ public class ProductControllerTest {
                 .expectStatus().is3xxRedirection()
                 .expectHeader().location("/product");
 
-          productService.get(product.getId())
+        productService.get(product.getId())
                 .as(StepVerifier::create)
                 .assertNext(obj -> {
                     assertThat(obj.getTitle()).isEqualTo("Updated Title");
                 }).verifyComplete();
 
     }
+
+    @Test
+    void deleteProduct_ShouldRedirect() throws IOException {
+        webTestClient.post()
+                .uri("/product/" + product.getId() + "/delete")
+                .exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/product");
+
+        StepVerifier.create(productService.get(product.getId()))
+                .expectErrorMatches(throwable -> {
+                    return throwable instanceof NotFoundException;
+                })
+                .verify();
+    }
+
+    @Test
+    void addToCart_ShouldRedirect() throws IOException {
+        webTestClient.post()
+                .uri("/product/item/" + product.getId() + "/add")
+                .exchange()
+                .expectStatus().is3xxRedirection();
+
+        StepVerifier.create(cartService.ifProductInCart(product.getId()))
+                .expectNext(true)
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void removeFromCart_ShouldRedirect() throws IOException {
+        webTestClient.post()
+                .uri("/product/item/" + product.getId() + "/remove")
+                .exchange()
+                .expectStatus().is3xxRedirection();
+
+        StepVerifier.create(cartService.ifProductInCart(product.getId()))
+                .expectNext(false)
+                .expectComplete()
+                .verify();
+    }
+
+
+    @Test
+    void setQuantityInCart_ShouldRedirect() throws IOException {
+        webTestClient.post()
+                .uri("/product/item/" + product.getId() + "/add")
+                .exchange()
+                .expectStatus().is3xxRedirection();
+
+        webTestClient.post()
+                .uri("/product/item/" + product.getId() + "/quantity/2")
+                .exchange()
+                .expectStatus().is3xxRedirection();
+
+        StepVerifier.create(cartService.findAll())
+                .assertNext(item -> assertThat(item.getQuantity()).isEqualTo(2)
+                ).verifyComplete();
+
+    }
+
 }
