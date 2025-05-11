@@ -68,5 +68,6 @@ public class FilePartForTest implements FilePart {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return Flux.just(buffer);    }
+        return Flux.just(buffer);
+    }
 }

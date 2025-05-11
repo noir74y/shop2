@@ -3,23 +3,10 @@ package ru.noir74.shop;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import ru.noir74.shop.models.domain.Product;
-import ru.noir74.shop.models.mappers.OrderMapper;
-import ru.noir74.shop.models.mappers.helpers.OrderMapperHelper;
-import ru.noir74.shop.repositories.CartRepository;
-import ru.noir74.shop.repositories.OrderRepository;
-import ru.noir74.shop.repositories.ProductRepository;
-import ru.noir74.shop.services.CartService;
-import ru.noir74.shop.services.OrderService;
-import ru.noir74.shop.services.ProductService;
 
 import java.io.IOException;
 
@@ -28,50 +15,12 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest
 @AutoConfigureWebTestClient
 
-public class CartHandlerTest {
-
-    @Autowired
-    private WebTestClient webTestClient;
-
-    @Autowired
-    private ProductRepository productRepository;
-
-    @Autowired
-    private ProductService productService;
-
-    @Autowired
-    private CartRepository cartRepository;
-
-    @Autowired
-    private CartService cartService;
-
-    @Autowired
-    private OrderRepository orderRepository;
-
-    @Autowired
-    private OrderService orderService;
-
-    @Autowired
-    private OrderMapper orderMapper;
-
-    @Autowired
-    private OrderMapperHelper orderMapperHelper;
-
-    private Product product;
+public class CartHandlerTest extends GenericTest {
 
     @BeforeEach
     @Transactional
-    public void setUP() throws IOException {
-        orderRepository.deleteAll().block();
-        cartRepository.deleteAll().block();
-        productRepository.deleteAll().block();
-
-        product = productService.save(Mono.just(Product.builder()
-                .title("title1")
-                .price(3333)
-                .description("description1")
-                .file(new FilePartForTest("shlisselburg-krepost.jpg"))
-                .build())).block();
+    void setUp() throws IOException {
+        setUpGeneric();
     }
 
     @Test
@@ -148,7 +97,7 @@ public class CartHandlerTest {
 
         var order = orderRepository
                 .findAll()
-                .transform(orderEntity -> orderMapper.fluxEntity2fluxDomain(orderEntity,orderMapperHelper))
+                .transform(orderEntity -> orderMapper.fluxEntity2fluxDomain(orderEntity, orderMapperHelper))
                 .blockFirst();
 
         Assertions.assertNotNull(order);
