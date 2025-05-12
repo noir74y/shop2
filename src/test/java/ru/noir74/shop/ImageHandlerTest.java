@@ -10,9 +10,6 @@ import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.mockito.ArgumentMatchers.contains;
-
 @SpringBootTest
 @AutoConfigureWebTestClient
 public class ImageHandlerTest extends GenericTest {
