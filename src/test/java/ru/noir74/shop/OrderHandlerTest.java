@@ -10,9 +10,6 @@ import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 
-@SpringBootTest
-@AutoConfigureWebTestClient
-
 public class OrderHandlerTest extends GenericTest {
 
     @BeforeEach

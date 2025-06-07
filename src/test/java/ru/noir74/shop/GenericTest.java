@@ -1,6 +1,8 @@
 package ru.noir74.shop;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
@@ -20,6 +22,8 @@ import ru.noir74.shop.services.ProductService;
 
 import java.io.IOException;
 
+@SpringBootTest
+@AutoConfigureWebTestClient
 public abstract class GenericTest {
     @Autowired
     protected WebTestClient webTestClient;

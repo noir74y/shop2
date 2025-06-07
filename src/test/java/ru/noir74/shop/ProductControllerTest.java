@@ -17,9 +17,6 @@ import java.io.IOException;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@SpringBootTest
-@AutoConfigureWebTestClient
-
 public class ProductControllerTest extends GenericTest {
     @BeforeEach
     @Transactional

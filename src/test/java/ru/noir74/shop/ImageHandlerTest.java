@@ -10,8 +10,6 @@ import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 
-@SpringBootTest
-@AutoConfigureWebTestClient
 public class ImageHandlerTest extends GenericTest {
 
     @BeforeEach
