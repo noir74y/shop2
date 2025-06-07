@@ -1,65 +1,53 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.4.5'
-	id 'io.spring.dependency-management' version '1.1.7'
+    id 'java'
+    id 'org.springframework.boot' version '3.4.5'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'ru.noir74'
-version = '0.0.1-SNAPSHOT'
+version = '1.0-SNAPSHOT'
 
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
+ext {
+    springBootVersion = '3.4.5'
+    springDependencyManagementVersion = '1.1.7'
+    lombokVersion = '1.18.32'
+    mapstructVersion = '1.6.3'
+    junitBomVersion = '5.10.0'
 }
 
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-}
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
-bootJar {
-	launchScript()
-}
+subprojects {
+    apply plugin: 'java'
 
-dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.postgresql:r2dbc-postgresql'
+    group = rootProject.group
+    version = rootProject.version
 
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
 
-	implementation 'org.mapstruct:mapstruct:1.6.3'
-	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+    repositories {
+        mavenCentral()
+    }
 
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'io.projectreactor:reactor-test'
-	testImplementation 'org.springframework.security:spring-security-test'
+    dependencies {
+        testImplementation platform("org.junit:junit-bom:${junitBomVersion}")
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+        testImplementation 'org.mockito:mockito-core'
+        testImplementation 'org.mockito:mockito-junit-jupiter'
+    }
 
-	testImplementation 'org.springframework:spring-webflux'
-
-	testImplementation 'org.junit.jupiter:junit-jupiter-api'
-	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
-
-	testImplementation 'org.mockito:mockito-core'
-	testImplementation 'org.mockito:mockito-junit-jupiter'
-
-	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-}
-
-tasks.named('test') {
-	useJUnitPlatform()
-
-	testLogging {
-		events "passed", "skipped", "failed"
-		exceptionFormat "full"
-	}
+    tasks.named('test') {
+        useJUnitPlatform()
+        testLogging {
+            events "passed", "skipped", "failed"
+            exceptionFormat "full"
+        }
+    }
 }
