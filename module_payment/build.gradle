@@ -1,16 +1,6 @@
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
-plugins {
-    id 'org.springframework.boot'
-    id 'io.spring.dependency-management'
-    id "org.openapi.generator"
-}
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
+apply plugin: 'org.openapi.generator'
 
 openApiGenerate {
     generatorName.set("spring")
@@ -35,7 +25,6 @@ openApiGenerate {
     ])
 }
 
-
 tasks.register('buildClient', GenerateTask) {
     generatorName.set("java")
     inputSpec.set(layout.projectDirectory.file("src/main/resources/api-spec.yaml").toString())
@@ -52,26 +41,6 @@ tasks.register('buildClient', GenerateTask) {
             skipDefaultInterface   : "true",
             generateModels         : "false"
     ])
-}
-
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-}
-
-bootJar {
-    launchScript()
-}
-
-dependencies {
-}
-
-tasks.named('test') {
-    testLogging {
-        events "passed", "skipped", "failed"
-        exceptionFormat "full"
-    }
 }
 
 tasks.named('compileJava') {

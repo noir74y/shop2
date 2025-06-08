@@ -1,25 +1,6 @@
-plugins {
-	id 'org.springframework.boot'
-	id 'io.spring.dependency-management'
-}
-
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
-}
-
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-}
-
-bootJar {
-	launchScript()
-}
-
 dependencies {
+	implementation project(':module_payment')
+
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
 	implementation 'org.springframework.boot:spring-boot-starter-cache'
 
@@ -31,15 +12,4 @@ dependencies {
 	testImplementation 'org.springframework:spring-webflux'
 
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-}
-
-tasks.withType(JavaCompile).configureEach {
-	options.compilerArgs << "-parameters"
-}
-
-tasks.named('test') {
-	testLogging {
-		events "passed", "skipped", "failed"
-		exceptionFormat "full"
-	}
 }
