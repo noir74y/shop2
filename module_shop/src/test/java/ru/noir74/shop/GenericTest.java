@@ -68,7 +68,7 @@ public abstract class GenericTest {
         cartRepository.deleteAll().block();
         productRepository.deleteAll().block();
 
-        product = productService.save(Mono.just(Product.builder()
+        product = productService.create(Mono.just(Product.builder()
                 .title("title1")
                 .price(3333)
                 .description("description1")

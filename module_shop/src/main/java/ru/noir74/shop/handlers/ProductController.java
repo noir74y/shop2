@@ -77,7 +77,7 @@ public class ProductController {
     public Mono<String> createProduct(@ModelAttribute ProductDtoReq productDtoReq) {
         return Mono.just(productDtoReq)
                 .transform(productMapper::monoDtoReq2monoDomain)
-                .transform(productService::save)
+                .transform(productService::create)
                 .thenReturn("redirect:/product");
     }
 
@@ -85,7 +85,7 @@ public class ProductController {
     public Mono<String> updateProduct(@ModelAttribute ProductDtoReq productDtoReq, @PathVariable("id") @NotNull @Positive Long id) {
         return Mono.just(productDtoReq)
                 .transform(productMapper::monoDtoReq2monoDomain)
-                .transform(productService::save)
+                .transform(productService::update)
                 .then(productDtoReq.getQuantity() != 0
                         ? cartService.addToCart(id, productDtoReq.getQuantity())
                         : cartService.removeFromCart(id)

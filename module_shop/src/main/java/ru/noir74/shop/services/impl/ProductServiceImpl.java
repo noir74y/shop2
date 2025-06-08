@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +35,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "productPages", key = "#page + '_' + #size + '_' + #sort")
     public Flux<Product> getPage(Integer page, Integer size, ProductSorting sort) {
+        System.out.println("Fetching products page from DB: page=" + page + ", size=" + size + ", sort=" + sort);
         return productRepository
                 .findAllWithSortAndPagination(sort.name(), (long) size * (page - 1), size)
                 .as(productMapper::fluxEntity2fluxDomain);
@@ -52,7 +55,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    @CacheEvict(value = "products", key = "#id")
+    @Caching(evict = {
+            @CacheEvict(value = "products", key = "#id"),
+            @CacheEvict(value = "productPages", allEntries = true)
+    })
     public Mono<Void> delete(Long id) {
         return cartService.ifProductInCart(id)
                 .flatMap(inCart -> {
@@ -68,8 +74,21 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @CacheEvict(value = "products", key = "#id")
-    public Mono<Product> save(Mono<Product> productMono) {
+    public Mono<Product> create(Mono<Product> productMono) {
+        return save(null, productMono);
+    }
+
+    @Override
+    public Mono<Product> update(Mono<Product> productMono) {
+        return productMono.flatMap(product -> save(product.getId(), productMono));
+    }
+
+    @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "products", key = "#id"),
+            @CacheEvict(value = "productPages", allEntries = true)
+    })
+    public Mono<Product> save(Long id, Mono<Product> productMono) {
         return productMono
                 .as(productMapper::monoDomain2monoEntity)
                 .flatMap(productRepository::save)

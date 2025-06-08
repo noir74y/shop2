@@ -20,6 +20,9 @@ bootJar {
 }
 
 dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -28,6 +31,10 @@ dependencies {
 	testImplementation 'org.springframework:spring-webflux'
 
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.compilerArgs << "-parameters"
 }
 
 tasks.named('test') {
