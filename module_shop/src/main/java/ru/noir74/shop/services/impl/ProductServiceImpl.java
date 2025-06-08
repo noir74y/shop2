@@ -2,6 +2,8 @@ package ru.noir74.shop.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +42,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "products", key = "#id")
     public Mono<Product> get(Long id) {
+        System.out.println("Fetching product from DB for ID: " + id);
         return productRepository.findById(id)
                 .switchIfEmpty(Mono.error(new NotFoundException("product is not found", "id=" + id)))
                 .as(productMapper::monoEntity2monoDomain);
@@ -48,6 +52,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "products", key = "#id")
     public Mono<Void> delete(Long id) {
         return cartService.ifProductInCart(id)
                 .flatMap(inCart -> {
@@ -63,6 +68,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @CacheEvict(value = "products", key = "#id")
     public Mono<Product> save(Mono<Product> productMono) {
         return productMono
                 .as(productMapper::monoDomain2monoEntity)

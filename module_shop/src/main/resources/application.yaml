@@ -1,12 +1,34 @@
-spring.application.name=shop2
-server.port=9093
-spring.r2dbc.url=r2dbc:postgresql://localhost:5433/mine
-spring.r2dbc.username=postgres
-spring.r2dbc.password=postgres
-spring.r2dbc.initialization-mode=always
-spring.r2dbc.schema=classpath:schema.sql
-spring.thymeleaf.prefix=classpath:/templates/
-spring.thymeleaf.suffix=.html
+spring:
+  application:
+    name: shop2
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5433/mine
+    username: postgres
+    password: postgres
+    initialization-mode: always
+    schema: classpath:schema.sql
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+server:
+  port: 9093
+data:
+  redis:
+    host: localhost
+    port: 6379
+#  cache:
+#    redis:
+#      time-to-live: PT60S
+
+#spring.application.name=shop2
+#server.port=9093
+#spring.r2dbc.url=r2dbc:postgresql://localhost:5433/mine
+#spring.r2dbc.username=postgres
+#spring.r2dbc.password=postgres
+#spring.r2dbc.initialization-mode=always
+#spring.r2dbc.schema=classpath:schema.sql
+#spring.thymeleaf.prefix=classpath:/templates/
+#spring.thymeleaf.suffix=.html
 #logging.level.org.springframework.r2dbc=DEBUG
 #logging.level.org.springframework.boot.autoconfigure.r2dbc=DEBUG
 #logging.level.org.springframework.r2dbc.datasource.init=DEBUG

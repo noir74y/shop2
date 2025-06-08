@@ -1,5 +1,6 @@
 package ru.noir74.shop.models.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +19,7 @@ public class Product {
     private String title;
     private Integer price;
     private String description;
+    //@JsonIgnore
     private FilePart file;
 
     public Integer getPrice() {
