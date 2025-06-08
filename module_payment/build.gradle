@@ -14,11 +14,11 @@ java {
 
 openApiGenerate {
     generatorName.set("spring")
-    inputSpec.set("${project.projectDir}/src/main/resources/api-spec.yaml")
-    outputDir.set("${project.projectDir}/build/generated")
-    modelPackage.set("ru.noir74.shop.models")
-    apiPackage.set("ru.noir74.shop.controllers")
-    invokerPackage.set("ru.noir74.shop.clients")
+    inputSpec.set(layout.projectDirectory.file("src/main/resources/api-spec.yaml").toString())
+    outputDir.set(layout.buildDirectory.dir("generated/openapi-server").get().toString())
+    modelPackage.set("ru.noir74.payment.models.dto")
+    apiPackage.set("ru.noir74.payment.controllers")
+    invokerPackage.set("ru.noir74.payment.clients")
     configOptions.set([
             hideGenerationTimestamp: "true",
             requestMappingMode: "controller",
@@ -38,18 +38,20 @@ openApiGenerate {
 
 tasks.register('buildClient', GenerateTask) {
     generatorName.set("java")
-    inputSpec.set("$projectDir/src/main/resources/api-spec.yaml")
-    outputDir.set("$projectDir/build/generated")
-    modelPackage.set("ru.noir74.shop.models")
-    apiPackage.set("ru.noir74.shop.controllers")
-    invokerPackage.set("ru.noir74.shop.clients")
+    inputSpec.set(layout.projectDirectory.file("src/main/resources/api-spec.yaml").toString())
+    outputDir.set(layout.buildDirectory.dir("generated/openapi-client").get().toString())
+    modelPackage.set("ru.noir74.shop.models.dto")
+    apiPackage.set("ru.noir74.shop.client.api")
+    invokerPackage.set("ru.noir74.shop.client.clients")
     configOptions.set([
             hideGenerationTimestamp: "true",
             library                : "webclient",
             useJakartaEe           : "true",
             useTags                : "false",
             openApiNullable        : "false",
-            serializableModel      : "true"
+            serializableModel      : "true",
+            skipDefaultInterface: "true",
+            generateModels: "false"
     ])
 }
 
@@ -74,13 +76,18 @@ tasks.named('test') {
 }
 
 tasks.named('compileJava') {
-    dependsOn([tasks.openApiGenerate, tasks.buildClient])
+    dependsOn tasks.openApiGenerate
+    dependsOn tasks.buildClient
 }
 
 sourceSets {
     main {
         java {
-            srcDirs 'build/generated'
+            srcDirs = [
+                    'src/main/java',
+                    "${buildDir}/generated/openapi-server/src/main/java",
+                    "${buildDir}/generated/openapi-client/src/main/java"
+            ]
         }
     }
 }
