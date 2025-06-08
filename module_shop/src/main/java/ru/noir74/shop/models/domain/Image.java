@@ -1,5 +1,6 @@
 package ru.noir74.shop.models.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +18,7 @@ public class Image {
     private String imageName;
     private Long productId;
 
+    @JsonIgnore
     public String getImageType() {
         return Arrays.stream(imageName.split("\\."))
                 .reduce((first, second) -> second)

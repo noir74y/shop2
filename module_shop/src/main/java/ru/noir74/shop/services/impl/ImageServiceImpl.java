@@ -1,6 +1,8 @@
 package ru.noir74.shop.services.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "images", key = "#id")
     public Mono<Image> findImageById(Long id) {
         return imageRepository.findById(id)
                 .switchIfEmpty(Mono.error(new NotFoundException("image is not found", "id=" + id)))
@@ -39,6 +42,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
+    @CacheEvict(value = "images", key = "#id")
     public Mono<Void> deleteById(Long id) {
         return imageRepository.deleteById(id);
     }
