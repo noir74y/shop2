@@ -19,7 +19,7 @@ public class Product {
     private String title;
     private Integer price;
     private String description;
-    //@JsonIgnore
+    @JsonIgnore // не кэшировать. Image кэшируется в своем сервисе
     private FilePart file;
 
     public Integer getPrice() {
