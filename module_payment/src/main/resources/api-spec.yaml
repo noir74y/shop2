@@ -1,0 +1,98 @@
+openapi: 3.0.0
+info:
+  title: API Управления Балансом
+  version: 1.0.0
+  description: API для получения баланса и осуществления платежей.
+
+paths:
+  /balance:
+    get:
+      summary: Получить текущий баланс на счете
+      operationId: getBalance
+      responses:
+        '200':
+          description: Успешное получение баланса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Balance'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /payment:
+    post:
+      summary: Осуществить платеж
+      operationId: makePayment
+      requestBody:
+        description: Сумма платежа
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+      responses:
+        '200':
+          description: Платеж успешно осуществлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentConfirmation'
+        '400':
+          description: Неверный запрос (например, отрицательная сумма)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Balance:
+      type: object
+      properties:
+        amount:
+          type: integer
+          description: Текущий баланс счета
+          example: 1500
+      required:
+        - amount
+
+    PaymentRequest:
+      type: object
+      properties:
+        amount:
+          type: integer
+          description: Сумма для осуществления платежа
+          minimum: 1 # Платеж должен быть положительным числом
+          example: 500
+      required:
+        - amount
+
+    PaymentConfirmation:
+      type: object
+      properties:
+        newBalance:
+          type: integer
+          description: Новый баланс счета после осуществления платежа
+          example: 1000
+      required:
+        - newBalance
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Сообщение об ошибке
+          example: Произошла непредвиденная ошибка.
+      required:
+        - message
