@@ -1,4 +1,4 @@
-dependencies {
+ыуdependencies {
 	implementation project(':module_payment')
 
 	implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
