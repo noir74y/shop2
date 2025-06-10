@@ -1,3 +1,23 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == 'org.springframework.boot') {
+                useVersion springBootVersion
+            }
+            if (requested.id.id == 'io.spring.dependency-management') {
+                useVersion springDependencyManagementVersion
+            }
+            if (requested.id.id == 'org.openapi.generator') {
+                useVersion openApiGeneratorPluginVersion
+            }
+        }
+    }
+}
+
 rootProject.name = 'shop2'
 include 'module_shop'
 include 'module_payment'
