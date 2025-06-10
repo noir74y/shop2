@@ -8,7 +8,7 @@ import ru.noir74.payment.models.dto.PaymentConfirmation;
 import ru.noir74.payment.models.dto.PaymentRequest;
 
 @Service
-public class PaymentService {
+public class PaymentApiService {
     @Value("${application.payment.initial-balance}")
     private int currentBalance;
 

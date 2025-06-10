@@ -4,9 +4,14 @@ info:
   version: 1.0.0
   description: API для получения баланса и осуществления платежей.
 
+tags:
+  - name: Payment
+
 paths:
   /balance:
     get:
+      tags:
+        - Payment
       summary: Получить текущий баланс на счете
       operationId: getBalance
       responses:
@@ -25,6 +30,8 @@ paths:
 
   /payment:
     post:
+      tags:
+        - Payment
       summary: Осуществить платеж
       operationId: makePayment
       requestBody:
