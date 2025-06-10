@@ -2,6 +2,10 @@ import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 apply plugin: 'org.openapi.generator'
 
+dependencies {
+    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.8.8'
+}
+
 openApiGenerate {
     generatorName.set("spring")
     inputSpec.set(layout.projectDirectory.file("src/main/resources/api-spec.yaml").toString())
