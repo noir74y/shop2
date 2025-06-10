@@ -44,12 +44,6 @@ subprojects {
         implementation "org.mapstruct:mapstruct:${mapstructVersion}"
         annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 
-//        configurations.configureEach {
-//            resolutionStrategy {
-//                force "io.swagger.core.v3:swagger-annotations:${swaggerAnnotationVersion}"
-//            }
-//        }
-
         testImplementation platform("org.junit:junit-bom:${junitBomVersion}")
         testImplementation 'org.junit.jupiter:junit-jupiter'
         testImplementation 'org.mockito:mockito-core'
