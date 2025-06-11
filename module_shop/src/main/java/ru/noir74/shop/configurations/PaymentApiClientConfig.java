@@ -8,7 +8,7 @@ import ru.noir74.shop.client.clients.ApiClient;
 
 @Configuration
 public class PaymentApiClientConfig {
-    @Value("${payment-service.url}")
+    @Value("${payment-service.base-url}")
     private String paymentServiceBaseUrl;
 
     @Bean
