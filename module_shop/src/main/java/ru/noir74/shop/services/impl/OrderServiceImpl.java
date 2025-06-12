@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import ru.noir74.shop.client.api.PaymentApi;
 import ru.noir74.shop.misc.error.exceptions.NotFoundException;
 import ru.noir74.shop.models.domain.Item;
 import ru.noir74.shop.models.domain.Order;
@@ -24,6 +25,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderMapperHelper orderMapperHelper;
     private final ItemRepository itemRepository;
     private final ItemMapper itemMapper;
+    private final PaymentApi paymentApi;
 
     @Override
     @Transactional(readOnly = true)

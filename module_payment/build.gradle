@@ -17,17 +17,17 @@ openApiGenerate {
     invokerPackage.set("ru.noir74.payment.clients")
     configOptions.set([
             hideGenerationTimestamp: "true",
-            requestMappingMode: "controller",
-            interfaceOnly: "true",
-            library: "spring-boot",
-            reactive: "true",
-            useSpringBoot3: "true",
-            useJakartaEe: "true",
-            useTags: "true",
-            dateLibrary: "java8",
-            openApiNullable: "false",
-            serializableModel: "true",
-            returnSuccessCode: "true"
+            requestMappingMode     : "controller",
+            interfaceOnly          : "true",
+            library                : "spring-boot",
+            reactive               : "true",
+            useSpringBoot3         : "true",
+            useJakartaEe           : "true",
+            useTags                : "true",
+            dateLibrary            : "java8",
+            openApiNullable        : "false",
+            serializableModel      : "true",
+            returnSuccessCode      : "true"
     ])
 }
 
@@ -43,8 +43,6 @@ tasks.register('buildClient', GenerateTask) {
             useJakartaEe           : "true",
             useTags                : "true",
             openApiNullable        : "false",
-            serializableModel      : "true",
-            skipDefaultInterface   : "true",
             generateModels         : "false"
     ])
 }

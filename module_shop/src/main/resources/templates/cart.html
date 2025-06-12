@@ -72,12 +72,17 @@
 </table>
 
 <p></p>
-<label for="total">Стоимость</label>
-<input type="text" id="total" name="total" readonly th:value="${total}">
+<p>Общая сумма: <span th:text="${total}">0</span></p>
+<p>Баланс: <span th:text="${balance}">0</span></p>
+
 
 <form action="/cart/order" method="post">
     <p></p>
-    <button>Заказать</button>
+    <button
+            th:disabled="${balance < total}"
+            th:text="${balance < total} ? 'Денег нет' : 'Заказать'">
+        Заказать
+    </button>
 </form>
 
 <script defer type="text/javascript" th:inline="javascript">
