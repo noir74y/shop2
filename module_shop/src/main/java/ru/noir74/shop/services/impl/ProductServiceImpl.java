@@ -79,20 +79,21 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @CacheEvict(value = "productPages", allEntries = true)
     public Mono<Product> create(Mono<Product> productMono) {
         return self.save(null, productMono);
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "products", key = "#id"),
+            @CacheEvict(value = "productPages", allEntries = true)
+    })
     public Mono<Product> update(Mono<Product> productMono) {
         return productMono.flatMap(product -> self.save(product.getId(), productMono));
     }
 
     @Transactional
-    @Caching(evict = {
-            @CacheEvict(value = "products", key = "#id"),
-            @CacheEvict(value = "productPages", allEntries = true)
-    })
     public Mono<Product> save(Long id, Mono<Product> productMono) {
         return productMono
                 .as(productMapper::monoDomain2monoEntity)
