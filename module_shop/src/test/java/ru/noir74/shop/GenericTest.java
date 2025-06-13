@@ -1,10 +1,16 @@
 package ru.noir74.shop;
 
+import com.redis.testcontainers.RedisContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 import reactor.core.publisher.Mono;
 import ru.noir74.shop.models.domain.Image;
 import ru.noir74.shop.models.domain.Order;
@@ -24,7 +30,15 @@ import java.io.IOException;
 
 @SpringBootTest
 @AutoConfigureWebTestClient
+@Testcontainers
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public abstract class GenericTest {
+
+    @Container
+    @ServiceConnection
+    static final RedisContainer redisContainer =
+            new RedisContainer(DockerImageName.parse("redis:7.4.2-bookworm"));
+
     @Autowired
     protected WebTestClient webTestClient;
 
@@ -57,6 +71,9 @@ public abstract class GenericTest {
 
     @Autowired
     protected ImageMapper imageMapper;
+
+//     @Autowired
+//     protected ReactiveRedisTemplate<String, String> reactiveRedisTemplate;
 
     protected Product product;
     protected Order order;
