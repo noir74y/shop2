@@ -14,7 +14,7 @@ public interface ProductService {
 
     Mono<Product> create(Mono<Product> productMono);
 
-    Mono<Product> update(Mono<Product> productMono);
+    Mono<Product> update(Long id, Mono<Product> productMono);
 
     Mono<Product> save(Long id, Mono<Product> productMono);
 }

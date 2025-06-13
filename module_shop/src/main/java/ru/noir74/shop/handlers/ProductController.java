@@ -87,7 +87,7 @@ public class ProductController {
     public Mono<String> updateProduct(@ModelAttribute ProductDtoReq productDtoReq, @PathVariable("id") @NotNull @Positive Long id) {
         return Mono.just(productDtoReq)
                 .transform(productMapper::monoDtoReq2monoDomain)
-                .transform(productService::update)
+                .transform(productMono -> productService.update(id, productMono))
                 .then(productDtoReq.getQuantity() != 0
                         ? cartService.addToCart(id, productDtoReq.getQuantity())
                         : cartService.removeFromCart(id)

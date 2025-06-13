@@ -3,15 +3,13 @@ package ru.noir74.shop;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.openapitools.client.model.Balance;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.openapitools.client.model.PaymentRequest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import ru.noir74.shop.client.api.PaymentApi;
-import org.openapitools.client.model.PaymentRequest;
 
 import java.io.IOException;
 

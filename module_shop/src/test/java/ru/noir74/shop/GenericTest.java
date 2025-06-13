@@ -72,9 +72,6 @@ public abstract class GenericTest {
     @Autowired
     protected ImageMapper imageMapper;
 
-//     @Autowired
-//     protected ReactiveRedisTemplate<String, String> reactiveRedisTemplate;
-
     protected Product product;
     protected Order order;
     protected Image image;

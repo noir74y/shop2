@@ -89,8 +89,8 @@ public class ProductServiceImpl implements ProductService {
             @CacheEvict(value = "products", key = "#id"),
             @CacheEvict(value = "productPages", allEntries = true)
     })
-    public Mono<Product> update(Mono<Product> productMono) {
-        return productMono.flatMap(product -> self.save(product.getId(), productMono));
+    public Mono<Product> update(Long id, Mono<Product> productMono) {
+        return productMono.flatMap(product -> self.save(id, productMono));
     }
 
     @Transactional
