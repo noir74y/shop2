@@ -57,6 +57,8 @@ public class ProductController {
     @GetMapping("{id}")
     public Mono<String> getProduct(Model model, @PathVariable("id") @NotNull @Positive Long id) {
 
+        log.info("Loading product: id={}", id);
+
         return productService.get(id)
                 .transform(productMapper::monoDomain2monoDtoResp)
                 .zipWith(cartService.getQuantityOfProduct(id))

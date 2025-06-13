@@ -2,9 +2,11 @@ package ru.noir74.shop.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +34,9 @@ public class ProductServiceImpl implements ProductService {
     private final CartService cartService;
     private final ItemRepository itemRepository;
 
+    @Autowired
+    @Lazy
+    private ProductService self;
 
     @Override
     @Transactional(readOnly = true)
@@ -75,12 +80,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Mono<Product> create(Mono<Product> productMono) {
-        return save(null, productMono);
+        return self.save(null, productMono);
     }
 
     @Override
     public Mono<Product> update(Mono<Product> productMono) {
-        return productMono.flatMap(product -> save(product.getId(), productMono));
+        return productMono.flatMap(product -> self.save(product.getId(), productMono));
     }
 
     @Transactional
