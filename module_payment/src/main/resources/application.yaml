@@ -1,0 +1,12 @@
+server:
+  port: 6789
+application:
+  payment:
+    initial-balance: 1500
+
+springdoc:
+  swagger-ui:
+    enable: true
+    path: /swagger-ui-custom.html
+    tryItOutEnabled: true
+    persistAuthorization: true

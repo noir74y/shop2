@@ -1,17 +1,28 @@
 services:
-  app:
+  shop:
     build:
-      context: .
+      context: ./module_shop
     ports:
       - "9092:9091"
     depends_on:
       - db
+      - payment
+      - redis
     environment:
       SERVER_PORT: 9091
       SPRING_R2DBC_URL: r2dbc:postgresql://db:5432/postgres
       SPRING_R2DBC_USERNAME: postgres
       SPRING_R2DBC_PASSWORD: postgres
-
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      PAYMENT_SERVICE_BASE_URL: http://payment:6790
+  payment:
+    build:
+      context: ./module_payment
+    ports:
+      - "6790:6790"
+    environment:
+      SERVER_PORT: 6790
   db:
     image: postgres:17
     ports:
@@ -22,6 +33,7 @@ services:
       POSTGRES_DB: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-
+  redis:
+    image: redis:7-alpine
 volumes:
   postgres_data:
