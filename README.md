@@ -1,6 +1,6 @@
 ### URL
 
-http://localhost:9092
+http://localhost:9092/product
 ---
 
 ### ER
@@ -29,12 +29,17 @@ http://localhost:9092
 
 ##### Локально
 
+###### cd <project's root>
 ###### .\gradlew clean build bootJar
 
-###### cd .\build\libs\
+##### в одном терминале:
+###### cd <project's root>\module_payment\build\libs\
+###### java -jar .\module_payment-1.0-SNAPSHOT.jar
 
-###### java -jar .\shop-0.0.1-SNAPSHOT.jar
+##### в другом терминале:
+###### cd <project's root>\module_shop\build\libs\
+###### java -jar .\module_shop-1.0-SNAPSHOT.jar
 
 ##### Докер
-
+###### cd <project's root>
 ###### docker compose up
