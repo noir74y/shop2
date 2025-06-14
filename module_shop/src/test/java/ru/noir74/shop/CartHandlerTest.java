@@ -26,7 +26,7 @@ public class CartHandlerTest extends GenericTest {
     @Transactional
     void setUp() throws IOException {
         setUpGeneric();
-        when(paymentApi.getBalance()).thenReturn(Mono.just(new Balance().amount(1500)));
+        when(paymentApi.getBalance()).thenReturn(Mono.just(new Balance().amount(6000)));
         when(paymentApi.makePayment(any(PaymentRequest.class))).thenReturn(Mono.empty());
     }
 
@@ -44,7 +44,6 @@ public class CartHandlerTest extends GenericTest {
                     String responseBody = response.getResponseBody();
                     assert responseBody.contains("title1");
                 });
-
     }
 
     @Test
@@ -112,5 +111,37 @@ public class CartHandlerTest extends GenericTest {
                 .expectNext(order)
                 .expectComplete()
                 .verify();
+    }
+
+    @Test
+    void checkOrderOrderButtonWithGoodBalance_ShouldBeEnabled() {
+        Assertions.assertNotNull(product);
+        cartService.addToCart(product.getId(), 1).block();
+
+        webTestClient.get()
+                .uri("/cart")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .consumeWith(response -> {
+                    String responseBody = response.getResponseBody();
+                    assert responseBody.contains("Заказать");
+                });
+    }
+
+    @Test
+    void checkOrderOrderButtonWithBadBalance_ShouldBeDisabled() {
+        Assertions.assertNotNull(product);
+        cartService.addToCart(product.getId(), 3).block();
+
+        webTestClient.get()
+                .uri("/cart")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .consumeWith(response -> {
+                    String responseBody = response.getResponseBody();
+                    assert responseBody.contains("Мало денег");
+                });
     }
 }

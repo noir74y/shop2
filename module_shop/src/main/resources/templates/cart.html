@@ -80,7 +80,7 @@
     <p></p>
     <button
             th:disabled="${balance < total}"
-            th:text="${balance < total} ? 'Денег нет' : 'Заказать'">
+            th:text="${balance < total} ? 'Мало денег' : 'Заказать'">
         Заказать
     </button>
 </form>
