@@ -5,6 +5,7 @@ plugins {
 }
 
 dependencies {
+    implementation "io.swagger.core.v3:swagger-annotations:${swaggerAnnotationVersion}"
     implementation "org.springdoc:springdoc-openapi-starter-webflux-ui:${springdocOpenapiStarterWebFluxUi}"
 }
 
