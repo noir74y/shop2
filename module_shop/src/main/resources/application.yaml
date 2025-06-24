@@ -1,3 +1,8 @@
+server:
+  port: 9093
+payment-service:
+  base-url: http://localhost:6789
+
 spring:
   application:
     name: shop
@@ -14,12 +19,24 @@ spring:
     redis:
       host: localhost
       port: 6379
-
-server:
-    port: 9093
-payment-service:
-  base-url: http://localhost:6789
-
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            authorization-grant-type: authorization_code
+            provider: keycloak
+            client-id: shop-application
+            client-secret: UG1PVeAO7mi2oXVdxIZWcSDMkhfa2V73
+            redirect-uri: '{baseUrl}/{action}/oauth2/code/{registrationId}'
+            scope: openid, profile, roles
+        provider:
+          keycloak:
+            authorization-uri: http://localhost:8080/realms/shop/protocol/openid-connect/auth
+            token-uri: http://localhost:8080/realms/shop/protocol/openid-connect/token
+            user-info-uri: http://localhost:8080/realms/shop/protocol/openid-connect/userinfo
+            user-name-attribute: preferred_username
+            jwk-set-uri: http://localhost:8080/realms/shop/protocol/openid-connect/certs
 
 #  cache:
 #    redis:
