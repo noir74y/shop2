@@ -2,6 +2,8 @@ server:
   port: 9093
 payment-service:
   base-url: http://localhost:6789
+shop-service:
+  base-url: http://localhost:9093/product
 
 spring:
   application:
@@ -21,7 +23,9 @@ spring:
       port: 6379
   security:
     oauth2:
+      realm: shop
       client:
+        id: shop-application
         registration:
           keycloak:
             authorization-grant-type: authorization_code
