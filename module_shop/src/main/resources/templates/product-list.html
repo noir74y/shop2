@@ -15,6 +15,11 @@
 </head>
 
 <body>
+
+<p th:if="${userName}">Вы вошли как пользователь: <span th:text="${userName}"></span></p>
+<p th:unless="${userName}">Вы не вошли в систему.</p>
+<a th:href="${logoutUrl}">logout</a>
+
 <div style="overflow: hidden">
     <a href="/product" style="float: right; margin: 20px"> Продукты </a>
 </div>
