@@ -30,6 +30,15 @@ public class SecurityConfig {
     @Value("${spring.security.oauth2.client.provider.keycloak.jwk-set-uri}")
     private String JWK_SET_URI;
 
+    @Value("${spring.security.oauth2.client.provider.keycloak.authorization-uri}")
+    private String keyCloakAuthorizationUri;
+    @Value("${spring.security.oauth2.realm}")
+    private String keyCloakRealm;
+    @Value("${spring.security.oauth2.client.id}")
+    private String keyCloakClientId;
+    @Value("${shop-service.base-url}")
+    private String shopServiceBaseUrl;
+
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         return http
@@ -77,5 +86,17 @@ public class SecurityConfig {
     @Bean
     public ReactiveJwtDecoder jwtDecoder() {
         return NimbusReactiveJwtDecoder.withJwkSetUri(JWK_SET_URI).build();
+    }
+
+    public String getLogoutUrl(String usersIdToken) {
+        var keycloakBaseUrl = keyCloakAuthorizationUri.substring(0, keyCloakAuthorizationUri.indexOf("/realms"));
+        return String.format(
+                "%s/realms/%s/protocol/openid-connect/logout?post_logout_redirect_uri=%s&id_token_hint=%s&client_id=%s",
+                keycloakBaseUrl,
+                keyCloakRealm,
+                shopServiceBaseUrl,
+                usersIdToken,
+                keyCloakClientId
+        );
     }
 }
