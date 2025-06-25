@@ -4,11 +4,15 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+import ru.noir74.shop.configurations.SecurityConfig;
 import ru.noir74.shop.misc.enums.ProductSorting;
 import ru.noir74.shop.models.dto.ProductDtoReq;
 import ru.noir74.shop.models.dto.ProductDtoResp;
@@ -25,9 +29,11 @@ public class ProductController {
     private final ProductService productService;
     private final ProductMapper productMapper;
     private final CartService cartService;
+    private final SecurityConfig securityConfig;
 
     @GetMapping
     public Mono<String> getProductsPage(Model model,
+                                        @AuthenticationPrincipal Mono<OidcUser> oidcUserMono,
                                         @RequestParam(defaultValue = "1") String page,
                                         @RequestParam(defaultValue = "10") String size,
                                         @RequestParam(defaultValue = "TITLE") String sort) {
@@ -46,10 +52,15 @@ public class ProductController {
                                 .thenReturn(productDtoResp)
                 )
                 .collectList()
-                .doOnNext(products -> {
+                .zipWith(oidcUserMono)
+                .doOnNext(pair -> {
+                    var products = pair.getT1();
+                    var oidcUser = pair.getT2();
                     model.addAttribute("page", page);
                     model.addAttribute("size", size);
                     model.addAttribute("products", products);
+                    model.addAttribute("userName", oidcUser.getPreferredUsername());
+                    model.addAttribute("logoutUrl", securityConfig.getLogoutUrl(oidcUser.getIdToken().getTokenValue()));
                 })
                 .thenReturn("product-list");
     }
