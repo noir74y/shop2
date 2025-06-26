@@ -5,7 +5,11 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,10 +34,22 @@ public class ProductController {
     private final ProductMapper productMapper;
     private final CartService cartService;
     private final SecurityConfig securityConfig;
+    private final ReactiveClientRegistrationRepository clientRegistrationRepository;
+
+    @Value("${spring.security.oauth2.client.registration.keycloak.provider}")
+    private String registrationId;
+
+    @Value("${spring.security.oauth2.client.provider.keycloak.authorization-uri}")
+    private String keyCloakAuthorizationUri;
+    @Value("${spring.security.oauth2.realm}")
+    private String keyCloakRealm;
+    @Value("${spring.security.oauth2.client.id}")
+    private String keyCloakClientId;
+    @Value("${shop-service.base-url}")
+    private String shopServiceBaseUrl;
 
     @GetMapping
     public Mono<String> getProductsPage(Model model,
-                                        @AuthenticationPrincipal Mono<OidcUser> oidcUserMono,
                                         @RequestParam(defaultValue = "1") String page,
                                         @RequestParam(defaultValue = "10") String size,
                                         @RequestParam(defaultValue = "TITLE") String sort) {
@@ -44,6 +60,11 @@ public class ProductController {
         int sizeNum = Integer.parseInt(size);
         ProductSorting sorting = ProductSorting.valueOf(sort);
 
+        Mono<Authentication> authenticationMono = ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .filter(Authentication::isAuthenticated)
+                .filter(auth -> auth instanceof OAuth2AuthenticationToken);
+
         return productService.getPage(pageNum, sizeNum, sorting)
                 .transform(productMapper::fluxDomain2fluxDtoResp)
                 .concatMap(productDtoResp ->
@@ -52,17 +73,41 @@ public class ProductController {
                                 .thenReturn(productDtoResp)
                 )
                 .collectList()
-                .zipWith(oidcUserMono)
-                .doOnNext(pair -> {
-                    var products = pair.getT1();
-                    var oidcUser = pair.getT2();
+                .flatMap(products -> {
+                    model.addAttribute("products", products);
                     model.addAttribute("page", page);
                     model.addAttribute("size", size);
-                    model.addAttribute("products", products);
-                    model.addAttribute("userName", oidcUser.getPreferredUsername());
-                    model.addAttribute("logoutUrl", securityConfig.getLogoutUrl(oidcUser.getIdToken().getTokenValue()));
+                    return Mono.just("product-list");
                 })
-                .thenReturn("product-list");
+                .flatMap(stub -> authenticationMono
+                        .flatMap(authentication -> {
+                            if (authentication instanceof OAuth2AuthenticationToken oauth2Token &&
+                                    oauth2Token.getPrincipal() instanceof OidcUser oidcUser) {
+                                model.addAttribute("userName", oidcUser.getPreferredUsername());
+                                model.addAttribute("logoutUrl", getLogoutUrl(oidcUser));
+                            }
+                            return Mono.just("product-list");
+                        })
+                        .switchIfEmpty(
+                                clientRegistrationRepository.findByRegistrationId(registrationId)
+                                        .flatMap(clientRegistration -> {
+                                            var loginUrl = "/oauth2/authorization/" + clientRegistration.getRegistrationId();
+                                            model.addAttribute("loginUrl", loginUrl);
+                                            return Mono.just("product-list");
+                                        })
+                        ));
+    }
+
+    private String getLogoutUrl(OidcUser oidcUser) {
+        var keycloakBaseUrl = keyCloakAuthorizationUri.substring(0, keyCloakAuthorizationUri.indexOf("/realms"));
+        var usersIdToken = oidcUser.getIdToken().getTokenValue();
+        return String.format(
+                "%s/realms/%s/protocol/openid-connect/logout?post_logout_redirect_uri=%s&id_token_hint=%s&client_id=%s",
+                keycloakBaseUrl,
+                keyCloakRealm,
+                shopServiceBaseUrl,
+                usersIdToken,
+                keyCloakClientId);
     }
 
     @GetMapping("{id}")

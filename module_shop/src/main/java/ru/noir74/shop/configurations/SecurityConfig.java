@@ -1,5 +1,6 @@
 package ru.noir74.shop.configurations;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcReactiveOAuth2UserService;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.client.userinfo.ReactiveOAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
@@ -16,8 +18,10 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.authentication.RedirectServerAuthenticationSuccessHandler;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -25,7 +29,9 @@ import java.util.Set;
 
 @Configuration
 @EnableWebFluxSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+    private final ReactiveClientRegistrationRepository clientRegistrationRepository;
 
     @Value("${spring.security.oauth2.client.provider.keycloak.jwk-set-uri}")
     private String JWK_SET_URI;
@@ -44,9 +50,11 @@ public class SecurityConfig {
         return http
                 .authorizeExchange(exchanges -> exchanges
                         //.pathMatchers("/hello").hasRole("MANAGER")
+                        .pathMatchers("/product").permitAll()
                         .anyExchange().authenticated()
                 )
                 .oauth2Login(oauth2Login -> {
+                    oauth2Login.authenticationSuccessHandler(new RedirectServerAuthenticationSuccessHandler("/product"));
                 })
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .build();
