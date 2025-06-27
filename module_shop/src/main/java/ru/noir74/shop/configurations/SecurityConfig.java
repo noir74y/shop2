@@ -6,10 +6,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcReactiveOAuth2UserService;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
+import org.springframework.security.oauth2.client.oidc.web.server.logout.OidcClientInitiatedServerLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.client.userinfo.ReactiveOAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
@@ -19,9 +24,10 @@ import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.RedirectServerAuthenticationSuccessHandler;
+import org.springframework.security.web.server.authentication.logout.ServerLogoutSuccessHandler;
+import org.springframework.ui.Model;
 import reactor.core.publisher.Mono;
 
-import java.net.URI;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -36,14 +42,11 @@ public class SecurityConfig {
     @Value("${spring.security.oauth2.client.provider.keycloak.jwk-set-uri}")
     private String JWK_SET_URI;
 
-    @Value("${spring.security.oauth2.client.provider.keycloak.authorization-uri}")
-    private String keyCloakAuthorizationUri;
-    @Value("${spring.security.oauth2.realm}")
-    private String keyCloakRealm;
-    @Value("${spring.security.oauth2.client.id}")
-    private String keyCloakClientId;
     @Value("${shop-service.base-url}")
     private String shopServiceBaseUrl;
+
+    @Value("${spring.security.oauth2.client.registration.keycloak.provider}")
+    private String registrationId;
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
@@ -56,6 +59,10 @@ public class SecurityConfig {
                 .oauth2Login(oauth2Login -> {
                     oauth2Login.authenticationSuccessHandler(new RedirectServerAuthenticationSuccessHandler("/product"));
                 })
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessHandler(oidcLogoutSuccessHandler())
+                )
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .build();
     }
@@ -96,15 +103,34 @@ public class SecurityConfig {
         return NimbusReactiveJwtDecoder.withJwkSetUri(JWK_SET_URI).build();
     }
 
-    public String getLogoutUrl(String usersIdToken) {
-        var keycloakBaseUrl = keyCloakAuthorizationUri.substring(0, keyCloakAuthorizationUri.indexOf("/realms"));
-        return String.format(
-                "%s/realms/%s/protocol/openid-connect/logout?post_logout_redirect_uri=%s&id_token_hint=%s&client_id=%s",
-                keycloakBaseUrl,
-                keyCloakRealm,
-                shopServiceBaseUrl,
-                usersIdToken,
-                keyCloakClientId
-        );
+    @Bean
+    public ServerLogoutSuccessHandler oidcLogoutSuccessHandler() {
+        OidcClientInitiatedServerLogoutSuccessHandler logoutSuccessHandler =
+                new OidcClientInitiatedServerLogoutSuccessHandler(this.clientRegistrationRepository);
+        logoutSuccessHandler.setPostLogoutRedirectUri(shopServiceBaseUrl);
+        return logoutSuccessHandler;
+    }
+
+    public Mono<String> prepareLoginLogout(String view, Model model) {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .filter(Authentication::isAuthenticated)
+                .filter(authentication -> authentication instanceof OAuth2AuthenticationToken)
+                .flatMap(authentication -> {
+                    if (authentication instanceof OAuth2AuthenticationToken oauth2Token &&
+                            oauth2Token.getPrincipal() instanceof OidcUser oidcUser) {
+                        model.addAttribute("userName", oidcUser.getPreferredUsername());
+                        model.addAttribute("logoutUrl", "/logout");
+                    }
+                    return Mono.just(view);
+                })
+                .switchIfEmpty(
+                        clientRegistrationRepository.findByRegistrationId(registrationId)
+                                .flatMap(clientRegistration -> {
+                                    var loginUrl = "/oauth2/authorization/" + clientRegistration.getRegistrationId();
+                                    model.addAttribute("loginUrl", loginUrl);
+                                    return Mono.just(view);
+                                })
+                );
     }
 }

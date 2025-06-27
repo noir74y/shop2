@@ -18,7 +18,7 @@
 
 <div th:if="${userName}">
     <p>Вы вошли как пользователь: <span th:text="${userName}"></span></p>
-    <a href="/logout">logout</a>
+    <a th:href="@{/logout}">logout</a>
 </div>
 <div th:unless="${userName}">
     <p>Вы не вошли в систему.</p>
