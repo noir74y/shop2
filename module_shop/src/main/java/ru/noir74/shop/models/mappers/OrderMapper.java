@@ -16,6 +16,7 @@ public interface OrderMapper {
     OrderDto domain2dto(Order input);
 
     @Mapping(target = "items", ignore = true)
+    @Mapping(target = "username", ignore = true)
     Order dto2domain(OrderDto input);
 
     OrderEntity domain2entity(Order input);

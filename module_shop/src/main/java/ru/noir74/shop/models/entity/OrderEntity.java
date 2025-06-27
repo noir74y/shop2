@@ -13,5 +13,5 @@ import org.springframework.data.relational.core.mapping.Table;
 public class OrderEntity {
     @Id
     private Long id;
-    private String user;
+    private String username;
 }

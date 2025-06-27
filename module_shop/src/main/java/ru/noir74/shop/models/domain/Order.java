@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Order {
     private Long id;
-    private String user;
+    private String username;
     private List<Item> items;
 
     public Integer getTotal() {
