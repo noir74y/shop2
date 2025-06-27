@@ -36,9 +36,6 @@ import java.util.*;
 public class SecurityConfig {
     private final ReactiveClientRegistrationRepository clientRegistrationRepository;
 
-    @Value("${spring.security.oauth2.client.provider.keycloak.jwk-set-uri}")
-    private String JWK_SET_URI;
-
     @Value("${shop-service.base-url}")
     private String shopServiceBaseUrl;
 
@@ -59,42 +56,6 @@ public class SecurityConfig {
                 )
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .build();
-    }
-
-    @Bean
-    public ReactiveOAuth2UserService<OidcUserRequest, OidcUser> oidcReactiveUserService() {
-        final OidcReactiveOAuth2UserService oidcUserService = new OidcReactiveOAuth2UserService();
-
-        return (oidcUserRequest) -> oidcUserService.loadUser(oidcUserRequest)
-                .flatMap(oidcUser -> {
-                    Set<GrantedAuthority> mappedAuthorities = new HashSet<>(oidcUser.getAuthorities());
-                    OAuth2AccessToken accessToken = oidcUserRequest.getAccessToken();
-
-                    return jwtDecoder().decode(accessToken.getTokenValue())
-                            .doOnError(e -> System.err.println("Ошибка при декодировании Access Token: " + e.getMessage()))
-                            .map(decodedAccessToken -> {
-                                Map<String, Object> accessTokenClaims = decodedAccessToken.getClaims();
-
-                                if (accessTokenClaims.get("resource_access") instanceof Map<?, ?> resourceAccessInAccessToken) {
-                                    if (resourceAccessInAccessToken.get("shop-application") instanceof Map<?, ?> clientAccessInAccessToken) {
-                                        if (clientAccessInAccessToken.get("roles") instanceof Collection<?> clientRoles) {
-                                            clientRoles.forEach(role -> {
-                                                if (role instanceof String) {
-                                                    mappedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + ((String) role).toUpperCase()));
-                                                }
-                                            });
-                                        }
-                                    }
-                                }
-                                return new DefaultOidcUser(mappedAuthorities, oidcUser.getIdToken(), oidcUser.getUserInfo());
-                            })
-                            .onErrorResume(e -> Mono.just(new DefaultOidcUser(mappedAuthorities, oidcUser.getIdToken(), oidcUser.getUserInfo())));
-                });
-    }
-
-    @Bean
-    public ReactiveJwtDecoder jwtDecoder() {
-        return NimbusReactiveJwtDecoder.withJwkSetUri(JWK_SET_URI).build();
     }
 
     @Bean
