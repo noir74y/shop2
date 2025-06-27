@@ -7,10 +7,12 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import ru.noir74.shop.configurations.SecurityConfig;
+import ru.noir74.shop.models.dto.OrderDto;
 import ru.noir74.shop.models.mappers.OrderMapper;
 import ru.noir74.shop.services.OrderService;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -22,19 +24,19 @@ public class OrderHandler {
     private final SecurityConfig securityConfig;
 
     public Mono<ServerResponse> getAllOrders(ServerRequest request) {
+        Mono<List<OrderDto>> ordersListMono = orderService.findAll()
+                .as(orderMapper::fluxDomain2fluxDto)
+                .collectList();
+
+        Mono<Integer> totalMono = orderService.getTotal();
+
         Mono<Map<String, Object>> loginLoginAttributesMono = securityConfig.prepareLoginLogout();
 
-        return orderService.findAll()
-                .as(orderMapper::fluxDomain2fluxDto)
-                .collectList()
-                .zipWith(orderService.getTotal())
-                .zipWith(loginLoginAttributesMono)
+        return Mono.zip(ordersListMono, totalMono, loginLoginAttributesMono)
                 .flatMap(tuple -> {
-                    var tupleBox = tuple.getT1();
-                    Map<String, Object> loginLoginAttributes = tuple.getT2();
-
-                    var dtoList = tupleBox.getT1();
-                    var total = tupleBox.getT2();
+                    List<OrderDto> dtoList = tuple.getT1();
+                    Integer total = tuple.getT2();
+                    Map<String, Object> loginLoginAttributes = tuple.getT3();
 
                     Map<String, Object> modelData = new HashMap<>();
                     modelData.put("orders", dtoList);
