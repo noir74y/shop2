@@ -23,14 +23,12 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.authentication.RedirectServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.authentication.logout.ServerLogoutSuccessHandler;
 import org.springframework.ui.Model;
 import reactor.core.publisher.Mono;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -53,6 +51,7 @@ public class SecurityConfig {
                         .anyExchange().authenticated()
                 )
                 .oauth2Login(oauth2Login -> {
+                    oauth2Login.authenticationSuccessHandler(new RedirectServerAuthenticationSuccessHandler("/product"));
                 })
                 .logout(logout -> logout
                         .logoutUrl("/logout")
@@ -107,10 +106,7 @@ public class SecurityConfig {
     }
 
     public Mono<String> prepareLoginLogout(String view, Model model) {
-        return ReactiveSecurityContextHolder.getContext()
-                .map(SecurityContext::getAuthentication)
-                .filter(Authentication::isAuthenticated)
-                .filter(authentication -> authentication instanceof OAuth2AuthenticationToken)
+        return getAuthentification()
                 .flatMap(authentication -> {
                     if (authentication instanceof OAuth2AuthenticationToken oauth2Token &&
                             oauth2Token.getPrincipal() instanceof OidcUser oidcUser) {
@@ -127,5 +123,33 @@ public class SecurityConfig {
                                     return Mono.just(view);
                                 })
                 );
+    }
+
+    public Mono<Map<String, Object>> prepareLoginLogout() {
+        Map<String, Object> attributes = new HashMap<>();
+        return getAuthentification()
+                .flatMap(authentication -> {
+                    if (authentication instanceof OAuth2AuthenticationToken oauth2Token &&
+                            oauth2Token.getPrincipal() instanceof OidcUser oidcUser) {
+                        attributes.put("userName", oidcUser.getPreferredUsername());
+                        attributes.put("logoutUrl", "/logout");
+                    }
+                    return Mono.just(attributes);
+                })
+                .switchIfEmpty(
+                        clientRegistrationRepository.findByRegistrationId("keycloak-user")
+                                .flatMap(clientRegistration -> {
+                                    var loginUrl = "/oauth2/authorization/" + clientRegistration.getRegistrationId();
+                                    attributes.put("loginUrl", loginUrl);
+                                    return Mono.just(attributes);
+                                })
+                );
+    }
+
+    private Mono<Authentication> getAuthentification() {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .filter(Authentication::isAuthenticated)
+                .filter(authentication -> authentication instanceof OAuth2AuthenticationToken);
     }
 }

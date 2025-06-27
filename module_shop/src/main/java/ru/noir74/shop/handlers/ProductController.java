@@ -75,7 +75,7 @@ public class ProductController {
                     model.addAttribute("description", productDto.getDescription());
                     model.addAttribute("quantity", quantity);
                 })
-                .thenReturn("product");
+                .flatMap(stub -> securityConfig.prepareLoginLogout("product", model));
     }
 
     @PostMapping

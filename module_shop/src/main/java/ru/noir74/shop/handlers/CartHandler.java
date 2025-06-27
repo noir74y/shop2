@@ -8,11 +8,13 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import ru.noir74.shop.client.api.PaymentApi;
+import ru.noir74.shop.configurations.SecurityConfig;
 import ru.noir74.shop.models.dto.ItemDto;
 import ru.noir74.shop.models.mappers.ItemMapper;
 import ru.noir74.shop.services.CartService;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +24,7 @@ public class CartHandler {
     private final CartService cartService;
     private final ItemMapper itemMapper;
     private final PaymentApi paymentApi;
+    private final SecurityConfig securityConfig;
 
     public Mono<ServerResponse> viewCart(ServerRequest request) {
 
@@ -31,17 +34,21 @@ public class CartHandler {
                 .as(itemMapper::fluxDomain2fluxDto)
                 .collectList();
 
-        return Mono.zip(itemsDtoMono, totalMono, balanceMono).flatMap(tuple -> {
+        Mono<Map<String, Object>> loginLoginAttributesMono = securityConfig.prepareLoginLogout();
+
+        return Mono.zip(itemsDtoMono, totalMono, balanceMono, loginLoginAttributesMono).flatMap(tuple -> {
             List<ItemDto> itemsDto = tuple.getT1();
             Integer total = tuple.getT2();
             Balance balance = tuple.getT3();
+            Map<String, Object> loginLoginAttributes = tuple.getT4();
 
-            return ServerResponse.ok()
-                    .render("cart", Map.of(
-                            "items", itemsDto,
-                            "total", total,
-                            "balance", balance.getAmount()
-                    ));
+            Map<String, Object> modelData = new HashMap<>();
+            modelData.put("items", itemsDto);
+            modelData.put("total", total);
+            modelData.put("balance", balance.getAmount());
+            modelData.putAll(loginLoginAttributes);
+
+            return ServerResponse.ok().render("cart", modelData);
         });
     }
 
