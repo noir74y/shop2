@@ -50,7 +50,7 @@ public class SecurityConfig {
         return http
                 .authorizeExchange(exchanges -> exchanges
                         //.pathMatchers("/hello").hasRole("MANAGER")
-                        .pathMatchers("/product/**","/image/**","static/**").permitAll()
+                        .pathMatchers("/product/**", "/image/**", "static/**").permitAll()
                         .anyExchange().authenticated()
                 )
                 .oauth2Login(oauth2Login -> {

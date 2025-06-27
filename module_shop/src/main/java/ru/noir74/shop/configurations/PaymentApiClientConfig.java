@@ -55,7 +55,9 @@ public class PaymentApiClientConfig {
 
     @Bean
     public ApiClient paymentApiClient(WebClient paymentWebClient) {
-        return new ApiClient(paymentWebClient);
+        var apiClient = new ApiClient(paymentWebClient);
+        apiClient.setBasePath(paymentServiceBaseUrl);
+        return apiClient;
     }
 
     @Bean

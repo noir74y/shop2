@@ -37,7 +37,6 @@ spring:
             provider: keycloak
             client-id: shop-application
             client-secret: UG1PVeAO7mi2oXVdxIZWcSDMkhfa2V73
-            scope: payments:read, payments:write
         provider:
           keycloak:
             authorization-uri: http://localhost:8080/realms/shop/protocol/openid-connect/auth
