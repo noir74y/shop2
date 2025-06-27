@@ -45,9 +45,6 @@ public class SecurityConfig {
     @Value("${shop-service.base-url}")
     private String shopServiceBaseUrl;
 
-    @Value("${spring.security.oauth2.client.registration.keycloak.provider}")
-    private String registrationId;
-
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         return http
@@ -125,7 +122,7 @@ public class SecurityConfig {
                     return Mono.just(view);
                 })
                 .switchIfEmpty(
-                        clientRegistrationRepository.findByRegistrationId(registrationId)
+                        clientRegistrationRepository.findByRegistrationId("keycloak-user")
                                 .flatMap(clientRegistration -> {
                                     var loginUrl = "/oauth2/authorization/" + clientRegistration.getRegistrationId();
                                     model.addAttribute("loginUrl", loginUrl);
