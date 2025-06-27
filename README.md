@@ -30,16 +30,23 @@ http://localhost:9092/product
 ##### Локально
 
 ###### cd <project's root>
+
 ###### .\gradlew clean build bootJar
 
 ##### в одном терминале:
+
 ###### cd <project's root>\module_payment\build\libs\
+
 ###### java -jar .\module_payment-1.0-SNAPSHOT.jar
 
 ##### в другом терминале:
+
 ###### cd <project's root>\module_shop\build\libs\
+
 ###### java -jar .\module_shop-1.0-SNAPSHOT.jar
 
 ##### Докер
+
 ###### cd <project's root>
+
 ###### docker compose up
