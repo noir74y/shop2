@@ -15,21 +15,14 @@
 
 <body>
 
-<div style="overflow: hidden;">
-    <a href="/product" style="float: right; margin: 20px">
-        Продукты
-    </a>
+<div th:replace="~{fragments/auth-status :: authStatus}">
+    <p>Загрузка статуса пользователя...</p>
 </div>
-<div style="overflow: hidden;">
-    <a href="/cart" style="float: right; margin: 20px">
-        Корзина
-    </a>
+
+<div th:replace="~{fragments/navigator-panel :: NavigatorPanel}">
+    <p>Загрузка ссылок навигации...</p>
 </div>
-<div style="overflow: hidden;">
-    <a href="/order" style="float: right; margin: 20px">
-        Заказы
-    </a>
-</div>
+
 
 <h1>Заказ</h1>
 
