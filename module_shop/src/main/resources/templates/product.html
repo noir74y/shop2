@@ -30,42 +30,50 @@
     <input type="hidden" name="product_id" th:value="${id}">
 
     <label for="title">Название</label>
-    <input type="text" id="title" name="title" th:value="${title}" required>
+    <input type="text" id="title" name="title" th:value="${title}" required  th:readonly="${userName == null or userName == ''}">
 
     <p></p>
     <label for="price">Цена</label>
-    <input type="text" id="price" name="price" pattern="\d+" min=1 required th:value="${price}">
+    <input type="text" id="price" name="price" pattern="\d+" min=1 required th:value="${price}"  th:readonly="${userName == null or userName == ''}">
 
     <p></p>
     <label for="description">Описание</label>
-    <textarea rows="5" name="description" id="description" th:text="${description}"></textarea>
+    <textarea rows="5" name="description" id="description" th:text="${description}" th:readonly="${userName == null or userName == ''}"></textarea>
 
     <p></p>
-    <input id="fileInput" type="file" name="file" accept="image/*">
+    <div th:if="${userName != null and userName != ''}">
+        <input id="fileInput" type="file" name="file" accept="image/*">
+    </div>
+
     <img id="filePreview" alt="" th:src="|/image/${id}|" width="100" height="100">
 
-    <p></p>
-    <button type="button" onclick="addToCart(this.form)">Добавить в корзину</button>
-    <br>
-    <button type="button" onclick="removeFromCart(this.form)">Удалить из корзины</button>
+    <div th:if="${userName != null and userName != ''}">
+        <p></p>
+        <button type="button" onclick="addToCart(this.form)">Добавить в корзину</button>
+        <br>
+        <button type="button" onclick="removeFromCart(this.form)">Удалить из корзины</button>
 
-    <p></p>
-    <label for="quantity">Количество в корзине</label>
-    <input id="quantity" type="text" name="quantity" th:value="${quantity}" size=10 readonly>
-    <br>
-    <button onclick="changeQuantity(this.form, 1)" type="button">Больше</button>
-    <br>
-    <button onclick="changeQuantity(this.form, -1)" type="button">Меньше</button>
+        <p></p>
+        <label for="quantity">Количество в корзине</label>
+        <input id="quantity" type="text" name="quantity" th:value="${quantity}" size=10 readonly>
+        <br>
+        <button onclick="changeQuantity(this.form, 1)" type="button">Больше</button>
+        <br>
+        <button onclick="changeQuantity(this.form, -1)" type="button">Меньше</button>
 
-    <p></p>
-    <button type="submit">Сохранить</button>
+        <p></p>
+        <button type="submit">Сохранить</button>
+    </div>
+
 </form>
 
-<form th:action="|${id}/delete|" method="post">
-    <p></p>
-    <input type="hidden" name="_method" value="delete">
-    <button>Удалить</button>
-</form>
+<div th:if="${userName != null and userName != ''}">
+    <form th:action="|${id}/delete|" method="post">
+        <p></p>
+        <input type="hidden" name="_method" value="delete">
+        <button>Удалить</button>
+    </form>
+</div>
 
 
 <script defer type="text/javascript" th:inline="javascript">
