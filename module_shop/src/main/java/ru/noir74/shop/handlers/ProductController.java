@@ -63,23 +63,20 @@ public class ProductController {
         log.info("Loading product: id={}", id);
 
         return securityConfig.prepareLoginLogout(model)
-                .flatMap(userName -> {
-                    productService.get(id)
-                            .transform(productMapper::monoDomain2monoDtoResp)
-                            .zipWith(cartService.getQuantityOfProduct(id, userName))
-                            .flatMap(pair -> {
-                                ProductDtoResp productDto = pair.getT1();
-                                Integer quantity = pair.getT2();
+                .flatMap(userName -> productService.get(id)
+                        .transform(productMapper::monoDomain2monoDtoResp)
+                        .zipWith(cartService.getQuantityOfProduct(id, userName))
+                        .flatMap(pair -> {
+                            ProductDtoResp productDto = pair.getT1();
+                            Integer quantity = pair.getT2();
 
-                                model.addAttribute("id", productDto.getId());
-                                model.addAttribute("title", productDto.getTitle());
-                                model.addAttribute("price", productDto.getPrice());
-                                model.addAttribute("description", productDto.getDescription());
-                                model.addAttribute("quantity", quantity);
-                                return Mono.just("product");
-                            });
-                    return Mono.just("product");
-                });
+                            model.addAttribute("id", productDto.getId());
+                            model.addAttribute("title", productDto.getTitle());
+                            model.addAttribute("price", productDto.getPrice());
+                            model.addAttribute("description", productDto.getDescription());
+                            model.addAttribute("quantity", quantity);
+                            return Mono.just("product");
+                        }));
     }
 
     @PostMapping
