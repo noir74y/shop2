@@ -24,19 +24,19 @@ public class CartServiceImpl implements CartService {
     private final OrderService orderService;
 
     @Override
-    public Flux<Item> findAll() {
+    public Flux<Item> findAll(String userName) {
         return cartRepository
-                .findAll()
+                .findAll(userName)
                 .as(fluxItemEntity -> itemMapper.fluxEntity2fluxDomain(fluxItemEntity, itemMapperHelper));
     }
 
     @Override
-    public Mono<Integer> getQuantityOfProduct(Long productId) {
-        return cartRepository.getQuantityOfProduct(productId);
+    public Mono<Integer> getQuantityOfProduct(Long productId, String username) {
+        return cartRepository.getQuantityOfProduct(productId, username);
     }
 
     @Override
-    public Mono<Void> addToCart(Long productId) {
+    public Mono<Void> addToCart(Long productId, String userName) {
         return productRepository.findById(productId)
                 .flatMap(productEntity ->
                         cartRepository.insert(
@@ -44,13 +44,13 @@ public class CartServiceImpl implements CartService {
                                         .productId(productEntity.getId())
                                         .quantity(1)
                                         .price(productEntity.getPrice())
-                                        .build()
+                                        .build(), userName
                         )
                 );
     }
 
     @Override
-    public Mono<Void> addToCart(Long productId, Integer quantity) {
+    public Mono<Void> addToCart(Long productId, Integer quantity, String userName) {
         return productRepository.findById(productId)
                 .flatMap(productEntity ->
                         cartRepository.insert(
@@ -58,46 +58,46 @@ public class CartServiceImpl implements CartService {
                                         .productId(productEntity.getId())
                                         .quantity(quantity)
                                         .price(productEntity.getPrice())
-                                        .build()
+                                        .build(), userName
                         )
                 );
     }
 
     @Override
-    public Mono<Void> removeFromCart(Long productId) {
+    public Mono<Void> removeFromCart(Long productId, String userName) {
         return cartRepository
-                .findAll()
+                .findAll(userName)
                 .filter(itemEntity -> itemEntity.getProductId().equals(productId))
-                .flatMap(obj -> cartRepository.delete(obj).then())
+                .flatMap(obj -> cartRepository.delete(obj, userName).then())
                 .then();
     }
 
     @Override
-    public Mono<Void> setQuantity(Long productId, Integer quantity) {
+    public Mono<Void> setQuantity(Long productId, Integer quantity, String userName) {
         return cartRepository
-                .findAll()
+                .findAll(userName)
                 .filter(itemEntity -> itemEntity.getProductId().equals(productId))
                 .flatMap(itemEntity -> {
                     itemEntity.setQuantity(quantity);
-                    return cartRepository.replace(itemEntity);
+                    return cartRepository.replace(itemEntity, userName);
                 }).then();
     }
 
     @Override
-    public Mono<Integer> getTotal() {
-        return findAll().map(Item::getTotal).reduce(0, Integer::sum);
+    public Mono<Integer> getTotal(String userName) {
+        return findAll(userName).map(Item::getTotal).reduce(0, Integer::sum);
     }
 
     @Override
-    public Mono<Void> makeOrder() {
-        return cartRepository.findAll()
+    public Mono<Void> makeOrder(String userName) {
+        return cartRepository.findAll(userName)
                 .as(fluxItemEntity -> itemMapper.fluxEntity2fluxDomain(fluxItemEntity, itemMapperHelper))
-                .transform(orderService::save)
-                .then(cartRepository.deleteAll());
+                .transform(obj -> orderService.save(obj, userName))
+                .then(cartRepository.deleteAll(userName));
     }
 
     @Override
     public Mono<Boolean> ifProductInCart(Long productId) {
-        return cartRepository.ifProductInCart(productId);
+        return cartRepository.ifProductInAnyCart(productId);
     }
 }

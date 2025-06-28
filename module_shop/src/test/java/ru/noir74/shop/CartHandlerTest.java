@@ -33,7 +33,7 @@ public class CartHandlerTest extends GenericTest {
     @Test
     void viewCart_ShouldReturnOk() {
         Assertions.assertNotNull(product);
-        cartService.addToCart(product.getId(), 1).block();
+        cartService.addToCart(product.getId(), "!!!!!!!!!").block(); //TODO
 
         webTestClient.get()
                 .uri("/cart")
@@ -62,7 +62,7 @@ public class CartHandlerTest extends GenericTest {
     @Test
     void removeFromCart_ShouldRedirect() throws IOException {
         Assertions.assertNotNull(product);
-        cartService.addToCart(product.getId(), 1).block();
+        cartService.addToCart(product.getId(), "!!!!!!!!!!!").block(); // TODO
 
         webTestClient.post()
                 .uri("/cart/item/" + product.getId() + "/remove")
@@ -78,14 +78,14 @@ public class CartHandlerTest extends GenericTest {
     @Test
     void setQuantityInCart_ShouldRedirect() throws IOException {
         Assertions.assertNotNull(product);
-        cartService.addToCart(product.getId(), 1).block();
+        cartService.addToCart(product.getId(), "!!!!!!!!!!!!!!!!!").block(); // TODO
 
         webTestClient.post()
                 .uri("/cart/item/" + product.getId() + "/quantity/2")
                 .exchange()
                 .expectStatus().is3xxRedirection();
 
-        StepVerifier.create(cartService.findAll())
+        StepVerifier.create(cartService.findAll("!!!!!!!!!!!!!!!!!!")) //TODO
                 .assertNext(item -> assertThat(item.getQuantity()).isEqualTo(2)
                 ).verifyComplete();
 
@@ -94,7 +94,7 @@ public class CartHandlerTest extends GenericTest {
     @Test
     void makeOrder_ShouldRedirect() throws IOException {
         Assertions.assertNotNull(product);
-        cartService.addToCart(product.getId(), 1).block();
+        cartService.addToCart(product.getId(), "!!!!!!!!!!!!!!!!!!!!!").block(); // TODO
 
         webTestClient.post()
                 .uri("/cart/order")
@@ -107,7 +107,7 @@ public class CartHandlerTest extends GenericTest {
                 .blockFirst();
 
         Assertions.assertNotNull(order);
-        StepVerifier.create(orderService.findAll())
+        StepVerifier.create(orderService.findAll("!!!!!!!!!!!!!!!!!!")) // TODO
                 .expectNext(order)
                 .expectComplete()
                 .verify();
@@ -116,7 +116,7 @@ public class CartHandlerTest extends GenericTest {
     @Test
     void checkOrderOrderButtonWithGoodBalance_ShouldBeEnabled() {
         Assertions.assertNotNull(product);
-        cartService.addToCart(product.getId(), 1).block();
+        cartService.addToCart(product.getId(), "!!!!!!!!!!!!!!!!!").block(); // TODO
 
         webTestClient.get()
                 .uri("/cart")
@@ -132,7 +132,7 @@ public class CartHandlerTest extends GenericTest {
     @Test
     void checkOrderOrderButtonWithBadBalance_ShouldBeDisabled() {
         Assertions.assertNotNull(product);
-        cartService.addToCart(product.getId(), 3).block();
+        cartService.addToCart(product.getId(), "!!!!!!!!!!!!!!!!!!").block(); // TODO
 
         webTestClient.get()
                 .uri("/cart")

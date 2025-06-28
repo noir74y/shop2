@@ -21,6 +21,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -58,7 +59,7 @@ public class SecurityConfig {
         return logoutSuccessHandler;
     }
 
-    public Mono<String> prepareLoginLogout(String view, Model model) {
+    public Mono<String> prepareLoginLogout(Model model) {
         return getAuthentification()
                 .flatMap(authentication -> {
                     if (authentication instanceof OAuth2AuthenticationToken oauth2Token &&
@@ -66,14 +67,14 @@ public class SecurityConfig {
                         model.addAttribute("userName", oidcUser.getPreferredUsername());
                         model.addAttribute("logoutUrl", "/logout");
                     }
-                    return Mono.just(view);
+                    return Mono.just((String) Objects.requireNonNull(model.getAttribute("userName")));
                 })
                 .switchIfEmpty(
                         clientRegistrationRepository.findByRegistrationId("keycloak-user")
                                 .flatMap(clientRegistration -> {
                                     var loginUrl = "/oauth2/authorization/" + clientRegistration.getRegistrationId();
                                     model.addAttribute("loginUrl", loginUrl);
-                                    return Mono.just(view);
+                                    return Mono.just("");
                                 })
                 );
     }
@@ -97,6 +98,10 @@ public class SecurityConfig {
                                     return Mono.just(attributes);
                                 })
                 );
+    }
+
+    public Mono<String> getUserNameMono() {
+        return getAuthentification().map(authentication -> ((OidcUser) authentication.getPrincipal()).getPreferredUsername());
     }
 
     private Mono<Authentication> getAuthentification() {

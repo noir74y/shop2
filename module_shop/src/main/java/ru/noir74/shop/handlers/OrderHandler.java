@@ -24,9 +24,9 @@ public class OrderHandler {
     private final SecurityConfig securityConfig;
 
     public Mono<ServerResponse> getAllOrders(ServerRequest request) {
-        Mono<Map<String, Object>> loginLoginAttributesMono = securityConfig.prepareLoginLogout();
+        Mono<Map<String, Object>> loginLogoutAttributesMono = securityConfig.prepareLoginLogout();
 
-        return loginLoginAttributesMono
+        return loginLogoutAttributesMono
                 .flatMap(loginLoginAttributes -> {
                     String username = (String) loginLoginAttributes.getOrDefault("userName", "");
 

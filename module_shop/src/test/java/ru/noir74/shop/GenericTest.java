@@ -79,7 +79,7 @@ public abstract class GenericTest {
     @Transactional
     protected void setUpGeneric() throws IOException {
         orderRepository.deleteAll().block();
-        cartRepository.deleteAll().block();
+        cartRepository.deleteAll("!!!!!!!!!!!!!!!!!!!!!!!").block(); // TODO
         productRepository.deleteAll().block();
 
         product = productService.create(Mono.just(Product.builder()

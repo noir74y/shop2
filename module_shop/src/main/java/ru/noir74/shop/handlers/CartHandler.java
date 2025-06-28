@@ -28,58 +28,67 @@ public class CartHandler {
 
     public Mono<ServerResponse> viewCart(ServerRequest request) {
 
-        Mono<Integer> totalMono = cartService.getTotal();
-        Mono<Balance> balanceMono = paymentApi.getBalance();
-        Mono<List<ItemDto>> itemsDtoMono = cartService.findAll()
-                .as(itemMapper::fluxDomain2fluxDto)
-                .collectList();
+        return securityConfig.prepareLoginLogout()
+                .flatMap(loginLoginAttributes -> {
+                    var userName = (String) loginLoginAttributes.getOrDefault("userName", "");
 
-        Mono<Map<String, Object>> loginLoginAttributesMono = securityConfig.prepareLoginLogout();
+                    Mono<List<ItemDto>> itemsDtoMono = cartService.findAll(userName)
+                            .as(itemMapper::fluxDomain2fluxDto)
+                            .collectList();
 
-        return Mono.zip(itemsDtoMono, totalMono, balanceMono, loginLoginAttributesMono).flatMap(tuple -> {
-            List<ItemDto> itemsDto = tuple.getT1();
-            Integer total = tuple.getT2();
-            Balance balance = tuple.getT3();
-            Map<String, Object> loginLoginAttributes = tuple.getT4();
+                    Mono<Integer> totalMono = cartService.getTotal(userName);
 
-            Map<String, Object> modelData = new HashMap<>();
-            modelData.put("items", itemsDto);
-            modelData.put("total", total);
-            modelData.put("balance", balance.getAmount());
-            modelData.putAll(loginLoginAttributes);
+                    Mono<Integer> balanceAmountMono = paymentApi.getBalance().map(Balance::getAmount);
 
-            return ServerResponse.ok().render("cart", modelData);
-        });
+                    return Mono.zip(itemsDtoMono, totalMono, balanceAmountMono)
+                            .flatMap(tuple -> {
+                                // Получаем результаты из кортежа
+                                List<ItemDto> items = tuple.getT1();
+                                Integer total = tuple.getT2();
+                                Integer balance = tuple.getT3();
+
+                                Map<String, Object> modelData = new HashMap<>();
+                                modelData.put("items", items);
+                                modelData.put("total", total);
+                                modelData.put("balance", balance);
+                                modelData.putAll(loginLoginAttributes);
+
+                                return ServerResponse.ok().render("cart", modelData);
+                            })
+                            .switchIfEmpty(ServerResponse.notFound().build());
+                });
     }
 
     public Mono<ServerResponse> addToCart(ServerRequest request) {
         Long productId = Long.parseLong(request.pathVariable("productId"));
-        return cartService.addToCart(productId)
+        return securityConfig.getUserNameMono()
+                .flatMap(userName -> cartService.addToCart(productId, userName))
                 .then(ServerResponse.seeOther(URI.create("/cart")).build());
     }
 
     public Mono<ServerResponse> removeFromCart(ServerRequest request) {
         Long productId = Long.parseLong(request.pathVariable("productId"));
-        return cartService.removeFromCart(productId)
+        return securityConfig.getUserNameMono()
+                .flatMap(userName -> cartService.removeFromCart(productId, userName))
                 .then(ServerResponse.seeOther(URI.create("/cart")).build());
     }
 
     public Mono<ServerResponse> setQuantity(ServerRequest request) {
         Long productId = Long.parseLong(request.pathVariable("productId"));
         Integer quantity = Integer.parseInt(request.pathVariable("quantity"));
-        return cartService.setQuantity(productId, quantity)
+        return securityConfig.getUserNameMono()
+                .flatMap(userName -> cartService.setQuantity(productId, quantity, userName))
                 .then(ServerResponse.seeOther(URI.create("/cart")).build());
     }
 
     public Mono<ServerResponse> makeOrder(ServerRequest request) {
-        return cartService.getTotal()
-                .flatMap
-                        (total -> {
-                                    if (total == 0) return ServerResponse.noContent().build();
-                                    else return paymentApi.makePayment(new PaymentRequest().amount(total));
-                                }
-                        )
-                .then(cartService.makeOrder())
+        return securityConfig.getUserNameMono()
+                .flatMap(userName -> cartService.getTotal(userName)
+                        .flatMap(total -> {
+                            if (total == 0) return ServerResponse.noContent().build();
+                            else return paymentApi.makePayment(new PaymentRequest().amount(total));
+                        })
+                        .then(cartService.makeOrder(userName)))
                 .then(ServerResponse.seeOther(URI.create("/order")).build());
     }
 }

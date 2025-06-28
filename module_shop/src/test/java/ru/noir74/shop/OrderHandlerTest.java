@@ -16,9 +16,9 @@ public class OrderHandlerTest extends GenericTest {
         setUpGeneric();
 
         Assertions.assertNotNull(product);
-        cartService.addToCart(product.getId(), 1).block();
+        cartService.addToCart(product.getId(), "!!!!!!!!!!!!!!!").block(); //TODO
 
-        cartService.makeOrder().block();
+        cartService.makeOrder("!!!!!!!!!!!!!!!").block(); // TODO
 
         order = orderRepository
                 .findAll()
