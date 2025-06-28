@@ -36,8 +36,7 @@ public class SecurityConfig {
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         return http
                 .authorizeExchange(exchanges -> exchanges
-                        //.pathMatchers("/hello").hasRole("MANAGER")
-                        .pathMatchers("/product/**", "/image/**", "static/**").permitAll()
+                        .pathMatchers("/product","/product/*", "/image/**", "static/**").permitAll()
                         .anyExchange().authenticated()
                 )
                 .oauth2Login(oauth2Login -> {
