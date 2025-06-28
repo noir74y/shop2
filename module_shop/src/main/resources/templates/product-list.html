@@ -60,8 +60,11 @@
         <th>Картинка</th>
         <th>Название</th>
         <th>Цена</th>
-        <th>Действия</th>
-        <th>Количество в корзине</th>
+
+        <div th:if="${userName != null and userName != ''}">
+            <th>Действия</th>
+            <th>Количество в корзине</th>
+        </div>
     </tr>
     </thead>
 
@@ -82,40 +85,44 @@
             ></a>
         </td>
         <td th:text="${product.price}"></td>
-        <td>
-            <form th:id="|action-form-${product.id}|">
-                <input type="hidden" name="product_id" th:value="${product.id}"/>
-                <button type="button" onclick="addToCart(this.form)">
-                    Добавить в корзину
-                </button>
-                <br/>
-                <button type="button" onclick="removeFromCart(this.form)">
-                    Удалить из корзины
-                </button>
-            </form>
-        </td>
-        <td>
-            <form th:id="|quantity-form-${product.id}|">
-                <input type="hidden" name="product_id" th:value="${product.id}"/>
-                <label>
-                    <input
-                            type="text"
-                            name="quantity"
-                            th:value="${product.quantity}"
-                            size="10"
-                            readonly
-                    />
-                </label>
-                <br/>
-                <button onclick="changeQuantity(this.form, 1)" type="button">
-                    Больше
-                </button>
-                <br/>
-                <button onclick="changeQuantity(this.form, -1)" type="button">
-                    Меньше
-                </button>
-            </form>
-        </td>
+
+        <div th:if="${userName != null and userName != ''}">
+            <td>
+                <form th:id="|action-form-${product.id}|">
+                    <input type="hidden" name="product_id" th:value="${product.id}"/>
+                    <button type="button" onclick="addToCart(this.form)">
+                        Добавить в корзину
+                    </button>
+                    <br/>
+                    <button type="button" onclick="removeFromCart(this.form)">
+                        Удалить из корзины
+                    </button>
+                </form>
+            </td>
+            <td>
+                <form th:id="|quantity-form-${product.id}|">
+                    <input type="hidden" name="product_id" th:value="${product.id}"/>
+                    <label>
+                        <input
+                                type="text"
+                                name="quantity"
+                                th:value="${product.quantity}"
+                                size="10"
+                                readonly
+                        />
+                    </label>
+                    <br/>
+                    <button onclick="changeQuantity(this.form, 1)" type="button">
+                        Больше
+                    </button>
+                    <br/>
+                    <button onclick="changeQuantity(this.form, -1)" type="button">
+                        Меньше
+                    </button>
+                </form>
+            </td>
+        </div>
+
     </tr>
     </tbody>
 </table>
