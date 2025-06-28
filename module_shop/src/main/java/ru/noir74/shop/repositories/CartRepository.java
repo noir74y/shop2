@@ -17,54 +17,36 @@ public class CartRepository {
     }
 
     public Flux<ItemEntity> findAll(String userName) {
-        return Flux.fromStream(getUserCartEntries(userName).values().stream());
-
-// типа модно, но громоздко
-//        return Flux.fromStream(cartStorage
-//                .entrySet()
-//                .stream()
-//                .filter(allUsersCartEntries -> allUsersCartEntries.getKey().equals(userName))
-//                .flatMap(userCartEntries -> userCartEntries.getValue().values().stream()));
+        return Flux.fromStream(getUserCart(userName).values().stream());
     }
 
     public Mono<Integer> getQuantityOfProduct(Long productId, String userName) {
-        return Mono.just(getUserCartEntries(userName).getOrDefault(productId, ItemEntity.builder().quantity(0).build()).getQuantity());
-
-// типа модно, но громоздко
-//        return Mono.just(cartStorage
-//                .entrySet()
-//                .stream()
-//                .filter(allUsersCartEntries -> allUsersCartEntries.getKey().equals(userName))
-//                .flatMap(userCartEntries -> userCartEntries.getValue().entrySet().stream())
-//                .filter(itemEntityEntries -> itemEntityEntries.getKey().equals(productId))
-//                .findFirst()
-//                .map(Map.Entry::getValue)
-//                .orElse(ItemEntity.builder().quantity(0).build()).getQuantity());
+        return Mono.just(getUserCart(userName).getOrDefault(productId, ItemEntity.builder().quantity(0).build()).getQuantity());
     }
 
     public Mono<Void> insert(ItemEntity itemEntity, String userName) {
-        return Mono.justOrEmpty(getUserCartEntries(userName).put(itemEntity.getProductId(), itemEntity)).then();
+        return Mono.justOrEmpty(getUserCart(userName).put(itemEntity.getProductId(), itemEntity)).then();
     }
 
     public Mono<Void> delete(ItemEntity itemEntity, String userName) {
-        return Mono.justOrEmpty(getUserCartEntries(userName).remove(itemEntity.getProductId())).then();
+        return Mono.justOrEmpty(getUserCart(userName).remove(itemEntity.getProductId())).then();
     }
 
     public Mono<Void> replace(ItemEntity itemEntity, String userName) {
-        return Mono.justOrEmpty(getUserCartEntries(userName).replace(itemEntity.getProductId(), itemEntity)).then();
+        return Mono.justOrEmpty(getUserCart(userName).replace(itemEntity.getProductId(), itemEntity)).then();
     }
 
     public Mono<Void> deleteAll(String userName) {
-        return Mono.fromRunnable(getUserCartEntries(userName)::clear);
+        return Mono.fromRunnable(getUserCart(userName)::clear);
     }
 
     public Mono<Boolean> ifProductInAnyCart(Long productId) {
                 return Mono.just(cartStorage.entrySet().stream()
-                .flatMap(userCartEntries -> userCartEntries.getValue().entrySet().stream())
-                .anyMatch(itemEntityEntries -> itemEntityEntries.getKey().equals(productId)));
+                .flatMap(userCartMap -> userCartMap.getValue().entrySet().stream())
+                .anyMatch(userMapEntry -> userMapEntry.getKey().equals(productId)));
     }
 
-    private Map<Long, ItemEntity> getUserCartEntries(String userName) {
-        return cartStorage.getOrDefault(userName, new HashMap<>());
+    private Map<Long, ItemEntity> getUserCart(String userName) {
+        return cartStorage.computeIfAbsent(userName, userCart -> new HashMap<>());
     }
 }
