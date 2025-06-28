@@ -114,7 +114,7 @@ public class ProductControllerWithRedisTest extends GenericTest {
     }
 
     private void deleteProduct() {
-        cartRepository.deleteAll().block();
+        cartRepository.deleteAll("!!!!!!!!!!!!!!!").block(); //TODO
         webTestClient.post()
                 .uri("/product/" + product.getId() + "/delete")
                 .exchange()
