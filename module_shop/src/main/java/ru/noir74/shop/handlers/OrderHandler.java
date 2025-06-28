@@ -24,47 +24,47 @@ public class OrderHandler {
     private final SecurityConfig securityConfig;
 
     public Mono<ServerResponse> getAllOrders(ServerRequest request) {
-        Mono<List<OrderDto>> ordersListMono = orderService.findAll()
-                .as(orderMapper::fluxDomain2fluxDto)
-                .collectList();
-
-        Mono<Integer> totalMono = orderService.getTotal();
-
         Mono<Map<String, Object>> loginLoginAttributesMono = securityConfig.prepareLoginLogout();
 
-        return Mono.zip(ordersListMono, totalMono, loginLoginAttributesMono)
-                .flatMap(tuple -> {
-                    List<OrderDto> dtoList = tuple.getT1();
-                    Integer total = tuple.getT2();
-                    Map<String, Object> loginLoginAttributes = tuple.getT3();
+        return loginLoginAttributesMono
+                .flatMap(loginLoginAttributes -> {
+                    String username = (String) loginLoginAttributes.getOrDefault("userName", "");
 
-                    Map<String, Object> modelData = new HashMap<>();
-                    modelData.put("orders", dtoList);
-                    modelData.put("total", total);
-                    modelData.putAll(loginLoginAttributes);
+                    return orderService.findAll(username)
+                            .as(orderMapper::fluxDomain2fluxDto)
+                            .collectList()
+                            .zipWith(orderService.getTotal(username))
+                            .flatMap(tuple -> {
+                                List<OrderDto> dtoList = tuple.getT1();
+                                Integer total = tuple.getT2();
 
-                    return ServerResponse.ok().render("order-list", modelData);
+                                Map<String, Object> modelData = new HashMap<>();
+                                modelData.put("orders", dtoList);
+                                modelData.put("total", total);
+                                modelData.putAll(loginLoginAttributes);
+
+                                return ServerResponse.ok().render("order-list", modelData);
+                            })
+                            .switchIfEmpty(ServerResponse.notFound().build());
                 });
     }
 
     public Mono<ServerResponse> getOrderById(ServerRequest request) {
+        Mono<Map<String, Object>> loginLogoutAttributesMono = securityConfig.prepareLoginLogout();
         var id = Long.parseLong(request.pathVariable("id"));
-        Mono<Map<String, Object>> loginLoginAttributesMono = securityConfig.prepareLoginLogout();
 
-        return orderService.findById(id)
-                .as(orderMapper::monoDomain2monoDto)
-                .zipWith(loginLoginAttributesMono)
-                .flatMap(tuple -> {
-                    var orderDto = tuple.getT1();
-                    var loginLoginAttributes = tuple.getT2();
-
-                    Map<String, Object> modelData = new HashMap<>();
-                    modelData.put("items", orderDto.getItemsDto());
-                    modelData.put("total", orderDto.getTotal());
-                    modelData.putAll(loginLoginAttributes);
-
-                    return ServerResponse.ok().render("order", modelData);
+        return loginLogoutAttributesMono
+                .flatMap(loginLogoutAttributes -> {
+                    return orderService.findById(id)
+                            .as(orderMapper::monoDomain2monoDto)
+                            .flatMap(orderDto -> {
+                                Map<String, Object> modelData = new HashMap<>();
+                                modelData.put("items", orderDto.getItemsDto());
+                                modelData.put("total", orderDto.getTotal());
+                                modelData.putAll(loginLogoutAttributes);
+                                return ServerResponse.ok().render("order", modelData);
+                            })
+                            .switchIfEmpty(ServerResponse.notFound().build());
                 });
-
     }
 }
