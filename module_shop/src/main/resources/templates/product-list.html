@@ -120,53 +120,56 @@
     </tbody>
 </table>
 
-<p>
-    <button id="toggleNewProductFormButton" onclick="toggleNewProductForm()">
-        Добавить
-    </button>
-</p>
+<div th:if="${userName != null and userName != ''}">
 
-<div
-        class="new-product-form"
-        style="display: none"
-        id="newProductFormClass"
->
-    <h2>Новый продукт</h2>
-    <form
-            id="newProductForm"
-            enctype="multipart/form-data"
-            action=""
-            method="post"
-            accept-charset="UTF-8"
+    <p>
+        <button id="toggleNewProductFormButton" onclick="toggleNewProductForm()">
+            Добавить
+        </button>
+    </p>
+
+    <div
+            class="new-product-form"
+            style="display: none"
+            id="newProductFormClass"
     >
-        <label for="title">Название</label>
-        <input type="text" id="title" name="title" required/>
+        <h2>Новый продукт</h2>
+        <form
+                id="newProductForm"
+                enctype="multipart/form-data"
+                action=""
+                method="post"
+                accept-charset="UTF-8"
+        >
+            <label for="title">Название</label>
+            <input type="text" id="title" name="title" required/>
 
-        <p></p>
-        <label for="price">Цена</label>
-        <input
-                type="text"
-                id="price"
-                name="price"
-                pattern="\d+"
-                min="0"
-                required
-        />
+            <p></p>
+            <label for="price">Цена</label>
+            <input
+                    type="text"
+                    id="price"
+                    name="price"
+                    pattern="\d+"
+                    min="0"
+                    required
+            />
 
-        <p></p>
-        <label for="description">Описание</label>
-        <textarea rows="5" name="description" id="description"></textarea>
+            <p></p>
+            <label for="description">Описание</label>
+            <textarea rows="5" name="description" id="description"></textarea>
 
-        <p></p>
-        <input id="fileInput" type="file" name="file" accept="image/*"/>
-        <img id="filePreview" alt="" src="" width="100" height="100"/>
+            <p></p>
+            <input id="fileInput" type="file" name="file" accept="image/*"/>
+            <img id="filePreview" alt="" src="" width="100" height="100"/>
 
-        <label for="quantity"></label
-        ><input id="quantity" type="text" name="quantity" value="0" hidden/>
+            <label for="quantity"></label
+            ><input id="quantity" type="text" name="quantity" value="0" hidden/>
 
-        <p></p>
-        <button type="submit">Сохранить</button>
-    </form>
+            <p></p>
+            <button type="submit">Сохранить</button>
+        </form>
+    </div>
 </div>
 
 <script defer type="text/javascript" th:inline="javascript">
