@@ -3,6 +3,7 @@ package ru.noir74.shop;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
@@ -16,9 +17,9 @@ public class OrderHandlerTest extends GenericTest {
         setUpGeneric();
 
         Assertions.assertNotNull(product);
-        cartService.addToCart(product.getId(), "!!!!!!!!!!!!!!!").block(); //TODO
+        cartService.addToCart(product.getId(), testUserName).block();
 
-        cartService.makeOrder("!!!!!!!!!!!!!!!").block(); // TODO
+        cartService.makeOrder(testUserName).block();
 
         order = orderRepository
                 .findAll()
@@ -27,7 +28,19 @@ public class OrderHandlerTest extends GenericTest {
     }
 
     @Test
-    void getAllOrders_ShouldReturnOk() {
+    void getAllOrders_ShouldReturnRedirect_Anon_User() {
+        isUserAuthenticated = false;
+        webTestClient.get()
+                .uri("/order")
+                .exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/oauth2/authorization/keycloak-user");
+    }
+
+    @Test
+    @WithMockUser(username = "test-user")
+    void getAllOrders_ShouldReturnOk_Auth_User() {
+        isUserAuthenticated = true;
         webTestClient.get()
                 .uri("/order")
                 .exchange()
@@ -40,7 +53,20 @@ public class OrderHandlerTest extends GenericTest {
     }
 
     @Test
-    void getOrderById_ShouldReturnOk() {
+    void getOrderById_ShouldRedirect_Anon_User() {
+        isUserAuthenticated = false;
+        webTestClient.get()
+                .uri("/order/" + order.getId())
+                .exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/oauth2/authorization/keycloak-user");
+    }
+
+
+    @Test
+    @WithMockUser(username = "test-user")
+    void getOrderById_ShouldReturnOk_Auth_User() {
+        isUserAuthenticated = true;
         webTestClient.get()
                 .uri("/order/" + order.getId())
                 .exchange()
