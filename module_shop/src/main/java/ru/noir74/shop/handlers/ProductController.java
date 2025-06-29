@@ -79,7 +79,7 @@ public class ProductController {
                         }));
     }
 
-    @PostMapping
+    @PostMapping("new/create")
     public Mono<String> createProduct(@ModelAttribute ProductDtoReq productDtoReq) {
         return Mono.just(productDtoReq)
                 .transform(productMapper::monoDtoReq2monoDomain)
