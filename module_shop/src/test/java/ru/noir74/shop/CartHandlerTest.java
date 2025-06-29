@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openapitools.client.model.Balance;
 import org.openapitools.client.model.PaymentRequest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
@@ -31,9 +32,12 @@ public class CartHandlerTest extends GenericTest {
     }
 
     @Test
-    void viewCart_ShouldReturnOk() {
+    @WithMockUser(username = "test-user")
+    void viewCart_ShouldReturnOk_Auth_User() {
+        isUserAuthenticated = true;
+
         Assertions.assertNotNull(product);
-        cartService.addToCart(product.getId(), "!!!!!!!!!").block(); //TODO
+        cartService.addToCart(product.getId(), testUserName).block();
 
         webTestClient.get()
                 .uri("/cart")
@@ -47,7 +51,10 @@ public class CartHandlerTest extends GenericTest {
     }
 
     @Test
-    void addToCart_ShouldRedirect() {
+    @WithMockUser(username = "test-user")
+    void addToCart_ShouldRedirect_Auth_User() {
+        isUserAuthenticated = true;
+
         webTestClient.post()
                 .uri("/cart/product/" + product.getId() + "/add")
                 .exchange()
@@ -60,9 +67,12 @@ public class CartHandlerTest extends GenericTest {
     }
 
     @Test
-    void removeFromCart_ShouldRedirect() throws IOException {
+    @WithMockUser(username = "test-user")
+    void removeFromCart_ShouldRedirect_Auth_User() throws IOException {
+        isUserAuthenticated = true;
+
         Assertions.assertNotNull(product);
-        cartService.addToCart(product.getId(), "!!!!!!!!!!!").block(); // TODO
+        cartService.addToCart(product.getId(), testUserName).block();
 
         webTestClient.post()
                 .uri("/cart/item/" + product.getId() + "/remove")
@@ -76,25 +86,30 @@ public class CartHandlerTest extends GenericTest {
     }
 
     @Test
-    void setQuantityInCart_ShouldRedirect() throws IOException {
-        Assertions.assertNotNull(product);
-        cartService.addToCart(product.getId(), "!!!!!!!!!!!!!!!!!").block(); // TODO
+    @WithMockUser(username = "test-user")
+    void setQuantityInCart_ShouldRedirect_Auth_User() throws IOException {
+        isUserAuthenticated = true;
 
+        Assertions.assertNotNull(product);
+        cartService.addToCart(product.getId(), testUserName).block();
         webTestClient.post()
                 .uri("/cart/item/" + product.getId() + "/quantity/2")
                 .exchange()
                 .expectStatus().is3xxRedirection();
 
-        StepVerifier.create(cartService.findAll("!!!!!!!!!!!!!!!!!!")) //TODO
+        StepVerifier.create(cartService.findAll(testUserName))
                 .assertNext(item -> assertThat(item.getQuantity()).isEqualTo(2)
                 ).verifyComplete();
 
     }
 
     @Test
-    void makeOrder_ShouldRedirect() throws IOException {
+    @WithMockUser(username = "test-user")
+    void makeOrder_ShouldRedirect_Auth_User() throws IOException {
+        isUserAuthenticated = true;
+
         Assertions.assertNotNull(product);
-        cartService.addToCart(product.getId(), "!!!!!!!!!!!!!!!!!!!!!").block(); // TODO
+        cartService.addToCart(product.getId(), testUserName).block();
 
         webTestClient.post()
                 .uri("/cart/order")
@@ -107,16 +122,19 @@ public class CartHandlerTest extends GenericTest {
                 .blockFirst();
 
         Assertions.assertNotNull(order);
-        StepVerifier.create(orderService.findAll("!!!!!!!!!!!!!!!!!!")) // TODO
+        StepVerifier.create(orderService.findAll(testUserName))
                 .expectNext(order)
                 .expectComplete()
                 .verify();
     }
 
     @Test
-    void checkOrderOrderButtonWithGoodBalance_ShouldBeEnabled() {
+    @WithMockUser(username = "test-user")
+    void checkOrderOrderButtonWithGoodBalance_ShouldBeEnabled_Auth_User() {
+        isUserAuthenticated = true;
+
         Assertions.assertNotNull(product);
-        cartService.addToCart(product.getId(), "!!!!!!!!!!!!!!!!!").block(); // TODO
+        cartService.addToCart(product.getId(), testUserName).block();
 
         webTestClient.get()
                 .uri("/cart")
@@ -130,9 +148,13 @@ public class CartHandlerTest extends GenericTest {
     }
 
     @Test
-    void checkOrderOrderButtonWithBadBalance_ShouldBeDisabled() {
+    @WithMockUser(username = "test-user")
+    void checkOrderOrderButtonWithBadBalance_ShouldBeDisabled_Auth_User() {
+        isUserAuthenticated = true;
+
         Assertions.assertNotNull(product);
-        cartService.addToCart(product.getId(), "!!!!!!!!!!!!!!!!!!").block(); // TODO
+        cartService.addToCart(product.getId(), testUserName).block();
+        cartService.setQuantity(product.getId(), 10, testUserName).block();
 
         webTestClient.get()
                 .uri("/cart")
