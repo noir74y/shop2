@@ -8,6 +8,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import ru.noir74.shop.client.api.PaymentApi;
+import ru.noir74.shop.configurations.AuthenticationService;
 import ru.noir74.shop.configurations.SecurityConfig;
 import ru.noir74.shop.models.dto.ItemDto;
 import ru.noir74.shop.models.mappers.ItemMapper;
@@ -24,7 +25,7 @@ public class CartHandler {
     private final CartService cartService;
     private final ItemMapper itemMapper;
     private final PaymentApi paymentApi;
-    private final SecurityConfig securityConfig;
+    private final AuthenticationService securityConfig;
 
     public Mono<ServerResponse> viewCart(ServerRequest request) {
 

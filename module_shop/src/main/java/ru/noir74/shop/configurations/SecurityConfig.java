@@ -9,6 +9,7 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.oidc.web.server.logout.OidcClientInitiatedServerLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
@@ -56,57 +57,5 @@ public class SecurityConfig {
                 new OidcClientInitiatedServerLogoutSuccessHandler(this.clientRegistrationRepository);
         logoutSuccessHandler.setPostLogoutRedirectUri(shopServiceBaseUrl);
         return logoutSuccessHandler;
-    }
-
-    public Mono<String> prepareLoginLogout(Model model) {
-        return getAuthentification()
-                .flatMap(authentication -> {
-                    if (authentication instanceof OAuth2AuthenticationToken oauth2Token &&
-                            oauth2Token.getPrincipal() instanceof OidcUser oidcUser) {
-                        model.addAttribute("userName", oidcUser.getPreferredUsername());
-                        model.addAttribute("logoutUrl", "/logout");
-                    }
-                    return Mono.just((String) Objects.requireNonNull(model.getAttribute("userName")));
-                })
-                .switchIfEmpty(
-                        clientRegistrationRepository.findByRegistrationId("keycloak-user")
-                                .flatMap(clientRegistration -> {
-                                    var loginUrl = "/oauth2/authorization/" + clientRegistration.getRegistrationId();
-                                    model.addAttribute("loginUrl", loginUrl);
-                                    return Mono.just("");
-                                })
-                );
-    }
-
-    public Mono<Map<String, Object>> prepareLoginLogout() {
-        Map<String, Object> attributes = new HashMap<>();
-        return getAuthentification()
-                .flatMap(authentication -> {
-                    if (authentication instanceof OAuth2AuthenticationToken oauth2Token &&
-                            oauth2Token.getPrincipal() instanceof OidcUser oidcUser) {
-                        attributes.put("userName", oidcUser.getPreferredUsername());
-                        attributes.put("logoutUrl", "/logout");
-                    }
-                    return Mono.just(attributes);
-                })
-                .switchIfEmpty(
-                        clientRegistrationRepository.findByRegistrationId("keycloak-user")
-                                .flatMap(clientRegistration -> {
-                                    var loginUrl = "/oauth2/authorization/" + clientRegistration.getRegistrationId();
-                                    attributes.put("loginUrl", loginUrl);
-                                    return Mono.just(attributes);
-                                })
-                );
-    }
-
-    public Mono<String> getUserNameMono() {
-        return getAuthentification().map(authentication -> ((OidcUser) authentication.getPrincipal()).getPreferredUsername());
-    }
-
-    private Mono<Authentication> getAuthentification() {
-        return ReactiveSecurityContextHolder.getContext()
-                .map(SecurityContext::getAuthentication)
-                .filter(Authentication::isAuthenticated)
-                .filter(authentication -> authentication instanceof OAuth2AuthenticationToken);
     }
 }

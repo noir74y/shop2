@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+import ru.noir74.shop.configurations.AuthenticationService;
 import ru.noir74.shop.configurations.SecurityConfig;
 import ru.noir74.shop.misc.enums.ProductSorting;
 import ru.noir74.shop.models.dto.ProductDtoReq;
@@ -26,7 +27,7 @@ public class ProductController {
     private final ProductService productService;
     private final ProductMapper productMapper;
     private final CartService cartService;
-    private final SecurityConfig securityConfig;
+    private final AuthenticationService securityConfig;
 
     @GetMapping
     public Mono<String> getProductsPage(Model model,
