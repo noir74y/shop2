@@ -111,7 +111,7 @@ public abstract class GenericTest {
     @MockitoSpyBean
     protected AuthenticationService authenticationService;
     protected boolean isUserAuthenticated;
-    protected String tesUserName = "test-user";
+    protected String testUserName = "test-user";
 
     protected Product product;
     protected Order order;
@@ -134,8 +134,8 @@ public abstract class GenericTest {
             System.out.println("DEBUG: Intercepted Model in prepareLoginLogout. Added userName and loggedIn.");
             if (isUserAuthenticated) {
                 Model model = invocation.getArgument(0);
-                model.addAttribute("userName", tesUserName);
-                return Mono.just(tesUserName);
+                model.addAttribute("userName", testUserName);
+                return Mono.just(testUserName);
             } else
                 return Mono.just("");
         }).when(authenticationService).prepareLoginLogout(any(Model.class));
@@ -143,8 +143,17 @@ public abstract class GenericTest {
         doAnswer(invocation -> {
             Map<String, Object> attributes = new HashMap<>();
             if (this.isUserAuthenticated)
-                attributes.put("userName", tesUserName);
+                attributes.put("userName", testUserName);
             return Mono.just(attributes);
         }).when(authenticationService).prepareLoginLogout();
+
+        doAnswer(invocation -> {
+            if (this.isUserAuthenticated)
+                return Mono.just(testUserName);
+            else
+                return Mono.error(new IllegalStateException("Authentication is empty"));
+        }).when(authenticationService).getUserNameMono();
+
+
     }
 }
