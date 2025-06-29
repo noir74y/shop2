@@ -40,4 +40,5 @@ out/
 ### VS Code ###
 .vscode/
 #/keycloak/h2/keycloakdb.mv.db
-/keycloak/h2/keycloakdb.trace.db
+#/keycloak/h2/keycloakdb.trace.db
+keycloak/
