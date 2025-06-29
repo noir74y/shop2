@@ -40,6 +40,10 @@ public class CartRepository {
         return Mono.fromRunnable(getUserCart(userName)::clear);
     }
 
+    public Mono<Void> deleteAll() {
+        return Mono.fromRunnable(cartStorage::clear);
+    }
+
     public Mono<Boolean> ifProductInAnyCart(Long productId) {
                 return Mono.just(cartStorage.entrySet().stream()
                 .flatMap(userCartMap -> userCartMap.getValue().entrySet().stream())
