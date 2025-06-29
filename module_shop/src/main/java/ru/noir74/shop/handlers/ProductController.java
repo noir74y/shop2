@@ -9,7 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-import ru.noir74.shop.configurations.SecurityConfig;
+import ru.noir74.shop.configurations.AuthenticationService;
 import ru.noir74.shop.misc.enums.ProductSorting;
 import ru.noir74.shop.models.dto.ProductDtoReq;
 import ru.noir74.shop.models.dto.ProductDtoResp;
@@ -26,7 +26,7 @@ public class ProductController {
     private final ProductService productService;
     private final ProductMapper productMapper;
     private final CartService cartService;
-    private final SecurityConfig securityConfig;
+    private final AuthenticationService authenticationService;
 
     @GetMapping
     public Mono<String> getProductsPage(Model model,
@@ -40,7 +40,7 @@ public class ProductController {
         int sizeNum = Integer.parseInt(size);
         ProductSorting sorting = ProductSorting.valueOf(sort);
 
-        return securityConfig.prepareLoginLogout(model)
+        return authenticationService.prepareLoginLogout(model)
                 .flatMap(userName -> productService.getPage(pageNum, sizeNum, sorting)
                         .transform(productMapper::fluxDomain2fluxDtoResp)
                         .concatMap(productDtoResp ->
@@ -62,7 +62,7 @@ public class ProductController {
 
         log.info("Loading product: id={}", id);
 
-        return securityConfig.prepareLoginLogout(model)
+        return authenticationService.prepareLoginLogout(model)
                 .flatMap(userName -> productService.get(id)
                         .transform(productMapper::monoDomain2monoDtoResp)
                         .zipWith(cartService.getQuantityOfProduct(id, userName))
@@ -89,7 +89,7 @@ public class ProductController {
 
     @PostMapping("{id}/update")
     public Mono<String> updateProduct(@ModelAttribute ProductDtoReq productDtoReq, @PathVariable("id") @NotNull @Positive Long id) {
-        return securityConfig.getUserNameMono()
+        return authenticationService.getUserNameMono()
                 .flatMap(userName -> Mono.just(productDtoReq)
                         .transform(productMapper::monoDtoReq2monoDomain)
                         .transform(productMono -> productService.update(id, productMono))
@@ -108,14 +108,14 @@ public class ProductController {
 
     @PostMapping(value = "item/{productId}/add")
     public Mono<String> addToCart(@PathVariable("productId") Long productId) {
-        return securityConfig.getUserNameMono()
+        return authenticationService.getUserNameMono()
                 .flatMap(usrName -> cartService.addToCart(productId, usrName))
                 .thenReturn("redirect:/product");
     }
 
     @PostMapping(value = "item/{productId}/remove")
     public Mono<String> removeFromCart(@PathVariable("productId") @NotNull @Positive Long productId) {
-        return securityConfig.getUserNameMono()
+        return authenticationService.getUserNameMono()
                 .flatMap(userName -> cartService.removeFromCart(productId, userName))
                 .thenReturn("redirect:/product");
     }
@@ -124,7 +124,7 @@ public class ProductController {
     public Mono<String> setQuantity(Model model,
                                     @PathVariable("productId") @NotNull @Positive Long productId,
                                     @PathVariable("quantity") @NotNull @Positive Integer quantity) {
-        return securityConfig.getUserNameMono()
+        return authenticationService.getUserNameMono()
                 .flatMap(userName -> cartService.setQuantity(productId, quantity, userName))
                 .thenReturn("redirect:/product");
     }

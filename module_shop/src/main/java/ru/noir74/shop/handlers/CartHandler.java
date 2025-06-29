@@ -8,7 +8,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import ru.noir74.shop.client.api.PaymentApi;
-import ru.noir74.shop.configurations.SecurityConfig;
+import ru.noir74.shop.configurations.AuthenticationService;
 import ru.noir74.shop.models.dto.ItemDto;
 import ru.noir74.shop.models.mappers.ItemMapper;
 import ru.noir74.shop.services.CartService;
@@ -24,11 +24,11 @@ public class CartHandler {
     private final CartService cartService;
     private final ItemMapper itemMapper;
     private final PaymentApi paymentApi;
-    private final SecurityConfig securityConfig;
+    private final AuthenticationService authenticationService;
 
     public Mono<ServerResponse> viewCart(ServerRequest request) {
 
-        return securityConfig.prepareLoginLogout()
+        return authenticationService.prepareLoginLogout()
                 .flatMap(loginLoginAttributes -> {
                     var userName = (String) loginLoginAttributes.getOrDefault("userName", "");
 
@@ -61,14 +61,14 @@ public class CartHandler {
 
     public Mono<ServerResponse> addToCart(ServerRequest request) {
         Long productId = Long.parseLong(request.pathVariable("productId"));
-        return securityConfig.getUserNameMono()
+        return authenticationService.getUserNameMono()
                 .flatMap(userName -> cartService.addToCart(productId, userName))
                 .then(ServerResponse.seeOther(URI.create("/cart")).build());
     }
 
     public Mono<ServerResponse> removeFromCart(ServerRequest request) {
         Long productId = Long.parseLong(request.pathVariable("productId"));
-        return securityConfig.getUserNameMono()
+        return authenticationService.getUserNameMono()
                 .flatMap(userName -> cartService.removeFromCart(productId, userName))
                 .then(ServerResponse.seeOther(URI.create("/cart")).build());
     }
@@ -76,13 +76,13 @@ public class CartHandler {
     public Mono<ServerResponse> setQuantity(ServerRequest request) {
         Long productId = Long.parseLong(request.pathVariable("productId"));
         Integer quantity = Integer.parseInt(request.pathVariable("quantity"));
-        return securityConfig.getUserNameMono()
+        return authenticationService.getUserNameMono()
                 .flatMap(userName -> cartService.setQuantity(productId, quantity, userName))
                 .then(ServerResponse.seeOther(URI.create("/cart")).build());
     }
 
     public Mono<ServerResponse> makeOrder(ServerRequest request) {
-        return securityConfig.getUserNameMono()
+        return authenticationService.getUserNameMono()
                 .flatMap(userName -> cartService.getTotal(userName)
                         .flatMap(total -> {
                             if (total == 0) return ServerResponse.noContent().build();

@@ -6,7 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
-import ru.noir74.shop.configurations.SecurityConfig;
+import ru.noir74.shop.configurations.AuthenticationService;
 import ru.noir74.shop.models.dto.OrderDto;
 import ru.noir74.shop.models.mappers.OrderMapper;
 import ru.noir74.shop.services.OrderService;
@@ -21,10 +21,10 @@ import java.util.Map;
 public class OrderHandler {
     private final OrderService orderService;
     private final OrderMapper orderMapper;
-    private final SecurityConfig securityConfig;
+    private final AuthenticationService authenticationService;
 
     public Mono<ServerResponse> getAllOrders(ServerRequest request) {
-        Mono<Map<String, Object>> loginLogoutAttributesMono = securityConfig.prepareLoginLogout();
+        Mono<Map<String, Object>> loginLogoutAttributesMono = authenticationService.prepareLoginLogout();
 
         return loginLogoutAttributesMono
                 .flatMap(loginLoginAttributes -> {
@@ -50,7 +50,7 @@ public class OrderHandler {
     }
 
     public Mono<ServerResponse> getOrderById(ServerRequest request) {
-        Mono<Map<String, Object>> loginLogoutAttributesMono = securityConfig.prepareLoginLogout();
+        Mono<Map<String, Object>> loginLogoutAttributesMono = authenticationService.prepareLoginLogout();
         var id = Long.parseLong(request.pathVariable("id"));
 
         return loginLogoutAttributesMono
