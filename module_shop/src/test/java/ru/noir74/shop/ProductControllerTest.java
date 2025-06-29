@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.test.StepVerifier;
@@ -23,7 +24,8 @@ public class ProductControllerTest extends GenericTest {
     }
 
     @Test
-    void getProductsPage_ShouldReturnOk() {
+    void getProductsPage_ShouldReturnOk_Anon_User() {
+        isUserAuthenticated = false;
         webTestClient.get()
                 .uri("/product")
                 .exchange()
@@ -32,12 +34,30 @@ public class ProductControllerTest extends GenericTest {
                 .consumeWith(response -> {
                     String responseBody = response.getResponseBody();
                     assert responseBody != null && responseBody.contains("<html") && responseBody.contains("products");
-                    assert responseBody.contains("title1");
+                    assertThat(responseBody).contains("title1");
+                    assertThat(responseBody).doesNotContain("Действия");
                 });
     }
 
     @Test
-    void getProduct_ShouldReturnProductPage() throws IOException {
+    @WithMockUser(username = "test-user")
+    void getProductsPage_ShouldReturnOk_Auth_User() {
+        isUserAuthenticated = true;
+        webTestClient.get()
+                .uri("/product")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .consumeWith(response -> {
+                    String responseBody = response.getResponseBody();
+                    assert responseBody != null && responseBody.contains("<html") && responseBody.contains("products");
+                    assertThat(responseBody).contains("title1");
+                    assertThat(responseBody).contains("Действия");
+                });
+    }
+
+    @Test
+    void getProduct_ShouldReturnProductPage_Anon_User() throws IOException {
         webTestClient.get()
                 .uri("/product/" + product.getId())
                 .exchange()
@@ -51,6 +71,7 @@ public class ProductControllerTest extends GenericTest {
 
 
     @Test
+    @WithMockUser(username = "test-user")
     void createProduct_WithFile_ShouldRedirect() throws IOException {
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
 
@@ -63,7 +84,7 @@ public class ProductControllerTest extends GenericTest {
         builder.part("description", "Description");
 
         webTestClient.post()
-                .uri("/product")
+                .uri("/product/new/create")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(BodyInserters.fromMultipartData(builder.build()))
                 .exchange()
@@ -72,10 +93,11 @@ public class ProductControllerTest extends GenericTest {
     }
 
     @Test
+    @WithMockUser(username = "test-user")
     void updateProduct_ShouldRedirect() throws IOException {
         Assertions.assertNotNull(product);
         webTestClient.post()
-                .uri("/product/" + product.getId())
+                .uri("/product/" + product.getId() + "/update")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(BodyInserters.fromFormData("title", "Updated Title")
                         .with("price", "200")
@@ -94,6 +116,7 @@ public class ProductControllerTest extends GenericTest {
     }
 
     @Test
+    @WithMockUser(username = "test-user")
     void deleteProduct_ShouldRedirect() throws IOException {
         webTestClient.post()
                 .uri("/product/" + product.getId() + "/delete")
@@ -109,11 +132,23 @@ public class ProductControllerTest extends GenericTest {
     }
 
     @Test
-    void addToCart_ShouldRedirect() throws IOException {
+    void addToCart_ShouldRedirect_Anon_User() throws IOException {
         webTestClient.post()
                 .uri("/product/item/" + product.getId() + "/add")
                 .exchange()
-                .expectStatus().is3xxRedirection();
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/oauth2/authorization/keycloak-user");
+    }
+
+
+    @Test
+    @WithMockUser(username = "test-user")
+    void addToCart_ShouldRedirect_Auth_User() throws IOException {
+        webTestClient.post()
+                .uri("/product/item/" + product.getId() + "/add")
+                .exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/product");
 
         StepVerifier.create(cartService.ifProductInCart(product.getId()))
                 .expectNext(true)
@@ -136,6 +171,7 @@ public class ProductControllerTest extends GenericTest {
 
 
     @Test
+    @WithMockUser(username = "test-user")
     void setQuantityInCart_ShouldRedirect() throws IOException {
         webTestClient.post()
                 .uri("/product/item/" + product.getId() + "/add")
@@ -147,7 +183,7 @@ public class ProductControllerTest extends GenericTest {
                 .exchange()
                 .expectStatus().is3xxRedirection();
 
-        StepVerifier.create(cartService.findAll())
+        StepVerifier.create(cartService.findAll(tesUserName))
                 .assertNext(item -> assertThat(item.getQuantity()).isEqualTo(2)
                 ).verifyComplete();
 

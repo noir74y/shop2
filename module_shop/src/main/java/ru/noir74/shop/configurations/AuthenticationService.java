@@ -22,7 +22,7 @@ public class AuthenticationService {
     private final ReactiveClientRegistrationRepository clientRegistrationRepository;
 
     public Mono<String> prepareLoginLogout(Model model) {
-        return getAuthentification()
+        return getAuthenticationMono()
                 .flatMap(authentication -> {
                     if (authentication instanceof OAuth2AuthenticationToken oauth2Token &&
                             oauth2Token.getPrincipal() instanceof OidcUser oidcUser) {
@@ -43,7 +43,7 @@ public class AuthenticationService {
 
     public Mono<Map<String, Object>> prepareLoginLogout() {
         Map<String, Object> attributes = new HashMap<>();
-        return getAuthentification()
+        return getAuthenticationMono()
                 .flatMap(authentication -> {
                     if (authentication instanceof OAuth2AuthenticationToken oauth2Token &&
                             oauth2Token.getPrincipal() instanceof OidcUser oidcUser) {
@@ -67,28 +67,26 @@ public class AuthenticationService {
 //    }
 
     public Mono<String> getUserNameMono() {
-        return getAuthentification()
+        return getAuthenticationMono()
                 .flatMap(authentication -> {
                     Object principal = authentication.getPrincipal();
                     if (principal instanceof OidcUser) {
                         return Mono.just(((OidcUser) principal).getPreferredUsername());
-                    } else if (principal instanceof UserDetails) { // Например, если используете обычный User из Spring Security
+                    } else if (principal instanceof UserDetails) {
                         return Mono.just(((UserDetails) principal).getUsername());
                     } else if (principal != null) {
-                        // Если это какой-то другой тип principal, который вам нужно обработать
-                        return Mono.just(principal.toString()); // Или получить другое свойство
+                        return Mono.just(principal.toString());
                     } else {
-                        // Если principal == null
-                        return Mono.error(new IllegalStateException("Principal is null")); // Или Mono.empty() если это ожидаемо
+                        return Mono.error(new IllegalStateException("Principal is null"));
                     }
                 })
-                .switchIfEmpty(Mono.error(new IllegalStateException("Authentication is empty"))); // Обработка Mono.empty() от getAuthentification()
+                .switchIfEmpty(Mono.error(new IllegalStateException("Authentication is empty")));
     }
 
-    private Mono<Authentication> getAuthentification() {
+    private Mono<Authentication> getAuthenticationMono() {
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
-                .filter(Authentication::isAuthenticated)
-                .filter(authentication -> authentication instanceof OAuth2AuthenticationToken);
+                .filter(Authentication::isAuthenticated);
+                //.filter(authentication -> authentication instanceof OAuth2AuthenticationToken);
     }
 }
