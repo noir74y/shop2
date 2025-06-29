@@ -87,7 +87,7 @@ public class ProductController {
                 .thenReturn("redirect:/product");
     }
 
-    @PostMapping("{id}")
+    @PostMapping("{id}/update")
     public Mono<String> updateProduct(@ModelAttribute ProductDtoReq productDtoReq, @PathVariable("id") @NotNull @Positive Long id) {
         return securityConfig.getUserNameMono()
                 .flatMap(userName -> Mono.just(productDtoReq)
