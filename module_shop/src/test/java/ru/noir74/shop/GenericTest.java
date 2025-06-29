@@ -125,7 +125,7 @@ public abstract class GenericTest {
 
         product = productService.create(Mono.just(Product.builder()
                 .title("title1")
-                .price(3333)
+                .price(3000)
                 .description("description1")
                 .file(new FilePartTestUtilities("shlisselburg-krepost.jpeg"))
                 .build())).block();
