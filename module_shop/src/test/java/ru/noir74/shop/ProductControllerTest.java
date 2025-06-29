@@ -58,6 +58,7 @@ public class ProductControllerTest extends GenericTest {
 
     @Test
     void getProduct_ShouldReturnProductPage_Anon_User() throws IOException {
+        isUserAuthenticated = false;
         webTestClient.get()
                 .uri("/product/" + product.getId())
                 .exchange()
@@ -65,14 +66,53 @@ public class ProductControllerTest extends GenericTest {
                 .expectBody(String.class)
                 .consumeWith(response -> {
                     String responseBody = response.getResponseBody();
-                    assert responseBody.contains("title1");
+                    assertThat(responseBody).contains("title1");
+                    assertThat(responseBody).doesNotContain("Сохранить");
                 });
     }
 
+    @Test
+    @WithMockUser(username = "test-user")
+    void getProduct_ShouldReturnProductPage_Auth_User() throws IOException {
+        isUserAuthenticated = true;
+        webTestClient.get()
+                .uri("/product/" + product.getId())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .consumeWith(response -> {
+                    String responseBody = response.getResponseBody();
+                    assertThat(responseBody).contains("title1");
+                    assertThat(responseBody).contains("Сохранить");
+                });
+    }
+
+    @Test
+    void createProduct_WithFile_ShouldRedirect_Anon_User() throws IOException {
+        isUserAuthenticated = false;
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+
+        builder.part("file", new ClassPathResource("shlisselburg-krepost.jpeg"))
+                .filename("shlisselburg-krepost.jpeg")
+                .contentType(MediaType.IMAGE_JPEG);
+
+        builder.part("title", "New Product");
+        builder.part("price", "100");
+        builder.part("description", "Description");
+
+        webTestClient.post()
+                .uri("/product/new/create")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData(builder.build()))
+                .exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/oauth2/authorization/keycloak-user");
+    }
 
     @Test
     @WithMockUser(username = "test-user")
-    void createProduct_WithFile_ShouldRedirect() throws IOException {
+    void createProduct_WithFile_ShouldRedirect_Auth_User() throws IOException {
+        isUserAuthenticated = true;
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
 
         builder.part("file", new ClassPathResource("shlisselburg-krepost.jpeg"))
@@ -93,8 +133,25 @@ public class ProductControllerTest extends GenericTest {
     }
 
     @Test
+    void updateProduct_ShouldRedirect_Anon_User() throws IOException {
+        isUserAuthenticated = false;
+        Assertions.assertNotNull(product);
+        webTestClient.post()
+                .uri("/product/" + product.getId() + "/update")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(BodyInserters.fromFormData("title", "Updated Title")
+                        .with("price", "200")
+                        .with("description", "Updated Description")
+                        .with("quantity", "3"))
+                .exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/oauth2/authorization/keycloak-user");
+    }
+
+    @Test
     @WithMockUser(username = "test-user")
-    void updateProduct_ShouldRedirect() throws IOException {
+    void updateProduct_ShouldRedirect_Auth_User() throws IOException {
+        isUserAuthenticated = true;
         Assertions.assertNotNull(product);
         webTestClient.post()
                 .uri("/product/" + product.getId() + "/update")
@@ -116,8 +173,20 @@ public class ProductControllerTest extends GenericTest {
     }
 
     @Test
+    void deleteProduct_ShouldRedirect_Anon_User() throws IOException {
+        isUserAuthenticated = false;
+        webTestClient.post()
+                .uri("/product/" + product.getId() + "/delete")
+                .exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/oauth2/authorization/keycloak-user");
+    }
+
+
+    @Test
     @WithMockUser(username = "test-user")
-    void deleteProduct_ShouldRedirect() throws IOException {
+    void deleteProduct_ShouldRedirect_Auth_User() throws IOException {
+        isUserAuthenticated = true;
         webTestClient.post()
                 .uri("/product/" + product.getId() + "/delete")
                 .exchange()
@@ -133,6 +202,7 @@ public class ProductControllerTest extends GenericTest {
 
     @Test
     void addToCart_ShouldRedirect_Anon_User() throws IOException {
+        isUserAuthenticated = false;
         webTestClient.post()
                 .uri("/product/item/" + product.getId() + "/add")
                 .exchange()
@@ -144,6 +214,7 @@ public class ProductControllerTest extends GenericTest {
     @Test
     @WithMockUser(username = "test-user")
     void addToCart_ShouldRedirect_Auth_User() throws IOException {
+        isUserAuthenticated = true;
         webTestClient.post()
                 .uri("/product/item/" + product.getId() + "/add")
                 .exchange()
@@ -157,11 +228,24 @@ public class ProductControllerTest extends GenericTest {
     }
 
     @Test
-    void removeFromCart_ShouldRedirect() throws IOException {
+    void removeFromCart_ShouldRedirect_Anon_User() throws IOException {
+        isUserAuthenticated = false;
         webTestClient.post()
                 .uri("/product/item/" + product.getId() + "/remove")
                 .exchange()
-                .expectStatus().is3xxRedirection();
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/oauth2/authorization/keycloak-user");
+    }
+
+    @Test
+    @WithMockUser(username = "test-user")
+    void removeFromCart_ShouldRedirect_Auth_user() throws IOException {
+        isUserAuthenticated = true;
+        webTestClient.post()
+                .uri("/product/item/" + product.getId() + "/remove")
+                .exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/product");
 
         StepVerifier.create(cartService.ifProductInCart(product.getId()))
                 .expectNext(false)
@@ -169,21 +253,33 @@ public class ProductControllerTest extends GenericTest {
                 .verify();
     }
 
-
     @Test
-    @WithMockUser(username = "test-user")
-    void setQuantityInCart_ShouldRedirect() throws IOException {
+    void setQuantityInCart_ShouldRedirect_Anon_User() throws IOException {
+        isUserAuthenticated = false;
         webTestClient.post()
                 .uri("/product/item/" + product.getId() + "/add")
                 .exchange()
-                .expectStatus().is3xxRedirection();
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/oauth2/authorization/keycloak-user");
+    }
+
+    @Test
+    @WithMockUser(username = "test-user")
+    void setQuantityInCart_ShouldRedirect_Auth_User() throws IOException {
+        isUserAuthenticated = true;
+        webTestClient.post()
+                .uri("/product/item/" + product.getId() + "/add")
+                .exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/product");
 
         webTestClient.post()
                 .uri("/product/item/" + product.getId() + "/quantity/2")
                 .exchange()
-                .expectStatus().is3xxRedirection();
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/product");
 
-        StepVerifier.create(cartService.findAll(tesUserName))
+        StepVerifier.create(cartService.findAll(testUserName))
                 .assertNext(item -> assertThat(item.getQuantity()).isEqualTo(2)
                 ).verifyComplete();
 
