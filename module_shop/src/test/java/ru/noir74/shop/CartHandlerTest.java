@@ -166,4 +166,81 @@ public class CartHandlerTest extends GenericTest {
                     assert responseBody.contains("Мало денег");
                 });
     }
+
+    @Test
+    void viewCart_ShouldReturnOk_Anon_User() {
+        isUserAuthenticated = false;
+
+        webTestClient.get()
+                .uri("/cart")
+                .exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/oauth2/authorization/keycloak-user");
+    }
+
+    @Test
+    void addToCart_ShouldRedirect_Anon_User() {
+        isUserAuthenticated = false;
+
+        webTestClient.post()
+                .uri("/cart/product/" + product.getId() + "/add")
+                .exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/oauth2/authorization/keycloak-user");
+    }
+
+    @Test
+    void removeFromCart_ShouldRedirect_Anon_User() throws IOException {
+        isUserAuthenticated = false;
+
+        webTestClient.post()
+                .uri("/cart/item/" + product.getId() + "/remove")
+                .exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/oauth2/authorization/keycloak-user");
+    }
+
+    @Test
+    void setQuantityInCart_ShouldRedirect_Anon_User() throws IOException {
+        isUserAuthenticated = false;
+
+        webTestClient.post()
+                .uri("/cart/item/" + product.getId() + "/quantity/2")
+                .exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/oauth2/authorization/keycloak-user");
+    }
+
+    @Test
+    void makeOrder_ShouldRedirect_Anon_User() throws IOException {
+        isUserAuthenticated = false;
+
+        webTestClient.post()
+                .uri("/cart/order")
+                .exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/oauth2/authorization/keycloak-user");
+    }
+
+    @Test
+    void checkOrderOrderButtonWithGoodBalance_ShouldBeEnabled_Anon_User() {
+        isUserAuthenticated = false;
+
+        webTestClient.get()
+                .uri("/cart")
+                .exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/oauth2/authorization/keycloak-user");
+    }
+
+    @Test
+    void checkOrderOrderButtonWithBadBalance_ShouldBeDisabled_Anon_User() {
+        isUserAuthenticated = false;
+
+        webTestClient.get()
+                .uri("/cart")
+                .exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/oauth2/authorization/keycloak-user");
+    }
 }
