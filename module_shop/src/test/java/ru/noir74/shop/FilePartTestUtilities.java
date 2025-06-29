@@ -16,11 +16,11 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class FilePartForTest implements FilePart {
+public class FilePartTestUtilities implements FilePart {
     private final MockMultipartFile mockMultipartFile;
     private final Resource resource;
 
-    public FilePartForTest(String filename) throws IOException {
+    public FilePartTestUtilities(String filename) throws IOException {
         resource = new ClassPathResource(filename);
         InputStream inputStream = resource.getInputStream();
         this.mockMultipartFile = new MockMultipartFile(
