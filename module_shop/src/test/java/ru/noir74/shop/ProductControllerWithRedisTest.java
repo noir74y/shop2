@@ -8,6 +8,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.BodyInserters;
 
@@ -15,6 +16,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class ProductControllerWithRedisTest extends GenericTest {
     private final ByteArrayOutputStream outputStreamToCatch = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
@@ -126,5 +128,28 @@ public class ProductControllerWithRedisTest extends GenericTest {
                 .uri("/product/" + product.getId() + "/delete")
                 .exchange()
                 .expectStatus().is3xxRedirection();
+    }
+
+    @Test
+    @WithMockUser(username = "test-user")
+    public void createProduct_WithFile_ShouldRedirect_Auth_User() throws IOException {
+        isUserAuthenticated = true;
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+
+        builder.part("file", new ClassPathResource("shlisselburg-krepost.jpeg"))
+                .filename("shlisselburg-krepost.jpeg")
+                .contentType(MediaType.IMAGE_JPEG);
+
+        builder.part("title", "New Product");
+        builder.part("price", "100");
+        builder.part("description", "Description");
+
+        webTestClient.post()
+                .uri("/product/new/create")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData(builder.build()))
+                .exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/product");
     }
 }

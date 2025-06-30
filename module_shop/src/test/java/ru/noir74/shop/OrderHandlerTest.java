@@ -1,20 +1,27 @@
 package ru.noir74.shop;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class OrderHandlerTest extends GenericTest {
+    private final ByteArrayOutputStream outputStreamToCatch = new ByteArrayOutputStream();
 
     @BeforeEach
     @Transactional
     void setUp() throws IOException {
         setUpGeneric();
+        System.setOut(new PrintStream(outputStreamToCatch));
 
         Assertions.assertNotNull(product);
         cartService.addToCart(product.getId(), testUserName).block();
@@ -25,6 +32,11 @@ public class OrderHandlerTest extends GenericTest {
                 .findAll()
                 .flatMap(orderEntity -> Mono.just(orderMapper.entity2domain(orderEntity)))
                 .blockFirst();
+    }
+
+    @AfterEach
+    void reset() throws IOException {
+        System.setOut(System.out);
     }
 
     @Test

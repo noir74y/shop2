@@ -1,5 +1,6 @@
 package ru.noir74.shop;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,20 +8,32 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.test.StepVerifier;
 import ru.noir74.shop.misc.error.exceptions.NotFoundException;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class ProductControllerTest extends GenericTest {
+    private final ByteArrayOutputStream outputStreamToCatch = new ByteArrayOutputStream();
+
     @BeforeEach
     @Transactional
     void setUp() throws IOException {
         setUpGeneric();
+        System.setOut(new PrintStream(outputStreamToCatch));
+    }
+
+    @AfterEach
+    void reset() throws IOException {
+        System.setOut(System.out);
     }
 
     @Test
