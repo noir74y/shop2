@@ -24,6 +24,7 @@ public class ProductControllerWithRedisTest extends GenericTest {
     void setUp() throws IOException {
         setUpGeneric();
         System.setOut(new PrintStream(outputStreamToCatch));
+        isUserAuthenticated = true;
     }
 
     @AfterEach
@@ -32,7 +33,8 @@ public class ProductControllerWithRedisTest extends GenericTest {
     }
 
     @Test
-    void getProductsPage_ShouldUseRedisCache() {
+    @WithMockUser(username = "test-user")
+    void getProductsPage_ShouldUseRedisCache() throws IOException {
         checkForUsingRedisCacheForGetPage();
 
         createProduct();
@@ -46,6 +48,7 @@ public class ProductControllerWithRedisTest extends GenericTest {
     }
 
     @Test
+    @WithMockUser(username = "test-user")
     void getProduct_ShouldUseRedisCache() {
         String outputFromMethod = "Fetching product from DB for ID: " + product.getId();
 
@@ -68,7 +71,6 @@ public class ProductControllerWithRedisTest extends GenericTest {
         assert !outputStreamToCatch.toString().contains(outputFromGetPageMethod);
     }
 
-    @WithMockUser(username = "test-user")
     private void getProductPage() {
         isUserAuthenticated = true;
         webTestClient.get()
@@ -77,7 +79,6 @@ public class ProductControllerWithRedisTest extends GenericTest {
                 .expectStatus().isOk();
     }
 
-    @WithMockUser(username = "test-user")
     private void getProduct() {
         isUserAuthenticated = true;
         webTestClient.get()
@@ -86,9 +87,7 @@ public class ProductControllerWithRedisTest extends GenericTest {
                 .expectStatus().isOk();
     }
 
-    @WithMockUser(username = "test-user")
     private void createProduct() {
-        isUserAuthenticated = true;
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
 
         builder.part("file", new ClassPathResource("shlisselburg-krepost.jpeg"))
@@ -103,13 +102,12 @@ public class ProductControllerWithRedisTest extends GenericTest {
                 .uri("/product/new/create")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(BodyInserters.fromMultipartData(builder.build()))
-                .exchange();
+                .exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/product");
     }
 
-    @WithMockUser(username = "test-user")
     private void updateProduct() {
-        isUserAuthenticated = true;
-
         Assertions.assertNotNull(product);
         webTestClient.post()
                 .uri("/product/" + product.getId() + "/update")
@@ -122,10 +120,7 @@ public class ProductControllerWithRedisTest extends GenericTest {
                 .expectStatus().is3xxRedirection();
     }
 
-    @WithMockUser(username = "test-user")
     private void deleteProduct() {
-        isUserAuthenticated = true;
-
         cartRepository.deleteAll(testUserName).block();
         webTestClient.post()
                 .uri("/product/" + product.getId() + "/delete")
