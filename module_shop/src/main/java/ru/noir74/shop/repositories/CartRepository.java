@@ -45,7 +45,7 @@ public class CartRepository {
     }
 
     public Mono<Boolean> ifProductInAnyCart(Long productId) {
-                return Mono.just(cartStorage.entrySet().stream()
+        return Mono.just(cartStorage.entrySet().stream()
                 .flatMap(userCartMap -> userCartMap.getValue().entrySet().stream())
                 .anyMatch(userMapEntry -> userMapEntry.getKey().equals(productId)));
     }

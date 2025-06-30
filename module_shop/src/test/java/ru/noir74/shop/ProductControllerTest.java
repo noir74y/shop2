@@ -111,7 +111,7 @@ public class ProductControllerTest extends GenericTest {
 
     @Test
     @WithMockUser(username = "test-user")
-    void createProduct_WithFile_ShouldRedirect_Auth_User() throws IOException {
+    public void createProduct_WithFile_ShouldRedirect_Auth_User() throws IOException {
         isUserAuthenticated = true;
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
 

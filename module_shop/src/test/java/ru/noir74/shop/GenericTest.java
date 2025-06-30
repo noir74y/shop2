@@ -40,36 +40,6 @@ import static org.mockito.Mockito.doAnswer;
 @Testcontainers
 public abstract class GenericTest {
 
-//    @TestConfiguration
-//    static class MockBeansConfig {
-//        @Bean
-//        @Primary
-//        public AuthenticationService mockAuthenticationService() {
-//            AuthenticationService mock = mock(AuthenticationService.class);
-//
-//            when(mock.prepareLoginLogout(any(Model.class)))
-//                    .thenReturn(Mono.just("test-user"));
-//
-//            when(mock.getUserNameMono()).thenReturn(Mono.just("test-user"));
-//            OidcIdToken oidcIdToken = mock(OidcIdToken.class);
-//            when(oidcIdToken.getTokenValue()).thenReturn("mock-id-token-value");
-//            when(oidcIdToken.getClaims()).thenReturn(Map.of(
-//                    "sub", "test-user",
-//                    "preferred_username", "test-user"
-//            ));
-//            Set<GrantedAuthority> authorities = new HashSet<>();
-//            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-//            OidcUser oidcUser = new DefaultOidcUser(authorities, oidcIdToken, "preferred_username");
-//            OAuth2AuthenticationToken oauth2Token = new OAuth2AuthenticationToken(
-//                    oidcUser,
-//                    oidcUser.getAuthorities(),
-//                    "keycloak-user");
-//            when(mock.getAuthentificationMono()).thenReturn(Mono.just(oauth2Token));
-//
-//            return mock;
-//        }
-//    }
-
     @Container
     @ServiceConnection
     static final RedisContainer redisContainer =

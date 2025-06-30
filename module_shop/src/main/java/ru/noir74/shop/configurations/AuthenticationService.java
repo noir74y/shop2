@@ -87,6 +87,6 @@ public class AuthenticationService {
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .filter(Authentication::isAuthenticated);
-                //.filter(authentication -> authentication instanceof OAuth2AuthenticationToken);
+        //.filter(authentication -> authentication instanceof OAuth2AuthenticationToken);
     }
 }
