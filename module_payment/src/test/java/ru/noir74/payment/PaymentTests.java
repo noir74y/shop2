@@ -1,60 +1,85 @@
 package ru.noir74.payment;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
+import reactor.core.publisher.Mono;
+import ru.noir74.payment.configurations.ResourceServerConfig;
+import ru.noir74.payment.controllers.PaymentApiController;
 import ru.noir74.payment.models.dto.Balance;
 import ru.noir74.payment.models.dto.PaymentConfirmation;
 import ru.noir74.payment.models.dto.PaymentRequest;
 import ru.noir74.payment.services.PaymentApiService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@AutoConfigureWebTestClient
-@TestPropertySource(properties = {" ru.noir74.payment.services.PaymentApiService.currentBalance=valueForTest1"})
+@WebFluxTest(controllers = PaymentApiController.class)
+@Import(ResourceServerConfig.class)
 public class PaymentTests {
     @Autowired
     private WebTestClient webTestClient;
 
-    @Autowired
+    @MockitoBean
     private PaymentApiService paymentApiService;
 
-    @Value("${application.payment.initial-balance}")
+    @Value("${application.payment.initial-balance:1500}")
     private int initialBalance;
-
     private int currentBalance;
 
-    @BeforeEach
-    void setUp() {
-        paymentApiService.setCurrentBalance(initialBalance);
+    @Test
+    void getBalanceTest_Unauthorized_ShouldReturn401() {
+        webTestClient.get()
+                .uri("/balance")
+                .exchange() // Отправляем запрос
+                .expectStatus().isUnauthorized();
     }
 
     @Test
-    void getBalanceTest() {
-        webTestClient.get()
+    void getBalanceTest_Authorized_ShouldReturnBalance() {
+        when(paymentApiService.getBalance()).thenReturn(Mono.just(new Balance().amount(initialBalance)));
+        webTestClient.mutateWith(SecurityMockServerConfigurers.mockJwt())
+                .get()
                 .uri("/balance")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(Balance.class)
                 .consumeWith(response -> {
-                    Assertions.assertNotNull(response.getResponseBody());
+                    assertNotNull(response.getResponseBody());
                     assertEquals(initialBalance, response.getResponseBody().getAmount());
                 });
     }
 
     @Test
-    void makePaymentTest() {
+    void makePaymentTest_Unauthorized_ShouldReturn401() {
         var paymentAmount = 500;
         webTestClient.post()
+                .uri("/payment")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(new PaymentRequest().amount(paymentAmount)))
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Test
+    void makePaymentTest_Authorized_ShouldReturnPaymentConfirmation() {
+        var paymentAmount = 500;
+        var expectedNewBalance = initialBalance - paymentAmount;
+
+        when(paymentApiService.makePayment(any(Mono.class)))
+                .thenReturn(Mono.just(new PaymentConfirmation().newBalance(expectedNewBalance)));
+
+        webTestClient.mutateWith(SecurityMockServerConfigurers.mockJwt())
+                .post()
                 .uri("/payment")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(new PaymentRequest().amount(paymentAmount)))
@@ -62,8 +87,8 @@ public class PaymentTests {
                 .expectStatus().isOk()
                 .expectBody(PaymentConfirmation.class)
                 .consumeWith(response -> {
-                    Assertions.assertNotNull(response.getResponseBody());
-                    assertEquals(initialBalance - paymentAmount, response.getResponseBody().getNewBalance());
+                    assertNotNull(response.getResponseBody());
+                    assertEquals(expectedNewBalance, response.getResponseBody().getNewBalance());
                 });
     }
 }

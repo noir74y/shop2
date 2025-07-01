@@ -20,4 +20,3 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8080/realms/shop
-          # jwk-set-uri: http://localhost:8080/realms/shop/protocol/openid-connect/certs # Обычно не требуется явно, если issuer-uri настроен
