@@ -34,7 +34,6 @@ public class PaymentTests {
 
     @Value("${application.payment.initial-balance:1500}")
     private int initialBalance;
-    private int currentBalance;
 
     @Test
     void getBalanceTest_Unauthorized_ShouldReturn401() {
