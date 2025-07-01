@@ -62,31 +62,13 @@ public class AuthenticationService {
                 );
     }
 
-//    public Mono<String> getUserNameMono() {
-//        return getAuthentification().map(authentication -> ((OidcUser) authentication.getPrincipal()).getPreferredUsername());
-//    }
-
     public Mono<String> getUserNameMono() {
-        return getAuthenticationMono()
-                .flatMap(authentication -> {
-                    Object principal = authentication.getPrincipal();
-                    if (principal instanceof OidcUser) {
-                        return Mono.just(((OidcUser) principal).getPreferredUsername());
-                    } else if (principal instanceof UserDetails) {
-                        return Mono.just(((UserDetails) principal).getUsername());
-                    } else if (principal != null) {
-                        return Mono.just(principal.toString());
-                    } else {
-                        return Mono.error(new IllegalStateException("Principal is null"));
-                    }
-                })
-                .switchIfEmpty(Mono.error(new IllegalStateException("Authentication is empty")));
+        return getAuthenticationMono().map(authentication -> ((OidcUser) authentication.getPrincipal()).getPreferredUsername());
     }
 
     private Mono<Authentication> getAuthenticationMono() {
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .filter(Authentication::isAuthenticated);
-        //.filter(authentication -> authentication instanceof OAuth2AuthenticationToken);
     }
 }
