@@ -39,8 +39,5 @@ spring:
             client-secret: UG1PVeAO7mi2oXVdxIZWcSDMkhfa2V73
         provider:
           keycloak:
-            authorization-uri: http://localhost:8080/realms/shop/protocol/openid-connect/auth
-            token-uri: http://localhost:8080/realms/shop/protocol/openid-connect/token
-            user-info-uri: http://localhost:8080/realms/shop/protocol/openid-connect/userinfo
-            jwk-set-uri: http://localhost:8080/realms/shop/protocol/openid-connect/certs
+            issuer-uri: http://localhost:8080/realms/shop
             user-name-attribute: preferred_username
