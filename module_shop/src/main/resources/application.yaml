@@ -1,3 +1,10 @@
+server:
+  port: 9093
+payment-service:
+  base-url: http://localhost:6789
+shop-service:
+  base-url: http://localhost:9093/product
+
 spring:
   application:
     name: shop
@@ -14,40 +21,23 @@ spring:
     redis:
       host: localhost
       port: 6379
-
-server:
-    port: 9093
-payment-service:
-  base-url: http://localhost:6789
-
-
-#  cache:
-#    redis:
-#      time-to-live: PT60S
-
-#spring.application.name=shop2
-#server.port=9093
-#spring.r2dbc.url=r2dbc:postgresql://localhost:5433/mine
-#spring.r2dbc.username=postgres
-#spring.r2dbc.password=postgres
-#spring.r2dbc.initialization-mode=always
-#spring.r2dbc.schema=classpath:schema.sql
-#spring.thymeleaf.prefix=classpath:/templates/
-#spring.thymeleaf.suffix=.html
-#logging.level.org.springframework.r2dbc=DEBUG
-#logging.level.org.springframework.boot.autoconfigure.r2dbc=DEBUG
-#logging.level.org.springframework.r2dbc.datasource.init=DEBUG
-#logging.level.org.springframework.web.reactive=DEBUG
-#logging.level.reactor.netty=DEBUG
-#logging.level.your.package=TRACE
-#logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n%ex{full}
-#spring.datasource.url=jdbc:postgresql://localhost:5433/mine
-#spring.datasource.username=postgres
-#spring.datasource.password=postgres
-#spring.datasource.driver-class-name=org.postgresql.Driver
-#spring.sql.init.mode=always
-#spring.sql.init.schema-locations=classpath:schema.sql
-#spring.jpa.properties.hibernate.default_schema=store
-#spring.jpa.hibernate.ddl-auto=validate
-#spring.jpa.show-sql=true
-#spring.jpa.properties.hibernate.format_sql=true
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak-user:
+            authorization-grant-type: authorization_code
+            provider: keycloak
+            client-id: shop-application
+            client-secret: UG1PVeAO7mi2oXVdxIZWcSDMkhfa2V73
+            redirect-uri: '{baseUrl}/{action}/oauth2/code/{registrationId}'
+            scope: openid, profile, roles
+          keycloak-payment-service:
+            authorization-grant-type: client_credentials
+            provider: keycloak
+            client-id: shop-application
+            client-secret: UG1PVeAO7mi2oXVdxIZWcSDMkhfa2V73
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8080/realms/shop
+            user-name-attribute: preferred_username

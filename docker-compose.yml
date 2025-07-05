@@ -2,12 +2,18 @@ services:
   shop:
     build:
       context: ./module_shop
+    command: ["sh", "-c", "sleep 40 && java -jar shop.jar"]
     ports:
       - "9092:9091"
     depends_on:
-      - redis
-      - payment
-      - db
+      redis:
+        condition: service_started
+      payment:
+        condition: service_started
+      db:
+        condition: service_started
+      keycloak:
+          condition: service_started
     environment:
       SERVER_PORT: 9091
       SPRING_R2DBC_URL: r2dbc:postgresql://db:5432/postgres
@@ -16,15 +22,37 @@ services:
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
       PAYMENT_SERVICE_BASE_URL: http://payment:6790
+
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_USER_AUTHORIZATION_GRANT_TYPE: authorization_code
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_USER_PROVIDER: keycloak
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_USER_CLIENT_ID: shop-application
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_USER_CLIENT_SECRET: 66kUqIPiSrvlMM3xPB4nC5zV6W5bF9GU
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_USER_REDIRECT_URI: '{baseUrl}/{action}/oauth2/code/{registrationId}'
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_USER_SCOPE: openid,profile,roles
+
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_PAYMENT_SERVICE_AUTHORIZATION_GRANT_TYPE: client_credentials
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_PAYMENT_SERVICE_PROVIDER: keycloak
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_PAYMENT_SERVICE_CLIENT_ID: shop-application
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_PAYMENT_SERVICE_CLIENT_SECRET: 66kUqIPiSrvlMM3xPB4nC5zV6W5bF9GU
+
+      SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER_URI: http://host.docker.internal:8081/realms/shop
+      SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_USER_NAME_ATTRIBUTE: preferred_username
+
   redis:
     image: redis:7-alpine
+
   payment:
     build:
       context: ./module_payment
+    command: [ "sh", "-c", "sleep 30 && java -jar payment.jar" ]
     ports:
       - "6790:6790"
+    depends_on:
+      keycloak:
+        condition: service_started
     environment:
       SERVER_PORT: 6790
+
   db:
     image: postgres:17
     ports:
@@ -35,5 +63,23 @@ services:
       POSTGRES_DB: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.1.3
+    ports:
+      - "8081:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HTTP_ENABLED: "true"
+      KC_HTTPS_REQUIRED: "false"
+      #KC_HOSTNAME_URL: http://localhost:8081
+      KC_HOSTNAME: http://host.docker.internal:8081
+
+    command: ["start-dev"]
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+
 volumes:
   postgres_data:
+  keycloak_data:

@@ -10,3 +10,13 @@ springdoc:
     path: /swagger-ui-custom.html
     tryItOutEnabled: true
     persistAuthorization: true
+
+
+spring:
+  application:
+    name: payment-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/shop

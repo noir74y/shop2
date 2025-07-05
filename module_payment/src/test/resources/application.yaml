@@ -3,3 +3,9 @@ server:
 application:
   payment:
     initial-balance: 1500
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9999/auth/realms/test-realm

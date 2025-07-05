@@ -15,14 +15,13 @@
 </head>
 
 <body>
-<div style="overflow: hidden">
-    <a href="/product" style="float: right; margin: 20px"> Продукты </a>
+
+<div th:replace="~{fragments/auth-status :: authStatus}">
+    <p>Загрузка статуса пользователя...</p>
 </div>
-<div style="overflow: hidden">
-    <a href="/cart" style="float: right; margin: 20px"> Корзина </a>
-</div>
-<div style="overflow: hidden">
-    <a href="/order" style="float: right; margin: 20px"> Заказы </a>
+
+<div th:replace="~{fragments/navigator-panel :: NavigatorPanel}">
+    <p>Загрузка ссылок навигации...</p>
 </div>
 
 <h1>Продукты</h1>
@@ -61,8 +60,11 @@
         <th>Картинка</th>
         <th>Название</th>
         <th>Цена</th>
-        <th>Действия</th>
-        <th>Количество в корзине</th>
+
+        <div th:if="${userName != null and userName != ''}">
+            <th>Действия</th>
+            <th>Количество в корзине</th>
+        </div>
     </tr>
     </thead>
 
@@ -83,91 +85,98 @@
             ></a>
         </td>
         <td th:text="${product.price}"></td>
-        <td>
-            <form th:id="|action-form-${product.id}|">
-                <input type="hidden" name="product_id" th:value="${product.id}"/>
-                <button type="button" onclick="addToCart(this.form)">
-                    Добавить в корзину
-                </button>
-                <br/>
-                <button type="button" onclick="removeFromCart(this.form)">
-                    Удалить из корзины
-                </button>
-            </form>
-        </td>
-        <td>
-            <form th:id="|quantity-form-${product.id}|">
-                <input type="hidden" name="product_id" th:value="${product.id}"/>
-                <label>
-                    <input
-                            type="text"
-                            name="quantity"
-                            th:value="${product.quantity}"
-                            size="10"
-                            readonly
-                    />
-                </label>
-                <br/>
-                <button onclick="changeQuantity(this.form, 1)" type="button">
-                    Больше
-                </button>
-                <br/>
-                <button onclick="changeQuantity(this.form, -1)" type="button">
-                    Меньше
-                </button>
-            </form>
-        </td>
+
+        <div th:if="${userName != null and userName != ''}">
+            <td>
+                <form th:id="|action-form-${product.id}|">
+                    <input type="hidden" name="product_id" th:value="${product.id}"/>
+                    <button type="button" onclick="addToCart(this.form)">
+                        Добавить в корзину
+                    </button>
+                    <br/>
+                    <button type="button" onclick="removeFromCart(this.form)">
+                        Удалить из корзины
+                    </button>
+                </form>
+            </td>
+            <td>
+                <form th:id="|quantity-form-${product.id}|">
+                    <input type="hidden" name="product_id" th:value="${product.id}"/>
+                    <label>
+                        <input
+                                type="text"
+                                name="quantity"
+                                th:value="${product.quantity}"
+                                size="10"
+                                readonly
+                        />
+                    </label>
+                    <br/>
+                    <button onclick="changeQuantity(this.form, 1)" type="button">
+                        Больше
+                    </button>
+                    <br/>
+                    <button onclick="changeQuantity(this.form, -1)" type="button">
+                        Меньше
+                    </button>
+                </form>
+            </td>
+        </div>
+
     </tr>
     </tbody>
 </table>
 
-<p>
-    <button id="toggleNewProductFormButton" onclick="toggleNewProductForm()">
-        Добавить
-    </button>
-</p>
+<div th:if="${userName != null and userName != ''}">
 
-<div
-        class="new-product-form"
-        style="display: none"
-        id="newProductFormClass"
->
-    <h2>Новый продукт</h2>
-    <form
-            id="newProductForm"
-            enctype="multipart/form-data"
-            action=""
-            method="post"
-            accept-charset="UTF-8"
+    <p>
+        <button id="toggleNewProductFormButton" onclick="toggleNewProductForm()">
+            Добавить
+        </button>
+    </p>
+
+    <div
+            class="new-product-form"
+            style="display: none"
+            id="newProductFormClass"
     >
-        <label for="title">Название</label>
-        <input type="text" id="title" name="title" required/>
+        <h2>Новый продукт</h2>
+        <form
+                id="newProductForm"
+                enctype="multipart/form-data"
+                action="product/new/create"
+                method="post"
+                accept-charset="UTF-8"
+        >
+            <label for="title">Название</label>
+            <input type="text" id="title" name="title" required/>
 
-        <p></p>
-        <label for="price">Цена</label>
-        <input
-                type="text"
-                id="price"
-                name="price"
-                pattern="\d+"
-                min="0"
-                required
-        />
+            <p></p>
+            <label for="price">Цена</label>
+            <input
+                    type="text"
+                    id="price"
+                    name="price"
+                    pattern="\d+"
+                    min="0"
+                    required
+            />
 
-        <p></p>
-        <label for="description">Описание</label>
-        <textarea rows="5" name="description" id="description"></textarea>
+            <p></p>
+            <label for="description">Описание</label>
+            <textarea rows="5" name="description" id="description"></textarea>
 
-        <p></p>
-        <input id="fileInput" type="file" name="file" accept="image/*"/>
-        <img id="filePreview" alt="" src="" width="100" height="100"/>
+            <p></p>
+            <input id="fileInput" type="file" name="file" accept="image/*"/>
+            <img id="filePreview" alt="" src="" width="100" height="100"/>
 
-        <label for="quantity"></label
-        ><input id="quantity" type="text" name="quantity" value="0" hidden/>
+            <label for="quantity"></label
+            ><input id="quantity" type="text" name="quantity" value="0" hidden/>
 
-        <p></p>
-        <button type="submit">Сохранить</button>
-    </form>
+            <p></p>
+            <button type="submit">Сохранить</button>
+        </form>
+    </div>
 </div>
 
 <script defer type="text/javascript" th:inline="javascript">

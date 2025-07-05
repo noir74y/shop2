@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.BodyInserters;
 
@@ -14,6 +16,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class ProductControllerWithRedisTest extends GenericTest {
     private final ByteArrayOutputStream outputStreamToCatch = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
@@ -23,6 +26,7 @@ public class ProductControllerWithRedisTest extends GenericTest {
     void setUp() throws IOException {
         setUpGeneric();
         System.setOut(new PrintStream(outputStreamToCatch));
+        isUserAuthenticated = true;
     }
 
     @AfterEach
@@ -31,7 +35,8 @@ public class ProductControllerWithRedisTest extends GenericTest {
     }
 
     @Test
-    void getProductsPage_ShouldUseRedisCache() {
+    @WithMockUser(username = "test-user")
+    void getProductsPage_ShouldUseRedisCache() throws IOException {
         checkForUsingRedisCacheForGetPage();
 
         createProduct();
@@ -45,6 +50,7 @@ public class ProductControllerWithRedisTest extends GenericTest {
     }
 
     @Test
+    @WithMockUser(username = "test-user")
     void getProduct_ShouldUseRedisCache() {
         String outputFromMethod = "Fetching product from DB for ID: " + product.getId();
 
@@ -58,7 +64,7 @@ public class ProductControllerWithRedisTest extends GenericTest {
     }
 
     private void checkForUsingRedisCacheForGetPage() {
-        String outputFromGetPageMethod = "Fetching products page from DB: page=1, size=10, sort=TITLE";
+        String outputFromGetPageMethod = "Fetching products page from DB";
         outputStreamToCatch.reset();
         getProductPage();
         assert outputStreamToCatch.toString().contains(outputFromGetPageMethod);
@@ -68,6 +74,7 @@ public class ProductControllerWithRedisTest extends GenericTest {
     }
 
     private void getProductPage() {
+        isUserAuthenticated = true;
         webTestClient.get()
                 .uri("/product")
                 .exchange()
@@ -75,6 +82,7 @@ public class ProductControllerWithRedisTest extends GenericTest {
     }
 
     private void getProduct() {
+        isUserAuthenticated = true;
         webTestClient.get()
                 .uri("/product/" + product.getId())
                 .exchange()
@@ -93,17 +101,18 @@ public class ProductControllerWithRedisTest extends GenericTest {
         builder.part("description", "Description");
 
         webTestClient.post()
-                .uri("/product")
+                .uri("/product/new/create")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(BodyInserters.fromMultipartData(builder.build()))
                 .exchange()
-                .expectStatus().is3xxRedirection();
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/product");
     }
 
     private void updateProduct() {
         Assertions.assertNotNull(product);
         webTestClient.post()
-                .uri("/product/" + product.getId())
+                .uri("/product/" + product.getId() + "/update")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(BodyInserters.fromFormData("title", "Updated Title")
                         .with("price", "200")
@@ -114,11 +123,33 @@ public class ProductControllerWithRedisTest extends GenericTest {
     }
 
     private void deleteProduct() {
-        cartRepository.deleteAll().block();
+        cartRepository.deleteAll(testUserName).block();
         webTestClient.post()
                 .uri("/product/" + product.getId() + "/delete")
                 .exchange()
                 .expectStatus().is3xxRedirection();
     }
 
+    @Test
+    @WithMockUser(username = "test-user")
+    public void createProduct_WithFile_ShouldRedirect_Auth_User() throws IOException {
+        isUserAuthenticated = true;
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+
+        builder.part("file", new ClassPathResource("shlisselburg-krepost.jpeg"))
+                .filename("shlisselburg-krepost.jpeg")
+                .contentType(MediaType.IMAGE_JPEG);
+
+        builder.part("title", "New Product");
+        builder.part("price", "100");
+        builder.part("description", "Description");
+
+        webTestClient.post()
+                .uri("/product/new/create")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData(builder.build()))
+                .exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/product");
+    }
 }

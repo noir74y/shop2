@@ -29,8 +29,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public Flux<Order> findAll() {
-        return orderRepository.findAll()
+    public Flux<Order> findAll(String username) {
+        return orderRepository.findByUsername(username)
                 .as(fluxOrderEntity -> orderMapper.fluxEntity2fluxDomain(fluxOrderEntity, orderMapperHelper));
     }
 
@@ -44,8 +44,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public Mono<Void> save(Flux<Item> items) {
-        return orderRepository.save(OrderEntity.builder().build())
+    public Mono<Void> save(Flux<Item> items, String username) {
+        return orderRepository.save(OrderEntity.builder().username(username).build())
                 .flatMap(orderEntity ->
                         items
                                 .transform(flux -> itemMapper.fluxDomain2fluxEntity(flux, orderEntity.getId()))
@@ -55,7 +55,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Mono<Integer> getTotal() {
-        return findAll().map(Order::getTotal).reduce(0, Integer::sum).defaultIfEmpty(0);
+    public Mono<Integer> getTotal(String username) {
+        return findAll(username).map(Order::getTotal).reduce(0, Integer::sum).defaultIfEmpty(0);
     }
 }

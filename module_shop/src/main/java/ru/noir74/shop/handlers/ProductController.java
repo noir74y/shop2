@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+import ru.noir74.shop.configurations.AuthenticationService;
 import ru.noir74.shop.misc.enums.ProductSorting;
 import ru.noir74.shop.models.dto.ProductDtoReq;
 import ru.noir74.shop.models.dto.ProductDtoResp;
@@ -25,6 +26,7 @@ public class ProductController {
     private final ProductService productService;
     private final ProductMapper productMapper;
     private final CartService cartService;
+    private final AuthenticationService authenticationService;
 
     @GetMapping
     public Mono<String> getProductsPage(Model model,
@@ -38,20 +40,21 @@ public class ProductController {
         int sizeNum = Integer.parseInt(size);
         ProductSorting sorting = ProductSorting.valueOf(sort);
 
-        return productService.getPage(pageNum, sizeNum, sorting)
-                .transform(productMapper::fluxDomain2fluxDtoResp)
-                .concatMap(productDtoResp ->
-                        cartService.getQuantityOfProduct(productDtoResp.getId())
-                                .doOnNext(productDtoResp::setQuantity)
-                                .thenReturn(productDtoResp)
-                )
-                .collectList()
-                .doOnNext(products -> {
-                    model.addAttribute("page", page);
-                    model.addAttribute("size", size);
-                    model.addAttribute("products", products);
-                })
-                .thenReturn("product-list");
+        return authenticationService.prepareLoginLogout(model)
+                .flatMap(userName -> productService.getPage(pageNum, sizeNum, sorting)
+                        .transform(productMapper::fluxDomain2fluxDtoResp)
+                        .concatMap(productDtoResp ->
+                                cartService.getQuantityOfProduct(productDtoResp.getId(), userName)
+                                        .doOnNext(productDtoResp::setQuantity)
+                                        .thenReturn(productDtoResp)
+                        )
+                        .collectList()
+                        .flatMap(products -> {
+                            model.addAttribute("products", products);
+                            model.addAttribute("page", page);
+                            model.addAttribute("size", size);
+                            return Mono.just("product-list");
+                        }));
     }
 
     @GetMapping("{id}")
@@ -59,23 +62,24 @@ public class ProductController {
 
         log.info("Loading product: id={}", id);
 
-        return productService.get(id)
-                .transform(productMapper::monoDomain2monoDtoResp)
-                .zipWith(cartService.getQuantityOfProduct(id))
-                .doOnNext(pair -> {
-                    ProductDtoResp productDto = pair.getT1();
-                    Integer quantity = pair.getT2();
+        return authenticationService.prepareLoginLogout(model)
+                .flatMap(userName -> productService.get(id)
+                        .transform(productMapper::monoDomain2monoDtoResp)
+                        .zipWith(cartService.getQuantityOfProduct(id, userName))
+                        .flatMap(pair -> {
+                            ProductDtoResp productDto = pair.getT1();
+                            Integer quantity = pair.getT2();
 
-                    model.addAttribute("id", productDto.getId());
-                    model.addAttribute("title", productDto.getTitle());
-                    model.addAttribute("price", productDto.getPrice());
-                    model.addAttribute("description", productDto.getDescription());
-                    model.addAttribute("quantity", quantity);
-                })
-                .thenReturn("product");
+                            model.addAttribute("id", productDto.getId());
+                            model.addAttribute("title", productDto.getTitle());
+                            model.addAttribute("price", productDto.getPrice());
+                            model.addAttribute("description", productDto.getDescription());
+                            model.addAttribute("quantity", quantity);
+                            return Mono.just("product");
+                        }));
     }
 
-    @PostMapping
+    @PostMapping("new/create")
     public Mono<String> createProduct(@ModelAttribute ProductDtoReq productDtoReq) {
         return Mono.just(productDtoReq)
                 .transform(productMapper::monoDtoReq2monoDomain)
@@ -83,16 +87,17 @@ public class ProductController {
                 .thenReturn("redirect:/product");
     }
 
-    @PostMapping("{id}")
+    @PostMapping("{id}/update")
     public Mono<String> updateProduct(@ModelAttribute ProductDtoReq productDtoReq, @PathVariable("id") @NotNull @Positive Long id) {
-        return Mono.just(productDtoReq)
-                .transform(productMapper::monoDtoReq2monoDomain)
-                .transform(productMono -> productService.update(id, productMono))
-                .then(productDtoReq.getQuantity() != 0
-                        ? cartService.addToCart(id, productDtoReq.getQuantity())
-                        : cartService.removeFromCart(id)
-                )
-                .thenReturn("redirect:/product");
+        return authenticationService.getUserNameMono()
+                .flatMap(userName -> Mono.just(productDtoReq)
+                        .transform(productMapper::monoDtoReq2monoDomain)
+                        .transform(productMono -> productService.update(id, productMono))
+                        .then(productDtoReq.getQuantity() != 0
+                                ? cartService.addToCart(id, productDtoReq.getQuantity(), userName)
+                                : cartService.removeFromCart(id, userName)
+                        )
+                        .thenReturn("redirect:/product"));
     }
 
     @PostMapping(value = "{id}/delete")
@@ -103,13 +108,15 @@ public class ProductController {
 
     @PostMapping(value = "item/{productId}/add")
     public Mono<String> addToCart(@PathVariable("productId") Long productId) {
-        return cartService.addToCart(productId)
+        return authenticationService.getUserNameMono()
+                .flatMap(usrName -> cartService.addToCart(productId, usrName))
                 .thenReturn("redirect:/product");
     }
 
     @PostMapping(value = "item/{productId}/remove")
     public Mono<String> removeFromCart(@PathVariable("productId") @NotNull @Positive Long productId) {
-        return cartService.removeFromCart(productId)
+        return authenticationService.getUserNameMono()
+                .flatMap(userName -> cartService.removeFromCart(productId, userName))
                 .thenReturn("redirect:/product");
     }
 
@@ -117,7 +124,8 @@ public class ProductController {
     public Mono<String> setQuantity(Model model,
                                     @PathVariable("productId") @NotNull @Positive Long productId,
                                     @PathVariable("quantity") @NotNull @Positive Integer quantity) {
-        return cartService.setQuantity(productId, quantity)
+        return authenticationService.getUserNameMono()
+                .flatMap(userName -> cartService.setQuantity(productId, quantity, userName))
                 .thenReturn("redirect:/product");
     }
 }
