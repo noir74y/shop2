@@ -2,13 +2,18 @@ services:
   shop:
     build:
       context: ./module_shop
+    command: ["sh", "-c", "sleep 40 && java -jar shop.jar"]
     ports:
       - "9092:9091"
     depends_on:
-      - redis
-      - payment
-      - db
-      - keycloak
+      redis:
+        condition: service_started
+      payment:
+        condition: service_started
+      db:
+        condition: service_started
+      keycloak:
+          condition: service_started
     environment:
       SERVER_PORT: 9091
       SPRING_R2DBC_URL: r2dbc:postgresql://db:5432/postgres
@@ -21,19 +26,16 @@ services:
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_USER_AUTHORIZATION_GRANT_TYPE: authorization_code
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_USER_PROVIDER: keycloak
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_USER_CLIENT_ID: shop-application
-      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_USER_CLIENT_SECRET: RzPMkPmh4eLHjoA9JPgPmdAb32jifYne
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_USER_CLIENT_SECRET: 66kUqIPiSrvlMM3xPB4nC5zV6W5bF9GU
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_USER_REDIRECT_URI: '{baseUrl}/{action}/oauth2/code/{registrationId}'
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_USER_SCOPE: openid,profile,roles
 
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_PAYMENT_SERVICE_AUTHORIZATION_GRANT_TYPE: client_credentials
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_PAYMENT_SERVICE_PROVIDER: keycloak
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_PAYMENT_SERVICE_CLIENT_ID: shop-application
-      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_PAYMENT_SERVICE_CLIENT_SECRET: RzPMkPmh4eLHjoA9JPgPmdAb32jifYne
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_PAYMENT_SERVICE_CLIENT_SECRET: 66kUqIPiSrvlMM3xPB4nC5zV6W5bF9GU
 
-      SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_AUTHORIZATION_URI: http://keycloak:8080/realms/shop/protocol/openid-connect/auth
-      SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_TOKEN_URI: http://keycloak:8080/realms/shop/protocol/openid-connect/token
-      SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_USER_INFO_URI: http://keycloak:8080/realms/shop/protocol/openid-connect/userinfo
-      SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/shop/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER_URI: http://host.docker.internal:8081/realms/shop
       SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_USER_NAME_ATTRIBUTE: preferred_username
 
   redis:
@@ -42,10 +44,12 @@ services:
   payment:
     build:
       context: ./module_payment
+    command: [ "sh", "-c", "sleep 30 && java -jar payment.jar" ]
     ports:
       - "6790:6790"
     depends_on:
-      - keycloak
+      keycloak:
+        condition: service_started
     environment:
       SERVER_PORT: 6790
 
@@ -69,7 +73,8 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: admin
       KC_HTTP_ENABLED: "true"
       KC_HTTPS_REQUIRED: "false"
-      KC_HOSTNAME_URL: http://localhost:8081
+      #KC_HOSTNAME_URL: http://localhost:8081
+      KC_HOSTNAME: http://host.docker.internal:8081
 
     command: ["start-dev"]
     volumes:
